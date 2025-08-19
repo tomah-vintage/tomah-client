@@ -2,7 +2,7 @@
   import type { PageData } from './$types';
   import { order, removeFromOrder, updateQuantity } from '$lib/stores/order';
 
-  export let data: PageData;
+  
 
   function handleRemove(itemId: string) {
     removeFromOrder(itemId);

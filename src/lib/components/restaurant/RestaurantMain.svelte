@@ -1,0 +1,24 @@
+<script lang="ts">
+  import type { Restaurant } from '$lib/types/restaurant';
+  import RestaurantList from './RestaurantList.svelte';
+  
+  export let restaurants: Restaurant[] = [];
+  export let loading = false;
+  export let error: string | null = null;
+</script>
+
+<div class="restaurant-main">
+  <header>
+    <h1>Restaurants</h1>
+  </header>
+  
+  <main>
+    {#if loading}
+      <div class="loading">Loading...</div>
+    {:else if error}
+      <div class="error">{error}</div>
+    {:else}
+      <RestaurantList restaurants={restaurants} />
+    {/if}
+  </main>
+</div>

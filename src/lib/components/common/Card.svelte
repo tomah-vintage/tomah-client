@@ -1,3 +1,3 @@
-<div class="card p-4 rounded-md shadow-md">
+<div class="card p-6 rounded-xl shadow-lg bg-white">
   <slot />
 </div>
