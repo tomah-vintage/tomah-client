@@ -3,6 +3,10 @@
 
 @custom-variant dark (&:where(.dark, .dark *));
 
+body{
+  height: 100vh;
+}
+
 @layer utilities {
   .text-primary-blue {
     color: #2a85ff;

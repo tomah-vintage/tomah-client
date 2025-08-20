@@ -8,9 +8,6 @@
 </script>
 
 <div class="restaurant-main">
-  <header>
-    <h1>Restaurants</h1>
-  </header>
   
   <main>
     {#if loading}

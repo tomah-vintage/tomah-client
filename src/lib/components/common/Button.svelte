@@ -7,7 +7,7 @@
 
 <button
   {type}
-  class="w-full py-3 px-6 rounded-lg font-semibold transition duration-200 ease-in-out
+  class="w-full py-2  px-6 rounded-lg font-semibold transition duration-200 ease-in-out
     {variant === 'primary'
       ? 'bg-orange-500 text-white hover:bg-orange-600 focus:ring-orange-500'
       : 'bg-white text-gray-800 border border-gray-300 hover:bg-gray-100 focus:ring-gray-300'}

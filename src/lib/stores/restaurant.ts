@@ -5,13 +5,13 @@ import { PUBLIC_BACKEND_URL } from '$env/static/public';
 export interface RestaurantState {
   restaurants: Restaurant[];
   loading: boolean;
-  error: string | null;
+  error: string | undefined;
 }
 
 export const restaurantStore = writable<RestaurantState>({
   restaurants: [],
   loading: false,
-  error: null
+  error: undefined
 });
 
 export const restaurantActions = {

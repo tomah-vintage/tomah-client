@@ -8,6 +8,17 @@
 *   A search functionality to filter restaurants.
 *   Public access to the home page and restaurant list without requiring authentication.
 
+## Feature Overview: Restaurant Carousel
+- **Description**: A carousel component on the homepage to showcase featured restaurants with interactive navigation.
+- **User Stories**:
+  - As a user, I want to see a visually appealing carousel of restaurant thumbnails on the homepage so that I can quickly browse featured options.
+  - As a user, I want to be able to navigate through the restaurant thumbnails using left and right arrow icons so that I can view more restaurants.
+- **Acceptance Criteria**:
+  - The carousel displays at least three restaurant thumbnails at a time.
+  - Left and right navigation icons are present and functional.
+  - Clicking a thumbnail navigates to the respective restaurant's detail page.
+  - The carousel is responsive and adapts to different screen sizes.
+
 ### Task 1: Home Page UI/UX
 
 **Requirements:**
@@ -17,6 +28,8 @@
     *   Include "Log In" and "Sign Up" buttons that navigate to `/auth/login` and `/auth/register` respectively.
     *   A prominent search bar for finding restaurants.
     *   If a user is authenticated, display an "Orders" icon/link.
+*   **Restaurant Carousel:**
+    *   Implement the "Restaurant Carousel" feature as described in the "Feature Overview" section above.
 *   **Restaurant List:**
     *   Display restaurants in a card-based layout.
     *   Each restaurant card must show:
@@ -66,3 +79,16 @@
 *   Create a `+page.server.ts` to fetch the restaurant data from the API.
 *   Create a `RestaurantCard.svelte` component to display individual restaurant information.
 *   Create a `RestaurantList.svelte` component to display the grid of restaurant cards.
+*   
+
+### Task 5: Restaurant Card Design
+
+* The card should have rounded corners (16px), a shadow, and 4px spacing between elements.
+* Opening hours:
+    - Show a clock icon w=16 h=16 before the text.
+    - Keep a 4px gap between the icon and the text.
+    - Only the title text should be red.
+* Address:
+    - Show a map pin icon w=16 h=16 before the text.
+    - Keep a 4px gap between the icon and the text.
+    - If the text is too long, use ellipsis (…) to cut it off.

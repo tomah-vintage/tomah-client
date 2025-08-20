@@ -3,6 +3,11 @@
   "workspaces": {
     "": {
       "name": "tomah-client",
+      "dependencies": {
+        "lucide": "^0.540.0",
+        "lucide-svelte": "^0.540.0",
+        "postcss-load-config": "^6.0.1",
+      },
       "devDependencies": {
         "@skeletonlabs/skeleton": "^3.1.7",
         "@skeletonlabs/tw-plugin": "^0.4.1",
@@ -140,6 +145,8 @@
 
     "lightningcss-darwin-arm64": ["lightningcss-darwin-arm64@1.30.1", "", { "os": "darwin", "cpu": "arm64" }, ""],
 
+    "lilconfig": ["lilconfig@3.1.3", "", {}, "sha512-/vlFKAoH5Cgt3Ie+JLhRbwOsCQePABiU3tJ1egGvyQ+33R/vcwM2Zl2QR/LzjsBeItPt3oSVXapn+m4nQDvpzw=="],
+
     "locate-character": ["locate-character@3.0.0", "", {}, ""],
 
     "lodash.castarray": ["lodash.castarray@4.4.0", "", {}, ""],
@@ -147,6 +154,10 @@
     "lodash.isplainobject": ["lodash.isplainobject@4.0.6", "", {}, ""],
 
     "lodash.merge": ["lodash.merge@4.6.2", "", {}, ""],
+
+    "lucide": ["lucide@0.540.0", "", {}, "sha512-jUaVZLW/lSmbiZEnhIaV0wUHedNtguzFRf0cWsJi65jz1T/CCRBiiixBdgllNqhIBbe++bh39Vb7i739RPlZWQ=="],
+
+    "lucide-svelte": ["lucide-svelte@0.540.0", "", { "peerDependencies": { "svelte": "^3 || ^4 || ^5.0.0-next.42" } }, "sha512-jedJgKrrsT1B6mAMHGMmk6dIZKhorLq4KO7v+j7hYfeGR0LRe3W+SvwpWF1E6WT2/AY9IAm8KT/G+Nzf+0lW3g=="],
 
     "magic-string": ["magic-string@0.30.17", "", { "dependencies": { "@jridgewell/sourcemap-codec": "^1.5.0" } }, ""],
 
@@ -175,6 +186,8 @@
     "picomatch": ["picomatch@4.0.3", "", {}, ""],
 
     "postcss": ["postcss@8.5.6", "", { "dependencies": { "nanoid": "^3.3.11", "picocolors": "^1.1.1", "source-map-js": "^1.2.1" } }, ""],
+
+    "postcss-load-config": ["postcss-load-config@6.0.1", "", { "dependencies": { "lilconfig": "^3.1.1" }, "peerDependencies": { "jiti": ">=1.21.0", "postcss": ">=8.0.9", "tsx": "^4.8.1", "yaml": "^2.4.2" }, "optionalPeers": ["jiti", "postcss", "tsx", "yaml"] }, "sha512-oPtTM4oerL+UXmx+93ytZVN82RrlY/wPUV8IeDxFrzIjXOLF1pN+EmKPLbubvKHT2HC20xXsCAH2Z+CKV6Oz/g=="],
 
     "postcss-selector-parser": ["postcss-selector-parser@6.0.10", "", { "dependencies": { "cssesc": "^3.0.0", "util-deprecate": "^1.0.2" } }, ""],
 
