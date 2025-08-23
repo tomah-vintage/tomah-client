@@ -1,17 +1,17 @@
-@import "tailwindcss";
+@import 'tailwindcss';
 @tailwind utilities;
 
 @custom-variant dark (&:where(.dark, .dark *));
 
-body{
-  height: 100vh;
+body {
+	height: 100vh;
 }
 
 @layer utilities {
-  .text-primary-blue {
-    color: #2a85ff;
-  }
-  .bg-primary-blue {
-    background-color: #2a85ff;
-  }
+	.text-primary-blue {
+		color: #2a85ff;
+	}
+	.bg-primary-blue {
+		background-color: #2a85ff;
+	}
 }

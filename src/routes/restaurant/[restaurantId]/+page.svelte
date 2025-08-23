@@ -1,52 +1,33 @@
 <script lang="ts">
-  import type { PageData } from './$types';
-  import { MenuMain } from '$lib/components/menu';
-  import { order, addToOrder } from '$lib/stores/order';
+	import type { PageData } from './$types';
+	import ImageGallery from '$lib/components/restaurant/ImageGallery.svelte';
+	import FeaturedItems from '$lib/components/menu/FeaturedItems.svelte';
+	import MenuTabs from '$lib/components/menu/MenuTabs.svelte';
+	import MenuList from '$lib/components/menu/MenuList.svelte';
+	import InfoPanel from '$lib/components/restaurant/InfoPanel.svelte';
+	import Map from '$lib/components/restaurant/Map.svelte';
+	import Reviews from '$lib/components/reviews/Reviews.svelte';
 
-  export let data: PageData;
+	export let data: PageData;
 
-  function handleAdd(event: CustomEvent) {
-    addToOrder(event.detail);
-  }
+	let selectedCategoryId = data.restaurant.menu.categories[0].id;
+	let searchTerm = '';
+
+	$: filteredItems = data.restaurant.menu.items.filter(
+		(item) =>
+			item.categoryId === selectedCategoryId &&
+			item.name.toLowerCase().includes(searchTerm.toLowerCase())
+	);
 </script>
 
-<svelte:head>
-  <title>Menu | Tomah</title>
-  <meta name="description" content="Restaurant Menu" />
-</svelte:head>
-
-<div class="bg-gray-50 min-h-screen">
-  <div class="container mx-auto px-4 py-8">
-    <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
-      <div class="md:col-span-2">
-        <MenuMain items={data.menuItems} on:add={handleAdd} />
-      </div>
-
-      <div class="md:col-span-1">
-        <div class="bg-white p-6 rounded-lg shadow-lg">
-          <h2 class="text-2xl font-bold mb-4">Your Order</h2>
-          {#if $order.items.length === 0}
-            <p class="text-gray-500">Your order is empty.</p>
-          {:else}
-            <ul>
-              {#each $order.items as item}
-                <li class="flex justify-between items-center py-2 border-b">
-                  <div>
-                    <p class="font-semibold">{item.name}</p>
-                    <p class="text-sm text-gray-500">${item.price.toFixed(2)}</p>
-                  </div>
-                  <p>{item.quantity}</p>
-                </li>
-              {/each}
-            </ul>
-            <div class="flex justify-between items-center mt-4">
-              <p class="text-lg font-bold">Total:</p>
-              <p class="text-lg font-bold">${$order.total.toFixed(2)}</p>
-            </div>
-            <a href="/order" class="btn btn-primary w-full mt-4 bg-[#FF6B35] text-white">View Order</a>
-          {/if}
-        </div>
-      </div>
-    </div>
-  </div>
+<div>
+	<ImageGallery images={data.restaurant.restaurant_img_urls} />
+	<h1>{data.restaurant.name}</h1>
+	<InfoPanel restaurant={data.restaurant} />
+	<Map lat={data.restaurant.lat} lng={data.restaurant.lng} />
+	<img src={data.restaurant.logo} alt="logo" />
+	<FeaturedItems items={data.restaurant.featuredItems} />
+	<MenuTabs categories={data.restaurant.menu.categories} bind:selectedCategoryId bind:searchTerm />
+	<MenuList items={filteredItems} />
+	<Reviews reviews={data.restaurant.reviews} />
 </div>

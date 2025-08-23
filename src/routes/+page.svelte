@@ -1,34 +1,33 @@
 <script lang="ts">
-  import type { PageData } from './$types';
-  import { RestaurantMain } from '$lib/components/restaurant';
-  import { RestaurantCarousel } from '$lib/components/restaurant-carousel';
-  import { restaurantStore, restaurantActions } from '$lib/stores/restaurant';
-  import { goto } from '$app/navigation';
-  
-  export let data: PageData;
+	import { RestaurantMain } from '$lib/components/restaurant';
+	import { RestaurantCarousel } from '$lib/components/restaurant-carousel';
+	import { goto } from '$app/navigation';
+	import { onMount } from 'svelte';
+	import { restaurantStore, restaurantActions } from '$lib/stores/restaurant';
+	import type { Restaurant } from '$lib/types/restaurant';
 
-  restaurantStore.update(state => ({...state, restaurants: data.restaurants, error: data.error}))
+	let restaurants: Restaurant[] = [];
+	let loading = false;
+	let error: string | null = null;
 
-  function handleViewRestaurant(event: CustomEvent<string>) {
-    goto(`/restaurant/${event.detail}`);
-  }
+	onMount(() => {
+		restaurantActions.loadRestaurants();
+	});
 
+	$: restaurants = $restaurantStore.restaurants;
+	$: loading = $restaurantStore.loading;
+	$: error = $restaurantStore.error ?? null;
 
+	function handleViewRestaurant(event: CustomEvent<string>) {
+		goto(`/restaurant/${event.detail}`);
+	}
 </script>
 
 <svelte:head>
-  <title>Tomah</title>
-  <meta name="description" content="Tomah is a restaurant ordering app" />
+	<title>Tomah</title>
+	<meta name="description" content="Tomah is a restaurant ordering app" />
 </svelte:head>
 
+<RestaurantCarousel {restaurants} on:viewRestaurant={handleViewRestaurant} />
 
-<RestaurantCarousel
-  restaurants={$restaurantStore.restaurants}
-  on:viewRestaurant={handleViewRestaurant}
-/>
-
-<RestaurantMain 
-  restaurants={$restaurantStore.restaurants}
-  loading={$restaurantStore.loading}
-  error={$restaurantStore.error}
-/>
+<RestaurantMain {restaurants} {loading} {error} />

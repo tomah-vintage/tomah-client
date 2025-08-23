@@ -3,6 +3,7 @@
 **Goal:** Set up the SvelteKit project and build the basic UI components.
 
 ### Task 1.1: Initialize SvelteKit Project
+
 - **Action:** Run `npx sv create my-app tomah-client` to scaffold a new SvelteKit project.
 - **Configuration:**
   - Select the "Skeleton project" option.
@@ -15,6 +16,7 @@
   - Create an initial commit with all the generated files.
 
 ### Task 1.2: Setup Styling with Tailwind CSS and Skeleton UI
+
 - **Action:** Integrate Tailwind CSS and Skeleton UI for a consistent and modern design.
 - **Steps:**
   1. Install all required dependencies: `bun add -D tailwindcss postcss autoprefixer svelte-preprocess @skeletonlabs/skeleton @skeletonlabs/tw-plugin`.
@@ -24,6 +26,7 @@
   5. Create a `src/app.postcss` file for Tailwind directives.
 
 ### Task 1.3: Create Basic UI Components
+
 - **Goal:** Develop a set of reusable, fundamental UI components.
 - **Directory:** `src/lib/components/common/`
 - **Components to Create:**
@@ -41,6 +44,7 @@
   - **Index File (`index.ts`):** Create an `index.ts` file in `src/lib/components/common/` to export all common components for easy importing.
 
 ### Task 1.4: Set Up Basic Project Structure
+
 - **Goal:** Establish a clean and scalable project structure.
 - **Routing (`src/routes/`):**
   - `+page.svelte`: The main landing page.

@@ -5,6 +5,6 @@ import { defineConfig } from 'vite';
 export default defineConfig({
 	plugins: [tailwindcss(), sveltekit()],
 	css: {
-		postcss: './postcss.config.js', // Make sure this exists
+		postcss: './postcss.config.js' // Make sure this exists
 	}
 });

@@ -1,12 +1,23 @@
-<script>
-  import '../app.css';
-  import { Header, Footer } from '$lib/components/layout';
+<script lang="ts">
+	import '../app.css';
+	import { Header, Footer } from '$lib/components/layout';
+	import { onMount } from 'svelte';
+	import { authStore } from '$lib/stores/auth';
+	import { jwtDecode } from 'jwt-decode';
+
+	onMount(() => {
+		const token = localStorage.getItem('token');
+		if (token) {
+			const decoded: any = jwtDecode(token);
+			authStore.login(decoded);
+		}
+	});
 </script>
 
-<div class="flex flex-col min-h-screen">
-  <Header />
-  <main class="container mx-auto p-4 flex-grow">
-    <slot />
-  </main>
-  <Footer />
+<div class="flex min-h-screen flex-col">
+	<Header />
+	<main class="container mx-auto flex-grow p-4">
+		<slot />
+	</main>
+	<Footer />
 </div>

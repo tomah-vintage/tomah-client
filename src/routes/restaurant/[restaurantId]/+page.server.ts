@@ -1,35 +1,82 @@
 import type { PageServerLoad } from './$types';
-import type { MenuItem } from '$lib/types/menu';
 
 export const load: PageServerLoad = async ({ params }) => {
-  // In a real application, you would fetch the menu from a database
-  // or an API using the restaurantId. For now, we'll use mock data.
-  const menuItems: MenuItem[] = [
-    {
-      id: '1',
-      name: 'Pizza',
-      description: 'A delicious pizza with your choice of toppings.',
-      price: 12.99,
-      image: 'https://images.unsplash.com/photo-1513104890138-7c749659a591?q=80&w=2940&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D',
-    },
-    {
-      id: '2',
-      name: 'Burger',
-      description: 'A juicy burger with all the fixings.',
-      price: 8.99,
-      image: 'https://images.unsplash.com/photo-1571091718767-18b5b1457add?q=80&w=2940&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D',
-    },
-    {
-      id: '3',
-      name: 'Salad',
-      description: 'A healthy salad with fresh vegetables.',
-      price: 6.99,
-      image: 'https://images.unsplash.com/photo-1512621776951-a57141f2eefd?q=80&w=2940&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D',
-    },
-  ];
+	const restaurant = {
+		id: params.restaurantId,
+		name: 'The Golden Spoon',
+		logo: '/logo.png',
+		address: '123 Main St, Anytown',
+		lat: 47.9187,
+		lng: 106.917,
+		restaurant_img_urls: [
+			'https://www.amrest.eu/sites/default/files/styles/big_hero_image/public/2024-05/kfc0.png?itok=SMeJu6gN0',
+			'https://www.amrest.eu/sites/default/files/styles/big_hero_image/public/2024-05/kfc0.png?itok=SMeJu6gN0',
+			'https://www.amrest.eu/sites/default/files/styles/big_hero_image/public/2024-05/kfc0.png?itok=SMeJu6gN0'
+		],
+		openingHours: '9 AM - 10 PM',
+		featuredItems: [
+			{
+				id: '1',
+				name: 'Featured Item 1',
+				description: 'This is a featured item.',
+				price: 9.99,
+				image_url:
+					'https://www.amrest.eu/sites/default/files/styles/big_hero_image/public/2024-05/kfc0.png?itok=SMeJu6gN0'
+			},
+			{
+				id: '2',
+				name: 'Featured Item 2',
+				description: 'This is another featured item.',
+				price: 12.99,
+				image_url:
+					'https://www.amrest.eu/sites/default/files/styles/big_hero_image/public/2024-05/kfc0.png?itok=SMeJu6gN0'
+			}
+		],
+		menu: {
+			categories: [
+				{ id: '1', name: 'Category 1' },
+				{ id: '2', name: 'Category 2' }
+			],
+			items: [
+				{
+					id: '1',
+					name: 'Menu Item 1',
+					description: 'This is a menu item.',
+					price: 10.99,
+					image_url:
+						'https://www.amrest.eu/sites/default/files/styles/big_hero_image/public/2024-05/kfc0.png?itok=SMeJu6gN0',
+					categoryId: '1'
+				},
+				{
+					id: '2',
+					name: 'Menu Item 2',
+					description: 'This is another menu item.',
+					price: 15.99,
+					image_url:
+						'https://www.amrest.eu/sites/default/files/styles/big_hero_image/public/2024-05/kfc0.png?itok=SMeJu6gN0',
+					categoryId: '2'
+				}
+			]
+		},
+		reviews: [
+			{
+				id: '1',
+				user: { id: '1', name: 'John Doe' },
+				rating: 4,
+				comment: 'Great food!',
+				createdAt: '2024-01-01'
+			},
+			{
+				id: '2',
+				user: { id: '2', name: 'Jane Doe' },
+				rating: 5,
+				comment: 'Excellent service!',
+				createdAt: '2024-01-02'
+			}
+		]
+	};
 
-  return {
-    restaurantId: params.restaurantId,
-    menuItems,
-  };
+	return {
+		restaurant
+	};
 };

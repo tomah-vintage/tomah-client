@@ -1,4 +1,3 @@
-
 # Phase 2: Menu and Ordering Development Plan
 
 **Goal:** Implement the core functionality of viewing menus and placing orders.
