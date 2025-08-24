@@ -3,17 +3,19 @@
 	import MenuCard from './MenuCard.svelte';
 
 	export let items: MenuItem[];
-	export let limit = 2;
+	export let limit = 4;
 
 	function loadMore() {
-		limit += 2;
+		limit += 4;
 	}
 </script>
 
-<div class="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3">
-	{#each items.slice(0, limit) as item}
-		<MenuCard {item} />
-	{/each}
+<div class="mt-4">
+	<div class="grid grid-cols-1 gap-4 md:grid-cols-3 lg:grid-cols-4">
+		{#each items.slice(0, limit) as item}
+			<MenuCard {item} />
+		{/each}
+	</div>
 </div>
 
 {#if limit < items.length}
@@ -24,5 +26,11 @@
 		>
 			Load More
 		</button>
+	</div>
+{/if}
+
+{#if items.length < 1}
+	<div class="mt-4 text-center">
+		Хоол олдсонгүй
 	</div>
 {/if}

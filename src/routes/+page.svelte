@@ -25,9 +25,10 @@
 
 <svelte:head>
 	<title>Tomah</title>
-	<meta name="description" content="Tomah is a restaurant ordering app" />
+	<meta name="description" content="Tomah is a restaurant ordering app" /> 
 </svelte:head>
 
 <RestaurantCarousel {restaurants} on:viewRestaurant={handleViewRestaurant} />
 
 <RestaurantMain {restaurants} {loading} {error} />
+

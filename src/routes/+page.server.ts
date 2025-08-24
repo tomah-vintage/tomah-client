@@ -1,14 +1,15 @@
 import type { PageServerLoad } from './$types';
 import type { Restaurant } from '$lib/types/restaurant';
+import { restaurantActions, restaurantStore } from '$lib/stores/restaurant';
+import { get } from 'svelte/store';
 
-export const load: PageServerLoad = async ({ fetch, url }) => {
+export const load: PageServerLoad = async ({  url }) => {
 	const searchTerm = url.searchParams.get('search') || '';
 	try {
-		const response = await fetch(`/api/restaurants?search=${searchTerm}`);
-		if (!response.ok) {
-			throw new Error('Failed to load restaurants');
-		}
-		const { restaurants }: { restaurants: Restaurant[] } = await response.json();
+		await restaurantActions.loadRestaurants();
+		const { restaurants }: { restaurants: Restaurant[] } =  get(restaurantStore);
+
+
 		return {
 			restaurants,
 			searchTerm

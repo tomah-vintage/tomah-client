@@ -11,7 +11,7 @@
 
 <a
 	href="/menu/{restaurant.id}"
-	class="restaurant-carousel-card block transform cursor-pointer overflow-hidden rounded-lg bg-white shadow-md transition-transform duration-200 hover:scale-105"
+	class="restaurant-carousel-card block transform cursor-pointer bg-white shadow-md transition-transform duration-200 hover:scale-105 w-full"
 	on:click|preventDefault={handleClick}
 >
 	<img src={restaurant.logo} alt={restaurant.name} class="h-60 w-full object-cover" />

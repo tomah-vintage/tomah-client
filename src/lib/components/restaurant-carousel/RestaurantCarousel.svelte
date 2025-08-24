@@ -3,15 +3,18 @@
 	import RestaurantCarouselCard from './RestaurantCarouselCard.svelte';
 	import { ChevronLeft, ChevronRight } from 'lucide-svelte';
 	import { createEventDispatcher } from 'svelte';
+	import { restaurantStore } from '$lib/stores/restaurant';
 
 	const dispatch = createEventDispatcher<{ viewRestaurant: string }>();
 
 	export let restaurants: Restaurant[] = [];
 	export let itemsPerPage = 3;
+	export let loading = false;
 
 	let currentIndex = 0;
 
 	$: visibleRestaurants = restaurants.slice(currentIndex, currentIndex + itemsPerPage);
+	$: loading = $restaurantStore.loading;
 
 	function next() {
 		if (currentIndex + itemsPerPage < restaurants.length) {
@@ -30,15 +33,20 @@
 	}
 
 	function handleCardView(restaurantId: string) {
+console.log("restaurantId", restaurantId)
 		dispatch('viewRestaurant', restaurantId);
 	}
 </script>
 
-<div class="relative mx-auto w-full max-w-6xl">
+<div class="relative w-full">
+	{#if loading}
+	<div>
+	</div>
+	{:else}
 	<div class="relative flex items-center">
 		<button
 			on:click={prev}
-			class="focus:ring-primary-light absolute top-1/2 left-0 z-20 -translate-y-1/2 rounded-full bg-gray-200 p-2 hover:bg-gray-300 focus:ring-2 focus:outline-none"
+			class="focus:ring-primary-light absolute top-1/2 left-0 z-20 -translate-y-1/2 rounded-full bg-gray-200 p-2 hover:bg-gray-300 focus:outline-none"
 		>
 			<ChevronLeft size={24} />
 		</button>
@@ -49,7 +57,7 @@
 				style="transform: translateX(-{currentIndex * (100 / itemsPerPage)}%)"
 			>
 				{#each restaurants as restaurant (restaurant.id)}
-					<div class="flex-shrink-0" style="width: calc(100% / {itemsPerPage});">
+					<div class="flex-shrink-0 overflow-hidden rounded-lg w-full" style="width: calc(100% / {itemsPerPage} - 4%);">
 						<RestaurantCarouselCard
 							{restaurant}
 							on:view={(event) => handleCardView(event.detail)}
@@ -61,11 +69,12 @@
 
 		<button
 			on:click={next}
-			class="focus:ring-primary-light absolute top-1/2 right-0 z-20 -translate-y-1/2 rounded-full bg-gray-200 p-2 hover:bg-gray-300 focus:ring-2 focus:outline-none"
+			class="focus:ring-primary-light absolute top-1/2 right-0 z-20 -translate-y-1/2 rounded-full bg-gray-200 p-2 hover:bg-gray-300 focus:outline-none"
 		>
 			<ChevronRight size={24} />
 		</button>
 	</div>
+	{/if}
 </div>
 
 <style lang="postcss">

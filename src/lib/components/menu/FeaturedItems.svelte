@@ -5,9 +5,9 @@
 	export let items: MenuItem[];
 </script>
 
-<div>
-	<h2>Featured Items</h2>
-	<div class="flex space-x-4 overflow-x-auto">
+<div class="mb-4">
+	<p class="text-lg font-bold mt-7 mb-2">Онцлох бүтээгдэхүүн</p>
+	<div class="grid grid-cols-1 gap-4 md:grid-cols-3 lg:grid-cols-4">
 		{#each items as item}
 			<MenuCard {item} />
 		{/each}

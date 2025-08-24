@@ -1,54 +1,58 @@
 <script lang="ts">
-	import { ChevronLeft, ChevronRight } from 'lucide-svelte';
-
 	export let images: string[] = [];
 
-	let currentIndex = 0;
-
-	function next() {
-		if (currentIndex < images.length - 1) {
-			currentIndex += 1;
-		} else {
-			currentIndex = 0; // Loop back to start
-		}
-	}
-
-	function prev() {
-		if (currentIndex > 0) {
-			currentIndex -= 1;
-		} else {
-			currentIndex = images.length - 1; // Loop to end
-		}
-	}
 </script>
 
-<div class="relative mx-auto w-full max-w-6xl">
-	<div class="relative flex items-center">
-		<button
-			on:click={prev}
-			class="focus:ring-primary-light absolute top-1/2 left-0 z-20 -translate-y-1/2 rounded-full bg-gray-200 p-2 hover:bg-gray-300 focus:ring-2 focus:outline-none"
-		>
-			<ChevronLeft size={24} />
-		</button>
+<div class="w-full">
+	
+{#if images.length === 1}
+<!-- Single image full width -->
+<div class="w-full h-[400px]">
+  <img
+	src={images[0]}
+	alt="Restaurant"
+	class="w-full object-cover rounded-lg h-[400px]"
+  />
+</div>
 
-		<div class="flex-1 overflow-hidden">
-			<div
-				class="flex transition-transform duration-300 ease-in-out"
-				style="transform: translateX(-{currentIndex * 100}%)"
-			>
-				{#each images as image, i (i)}
-					<div class="w-full flex-shrink-0">
-						<img src={image} alt="Restaurant" class="h-96 w-full object-cover" />
-					</div>
-				{/each}
-			</div>
-		</div>
+{:else if images.length === 2}
+<!-- Two images side by side -->
+<div class="grid grid-cols-2 gap-2 h-[400px]">
+  {#each images as img}
+	<img
+	  src={img}
+	  alt="Restaurant"
+	  class="w-full object-cover rounded-lg h-[400px]"
+	/>
+  {/each}
+</div>
 
-		<button
-			on:click={next}
-			class="focus:ring-primary-light absolute top-1/2 right-0 z-20 -translate-y-1/2 rounded-full bg-gray-200 p-2 hover:bg-gray-300 focus:ring-2 focus:outline-none"
-		>
-			<ChevronRight size={24} />
-		</button>
-	</div>
+{:else if images.length >= 3}
+<!-- Layout with 3+ images (like screenshot) -->
+<div class="grid grid-cols-3 gap-2 h-[400px]">
+  <!-- Main image -->
+  <div class="col-span-2 h-full">
+	<img
+	  src={images[0]}
+	  alt="Main restaurant"
+	  class="w-full object-cover rounded-lg h-[408px]"
+	/>
+  </div>
+
+  <!-- Two stacked side images -->
+  <div class="flex flex-col gap-2 h-[400px]">
+	<img
+	  src={images[1]}
+	  alt="Restaurant side 1"
+	  class="w-full h-1/2 object-cover rounded-lg"
+	/>
+	<img
+	  src={images[2]}
+	  alt="Restaurant side 2"
+	  class="w-full h-1/2 object-cover rounded-lg"
+	/>
+  </div>
+</div>
+{/if}
+	  
 </div>
