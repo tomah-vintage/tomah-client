@@ -28,7 +28,9 @@ export const restaurantActions = {
 			if (!response.ok) {
 				throw new Error('Failed to load restaurants');
 			}
-			const restaurants = await response.json();
+			const data = await response.json();
+
+			const restaurants = data.results || data;
 			restaurantStore.update((state) => ({ ...state, restaurants, loading: false }));
 		} catch (error) {
 			if (error instanceof Error) {

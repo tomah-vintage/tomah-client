@@ -13,7 +13,7 @@
 
 	let currentIndex = 0;
 
-	$: visibleRestaurants = restaurants.slice(currentIndex, currentIndex + itemsPerPage);
+	// $: visibleRestaurants = restaurants?.slice(currentIndex, currentIndex + itemsPerPage);
 	$: loading = $restaurantStore.loading;
 
 	function next() {

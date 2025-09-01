@@ -15,9 +15,14 @@ export const load: PageServerLoad = async ({ params }) => {
 			throw new Error(`Restaurant with ID ${params.restaurantId} not found`);
 		}
 		
-		const restaurant: Restaurant = await response.json();
-		const menuItems: MenuItem[] = await menuResponse.json();
-		const categories: MenuCategory[] = await categoryResponse.json();
+		const restaurantData = await response.json() ?? {};
+		const menuData = await menuResponse.json() ?? {};
+		const categoryData = await categoryResponse.json() ?? {};
+		
+		// Extract results field from API responses (external API format)
+		const restaurant: Restaurant = restaurantData.results || restaurantData;
+		const menuItems: MenuItem[] = menuData.results || menuData;
+		const categories: MenuCategory[] = categoryData.results || categoryData;
 		
 		return {
 			restaurant,

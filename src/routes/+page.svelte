@@ -14,9 +14,9 @@
 		restaurantActions.loadRestaurants();
 	});
 
-	$: restaurants = $restaurantStore.restaurants;
 	$: loading = $restaurantStore.loading;
 	$: error = $restaurantStore.error ?? null;
+	$: restaurants = $restaurantStore.restaurants ?? [];
 
 	function handleViewRestaurant(event: CustomEvent<string>) {
 		goto(`/restaurant/${event.detail}`);
