@@ -14,7 +14,7 @@
 	$: categories = data.categories || [];
 	$: menuItems = data.menuItems || [];
 	
-	let selectedCategoryId = categories[0]?.id || '';
+	let selectedCategoryId = categories ? categories[0]?.id : '';
 	let searchTerm = '';
 
 	$: filteredItems = Array.isArray(menuItems) 
