@@ -1,59 +1,64 @@
 <script lang="ts">
 	import type { Restaurant } from '$lib/types/restaurant';
 	import RestaurantCard from './RestaurantCard.svelte';
-	import { ChevronLeft, ChevronRight } from 'lucide-svelte';
+	import { ArrowLeft, ArrowRight } from 'lucide-svelte';
+	import Carousel from 'svelte-light-carousel';
 
 	export let restaurants: Restaurant[] = [];
 	export let emptyMessage = 'No restaurants found.';
-	let currentIndex = 0;
-	export let itemsPerPage = 4;
 
-	function next() {
-		if (currentIndex + itemsPerPage < restaurants.length) {
-			currentIndex += 1;
-		} else {
-			currentIndex = 0; // Loop back to start
-		}
-	}
+	let containerWidth: number;
+	const CARD_WIDTH = 300;
+	const CARD_GAP = 24;
 
-	function prev() {
-		if (currentIndex > 0) {
-			currentIndex -= 1;
-		} else {
-			currentIndex = restaurants.length - itemsPerPage; // Loop to end
-		}
+	$: cardsToShow = calculateCardsToShow(containerWidth, CARD_WIDTH, CARD_GAP);
+
+	function calculateCardsToShow(width: number, cardWidth: number, cardGap: number): number {
+		if (!width || width <= 0) return 1;
+		const numCards = (width + cardGap) / (cardWidth + cardGap);
+		return Math.max(1, Number(numCards.toFixed(1)));
 	}
 </script>
 
-<div class="restaurant-list mb-10">
+<div bind:clientWidth={containerWidth}>
 	{#if restaurants.length === 0}
 		<p class="text-center text-gray-500">{emptyMessage}</p>
 	{:else}
-	<div class="flex justify-between mb-2">
-		<p class="text-lg font-semibold self-center">Хөнглөлттэй бүтээгдэхүүн</p>
-		<div class="flex gap-3 align-center">
-			<button
-				on:click={prev}
-				class="focus:ring-primary-light rounded-full bg-gray-200 p-2 hover:bg-gray-300 focus:outline-none"
-			>
-				<ChevronLeft size={24} />
-			</button>
-			<button
-				on:click={next}
-				class="focus:ring-primary-light rounded-full bg-gray-200 p-2 hover:bg-gray-300 focus:outline-none"
-			>
-				<ChevronRight size={24} />
-			</button>
+		<div class="mb-2 flex justify-between">
+			<p class="self-center text-lg font-semibold">Хөнглөлттэй бүтээгдэхүүн</p>
 		</div>
-	</div>
-		<div class="grid grid-cols-1 gap-6 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 transition-transform duration-300 ease-in-out">
-			{#each restaurants as restaurant (restaurant.id)}
-				<RestaurantCard {restaurant} />
-			{/each}
-		</div>
+		{#if containerWidth}
+			<Carousel slides={restaurants} layout={{ default: cardsToShow }} gaps={{ default: CARD_GAP }}>
+				<div
+					slot="pagination"
+					class="absolute top-[-40px] flex w-full justify-end gap-3"
+					let:prev
+					let:canScrollPrev
+					let:next
+					let:canScrollNext
+				>
+					<button
+						on:click={prev}
+						disabled={!canScrollPrev}
+						class="rounded-full border border-[#494b5733] bg-transparent p-1.5 text-[#C0C0C0] hover:bg-[#71717A] hover:text-white focus:ring-2 focus:ring-white focus:ring-offset-2 focus:outline-none"
+						class:cursor-not-allowed={!canScrollPrev}
+					>
+						<ArrowLeft size={20} />
+					</button>
+					<button
+						on:click={next}
+						disabled={!canScrollNext}
+						class="rounded-full border border-[#494b5733] bg-transparent p-1.5 text-[#C0C0C0] hover:bg-[#71717A] hover:text-white focus:ring-2 focus:ring-white focus:ring-offset-2 focus:outline-none"
+						class:cursor-not-allowed={!canScrollNext}
+					>
+						<ArrowRight size={20} />
+					</button>
+				</div>
+
+				<div slot="slide" let:slide>
+					<RestaurantCard restaurant={slide} />
+				</div>
+			</Carousel>
+		{/if}
 	{/if}
 </div>
-
-<style lang="postcss">
-	/* Add any specific styles here if needed */
-</style>

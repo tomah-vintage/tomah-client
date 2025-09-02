@@ -11,10 +11,10 @@
 
 <a
 	href="/menu/{restaurant.id}"
-	class="restaurant-carousel-card block transform cursor-pointer bg-white shadow-md transition-transform duration-200 hover:scale-105 w-full"
+	class="restaurant-carousel-card block w-[386px] transform cursor-pointer overflow-hidden rounded-lg bg-white shadow-md transition-transform duration-200 hover:scale-105"
 	on:click|preventDefault={handleClick}
 >
-	<img src={restaurant.logo} alt={restaurant.name} class="h-60 w-full object-cover" />
+	<img src={restaurant.logo} alt={restaurant.name} class="h-[249px] w-full object-cover" />
 	<!-- <div class="p-4">
     <h3 class="font-semibold text-lg text-gray-800 truncate">
       {restaurant.name}

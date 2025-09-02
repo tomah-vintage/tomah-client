@@ -17,7 +17,6 @@
 
 	function handleSubmit(event: CustomEvent<{ rating: number; comment: string }>) {
 		// TODO: Handle review submission
-		console.log(event.detail);
 	}
 </script>
 
@@ -25,7 +24,7 @@
 	<p class="text-2xl font-bold">Сэтгэгдэл</p>
 	<p class="text-sm text-slate-400">Бидэнд санал хүсэлтээ илгээгээрэй</p>
 
-	<div class="flex gap-4 my-4">
+	<div class="my-4 flex gap-4">
 		{#each options as option}
 			<div
 				role="button"
@@ -41,7 +40,7 @@
 				>
 					{option.icon}
 				</div>
-				<p class="mt-2 font-medium text-sm text-gray-700">{option.label}</p>
+				<p class="mt-2 text-sm font-medium text-gray-700">{option.label}</p>
 			</div>
 		{/each}
 	</div>

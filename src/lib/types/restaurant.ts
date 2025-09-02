@@ -13,4 +13,6 @@ export interface Restaurant {
 		items: any[];
 	};
 	reviews?: any[];
+	discount?: number; // Added discount
+	rating?: number; // Added rating
 }
