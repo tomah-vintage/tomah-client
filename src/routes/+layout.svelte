@@ -16,7 +16,7 @@
 
 <div class="flex min-h-screen flex-col">
 	<Header />
-	<main class="container mx-auto flex-grow p-4">
+	<main class="container mx-auto flex-grow">
 		<slot />
 	</main>
 	<Footer />

@@ -1,74 +1,120 @@
 <script lang="ts">
-	import { page } from '$app/stores';
 	import { authStore } from '$lib/stores/auth';
 	import { cartStore } from '$lib/stores/cart';
 	import Button from '$lib/components/common/Button.svelte';
-	import Input from '$lib/components/common/Input.svelte';
-	import Icon from '$lib/components/common/Icon.svelte';
-	import { Search, ShoppingCart } from 'lucide-svelte';
+	import { Menu, MapPin, Search, ShoppingCart } from 'lucide-svelte';
 	import { goto } from '$app/navigation';
-	import logo from '$lib/assets/logo.png';
+	import QpickTextLogo from '../assets/QpickTextLogo.svelte';
+	import Modal from '$lib/components/common/Modal.svelte';
+	import LoginForm from '$lib/components/auth/LoginForm.svelte';
+	import RegisterForm from '$lib/components/auth/RegisterForm.svelte';
 
-	let searchTerm = '';
-
-	function handleSearch() {
-		goto(`/?search=${searchTerm}`);
-	}
+	let showLoginModal = false;
+	let showRegisterModal = false;
 
 	function handleLogout() {
 		authStore.logout();
 	}
 
+	let searchTerm = '';
+	function handleSearch() {
+		goto(`/?search=${searchTerm}`);
+	}
+	function handleOpenRegister() {
+		showLoginModal = false;
+		showRegisterModal = true;
+	}
+	function handleOpenLogin() {
+		showRegisterModal = false;
+		showLoginModal = true;
+	}
+
 	$: totalItems = $cartStore.items.reduce((acc, item) => acc + item.quantity, 0);
 </script>
 
-<header class="bg-primary-dark p-4 shadow-md">
+<header class="bg-white p-4 shadow-[0_2px_2px_0_rgba(0,0,0,0.15)]">
 	<div class="container mx-auto flex items-center justify-between">
-		<a href="/" class="text-accent-light flex items-center text-2xl font-bold">
-			<img src={logo} alt="Tomah Logo" class="mr-2 h-10 w-24" />
-		</a>
-
-		<!-- <nav class="hidden md:flex space-x-4">
-      <a href="/menu" class="hover:text-accent-light">Menu</a>
-      <a href="/order" class="hover:text-accent-light">Orders</a>
-    </nav> -->
+		<!-- Left Side -->
 		<div class="flex items-center space-x-4">
-			<div class="relative flex items-center rounded-md border border-gray-300 px-3">
-				<Input
+			<button class="p-2 lg:hidden">
+				<Menu class="h-6 w-6" />
+			</button>
+			<a href="/">
+				<QpickTextLogo />
+			</a>
+		</div>
+
+		<!-- Center -->
+		<div class="hidden flex-1 items-center justify-center space-x-4 lg:flex">
+			<button
+				class="flex items-center space-x-2 rounded-lg bg-gray-100 px-4 py-3 text-sm whitespace-nowrap"
+			>
+				<MapPin class="h-5 w-5 text-gray-500" />
+				<span>Ойр байгаа байршил</span>
+			</button>
+			<div class="relative w-full max-w-lg">
+				<div class="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3">
+					<Search class="h-5 w-5 text-gray-400" />
+				</div>
+				<input
 					type="text"
-					placeholder="Search..."
-					label={undefined}
+					placeholder="Хайл, Ресторан"
+					class="w-full rounded-lg border-transparent bg-gray-100 py-3 pr-4 pl-10 focus:border-red-500 focus:ring-red-500"
 					bind:value={searchTerm}
 					on:keydown={(e) => {
-						const ke = e as unknown as KeyboardEvent;
-						if (ke.key === 'Enter') handleSearch();
+						if (e.key === 'Enter') handleSearch();
 					}}
-					className="border-none bg-transparent focus:ring-0 focus:outline-none  w-full"
 				/>
-				<Icon icon={Search} size={20} color="gray" />
 			</div>
+		</div>
 
-			<a href="/order" class="relative">
-				<Icon icon={ShoppingCart} size={24} color="white" />
-				{#if totalItems > 0}
+		<!-- Right Side -->
+		<div class="flex items-center space-x-2 sm:space-x-6">
+			<div class="relative p-2">
+				<a href="/order">
+					<ShoppingCart class="h-6 w-6" />
 					<span
-						class="absolute -top-2 -right-2 flex h-5 w-5 items-center justify-center rounded-full bg-red-500 text-xs text-white"
+						class="absolute top-0 right-0 flex h-4 w-4 items-center justify-center rounded-full bg-red-500 text-xs text-white"
 					>
 						{totalItems}
 					</span>
-				{/if}
-			</a>
+				</a>
+			</div>
 
 			{#if $authStore.isAuthenticated}
-				<span class="text-sm">Hello, {$authStore.user?.name || 'User'}</span>
-				<Button label="Logout" on:click={handleLogout} variant="secondary" />
+				<div class="hidden items-center space-x-4 lg:flex">
+					<span class="text-sm">Hello, {$authStore.user?.name || 'User'}</span>
+					<Button label="Logout" on:click={handleLogout} variant="secondary" />
+				</div>
 			{:else}
-				<a href="/auth/login"><Button label="Login" variant="secondary" /></a>
-				<a href="/auth/register"><Button label="Register" variant="primary" /></a>
+				<div class="hidden items-center space-x-4 lg:flex">
+					<button
+						on:click={() => (showLoginModal = true)}
+						class="cursor-pointer text-sm font-medium whitespace-nowrap hover:text-red-600"
+						>Нэвтрэх</button
+					>
+					<Button
+						on:click={() => (showRegisterModal = true)}
+						label="Бүртгүүлэх"
+						variant="primary"
+						className="whitespace-nowrap bg-red-600 px-4 py-2 text-sm hover:bg-red-700"
+					/>
+				</div>
 			{/if}
+			<button class="p-2 lg:hidden">
+				<Search class="h-6 w-6" />
+			</button>
 		</div>
 	</div>
 </header>
+
+<Modal showModal={showLoginModal} on:close={() => (showLoginModal = false)}>
+	<LoginForm on:openRegister={handleOpenRegister} />
+</Modal>
+
+<Modal showModal={showRegisterModal} on:close={() => (showRegisterModal = false)}>
+	<RegisterForm on:switchToLogin={handleOpenLogin} />
+</Modal>
 
 <style lang="postcss">
 </style>
