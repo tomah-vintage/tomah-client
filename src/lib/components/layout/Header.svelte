@@ -1,6 +1,5 @@
 <script lang="ts">
 	import { authStore } from '$lib/stores/auth';
-	import { cartStore } from '$lib/stores/cart';
 	import Button from '$lib/components/common/Button.svelte';
 	import { Menu, MapPin, Search, ShoppingCart } from 'lucide-svelte';
 	import { goto } from '$app/navigation';
