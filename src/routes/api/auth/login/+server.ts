@@ -1,28 +1,36 @@
 import { json } from '@sveltejs/kit';
 import type { RequestHandler } from './$types';
-import { users } from '$lib/server/auth';
-import bcrypt from 'bcrypt';
-import jwt from 'jsonwebtoken';
-import { JWT_SECRET } from '$env/static/private';
+import { PUBLIC_BACKEND_URL } from '$env/static/public';
 
-export const POST: RequestHandler = async ({ request }) => {
+export const POST: RequestHandler = async ({ request, cookies }) => {
 	const { email, password } = await request.json();
 
-	const user = users.find((user) => user.email === email);
+	try {
+		const backendResponse = await fetch(`${PUBLIC_BACKEND_URL}/api/token/`, {
+			method: 'POST',
+			headers: {
+				'Content-Type': 'application/json'
+			},
+			body: JSON.stringify({ email, password })
+		});
 
-	if (!user || !user.password) {
-		return json({ error: 'Invalid credentials' }, { status: 401 });
+		if (!backendResponse.ok) {
+			const errorData = await backendResponse.json();
+			return json({ error: errorData.message || 'Authentication failed' }, { status: backendResponse.status });
+		}
+
+		const { access } = await backendResponse.json();
+
+		cookies.set('token', access, {
+			path: '/',
+			httpOnly: true,
+			secure: process.env.NODE_ENV === 'production',
+			maxAge: 60 * 60 * 24 * 7 // 1 week
+		});
+
+		return json({ success: true, token: access });
+	} catch (error) {
+		console.error('Login API error:', error);
+		return json({ error: 'Internal server error' }, { status: 500 });
 	}
-
-	const passwordMatch = await bcrypt.compare(password, user.password);
-
-	if (!passwordMatch) {
-		return json({ error: 'Invalid credentials' }, { status: 401 });
-	}
-
-	const token = jwt.sign({ id: user.id, email: user.email, role: user.role }, JWT_SECRET, {
-		expiresIn: '1h'
-	});
-
-	return json({ token });
 };

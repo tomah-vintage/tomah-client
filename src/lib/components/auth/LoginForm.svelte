@@ -28,7 +28,6 @@
 
 		if (response.ok) {
 			const { token } = await response.json();
-			localStorage.setItem('token', token);
 			const decoded: any = jwtDecode(token);
 			authStore.login(decoded);
 			dispatch('close');

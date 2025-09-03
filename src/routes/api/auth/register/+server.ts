@@ -1,33 +1,35 @@
 import { json } from '@sveltejs/kit';
 import type { RequestHandler } from './$types';
-import { users } from '$lib/server/auth';
-import bcrypt from 'bcrypt';
-import jwt from 'jsonwebtoken';
-import { JWT_SECRET } from '$env/static/private';
+import { PUBLIC_BACKEND_URL } from '$env/static/public';
 
 export const POST: RequestHandler = async ({ request }) => {
-	const { email, password, name } = await request.json();
+	const { lastName, firstName, email, password } = await request.json();
 
-	const existingUser = users.find((user) => user.email === email);
-	if (existingUser) {
-		return json({ error: 'User already exists' }, { status: 409 });
+	try {
+		const externalApiResponse = await fetch(`${PUBLIC_BACKEND_URL}/api/users/`, {
+			method: 'POST',
+			headers: {
+				'Content-Type': 'application/json'
+			},
+			body: JSON.stringify({
+				last_name: lastName,
+				first_name: firstName,
+				email,
+				password,
+				role: 3
+			})
+		});
+
+		if (externalApiResponse.ok) {
+			await externalApiResponse.json()
+
+			return json({ message: 'Registration successful' }, { status: 200 });
+		} else {
+			const { error: errorMessage } = await externalApiResponse.json();
+			return json({ error: errorMessage }, { status: externalApiResponse.status });
+		}
+	} catch (e) {
+		console.error('Error during registration:', e);
+		return json({ error: 'Registration failed. Please try again.' }, { status: 500 });
 	}
-
-	const hashedPassword = await bcrypt.hash(password, 10);
-
-	const newUser = {
-		id: String(users.length + 1),
-		email,
-		name,
-		role: 'customer' as const,
-		password: hashedPassword
-	};
-
-	users.push(newUser);
-
-	const token = jwt.sign({ id: newUser.id, email: newUser.email, role: newUser.role }, JWT_SECRET, {
-		expiresIn: '1h'
-	});
-
-	return json({ token });
 };
