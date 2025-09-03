@@ -16,7 +16,10 @@ export const POST: RequestHandler = async ({ request, cookies }) => {
 
 		if (!backendResponse.ok) {
 			const errorData = await backendResponse.json();
-			return json({ error: errorData.message || 'Authentication failed' }, { status: backendResponse.status });
+			return json(
+				{ error: errorData.message || 'Authentication failed' },
+				{ status: backendResponse.status }
+			);
 		}
 
 		const { access, refresh } = await backendResponse.json();

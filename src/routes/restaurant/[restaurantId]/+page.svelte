@@ -13,11 +13,11 @@
 	// Ensure data is available and has the expected structure
 	$: categories = data.categories || [];
 	$: menuItems = data.menuItems || [];
-	
+
 	let selectedCategoryId = categories ? categories[0]?.id : '';
 	let searchTerm = '';
 
-	$: filteredItems = Array.isArray(menuItems) 
+	$: filteredItems = Array.isArray(menuItems)
 		? menuItems.filter((menu) => menu.categories.includes(selectedCategoryId))
 		: [];
 </script>
@@ -25,9 +25,9 @@
 <div class="mt-3 w-full">
 	<ImageGallery images={data.restaurant?.restaurant_img_urls || []} />
 	<FeaturedItems items={menuItems} />
-	<MenuTabs categories={categories} bind:selectedCategoryId bind:searchTerm />
+	<MenuTabs {categories} bind:selectedCategoryId bind:searchTerm />
 	<MenuList items={filteredItems} />
 	<InfoPanel restaurant={data.restaurant} />
-	<Map  />
+	<Map />
 	<Reviews reviews={data.restaurant?.reviews || []} />
 </div>

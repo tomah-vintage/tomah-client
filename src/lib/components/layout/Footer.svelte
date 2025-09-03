@@ -12,7 +12,7 @@
 				<QpickLogo />
 			</div>
 
-			<div class="col-span-1 md:col-span-1" />
+			<div class="col-span-1 md:col-span-1"></div>
 
 			<div class="col-span-1 md:col-span-2">
 				<h3 class="mb-4 font-bold">Бүтээгдэхүүн</h3>

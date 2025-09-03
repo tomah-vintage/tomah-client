@@ -4,6 +4,10 @@
 
 All components and styles must adhere to the design system defined in `@guide/design_guideline.md`. This includes color palette, typography, spacing, and component styles. For icons, we will use the `lucide-svelte` library.
 
+### Styling
+
+Prioritize the use of Tailwind CSS for all styling. Vanilla CSS should only be used when absolutely necessary for complex or highly custom styles that cannot be achieved efficiently with Tailwind.
+
 ## Feature Overview
 
 - **Feature Name**: [e.g., user-profile, product-catalog, shopping-cart]

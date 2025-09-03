@@ -24,7 +24,7 @@ export const restaurantActions = {
 					'Content-Type': 'application/json'
 				}
 			});
-			
+
 			if (!response.ok) {
 				throw new Error('Failed to load restaurants');
 			}

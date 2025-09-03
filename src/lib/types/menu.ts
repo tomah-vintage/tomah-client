@@ -1,7 +1,7 @@
 export interface MenuCategory {
 	id: string;
 	name: string;
-	menu_item_count: number
+	menu_item_count: number;
 }
 
 export interface MenuItem {

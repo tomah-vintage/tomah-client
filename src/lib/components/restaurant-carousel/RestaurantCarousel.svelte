@@ -46,7 +46,7 @@
 				let:canScrollPrev
 				on:click={prev}
 				disabled={!canScrollPrev}
-				class="absolute top-[109px] left-[-18px] w-fit rounded-full border border-[#494b5733] bg-white/60 p-1.5 text-[#C0C0C0] hover:bg-[#71717A] hover:text-white focus:ring-2 focus:ring-white focus:ring-offset-2 focus:outline-none"
+				class="absolute top-[109px] left-[0] w-fit rounded-full border border-[#494b5733] bg-white/60 p-1.5 text-[#C0C0C0] hover:bg-[#71717A] hover:text-white focus:ring-2 focus:ring-white focus:ring-offset-2 focus:outline-none"
 			>
 				<ArrowLeft size={24} />
 			</button>
@@ -56,7 +56,7 @@
 				let:canScrollNext
 				on:click={next}
 				disabled={!canScrollNext}
-				class="absolute top-[109px] right-[-18px] w-fit rounded-full border border-[#494b5733] bg-white/60 p-1.5 text-[#C0C0C0] hover:bg-[#71717A] hover:text-white focus:ring-2 focus:ring-white focus:ring-offset-2 focus:outline-none"
+				class="absolute top-[109px] right-[0] w-fit rounded-full border border-[#494b5733] bg-white/60 p-1.5 text-[#C0C0C0] hover:bg-[#71717A] hover:text-white focus:ring-2 focus:ring-white focus:ring-offset-2 focus:outline-none"
 			>
 				<ArrowRight size={24} />
 			</button>

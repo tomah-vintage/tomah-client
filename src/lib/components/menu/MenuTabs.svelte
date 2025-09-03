@@ -20,7 +20,7 @@
 			type="text"
 			bind:value={searchTerm}
 			placeholder="Search..."
-			class="rounded-lg border p-2 w-xl"
+			class="w-xl rounded-lg border p-2"
 		/>
 	</div>
 	<div class="flex items-center justify-between border-b border-gray-300">

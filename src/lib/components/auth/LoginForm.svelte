@@ -44,7 +44,9 @@
 		<Input type="email" bind:value={email} placeholder="Имэйл, утасны дугаараа бичнэ үү" />
 		<Input type="password" bind:value={password} placeholder="Нууц үгээ оруулна уу" />
 		<div class="text-right">
-			<a href="#" class="text-sm text-gray-500 hover:text-red-600">Нууц үгээ мартсан уу?</a>
+			<button type="button" class="text-sm text-gray-500 hover:text-red-600"
+				>Нууц үгээ мартсан уу?</button
+			>
 		</div>
 		{#if error}
 			<p class="text-red-500">{error}</p>
@@ -53,10 +55,10 @@
 	</form>
 	<div class="text-center">
 		<p class="text-sm text-gray-500">
-			Бүртгэлтэй байгаа юу? <a
-				href="#"
-				on:click|preventDefault={() => dispatch('openRegister')}
-				class="font-medium text-red-600 hover:underline">Яг одоо бүртгүүлэх?</a
+			Бүртгэлтэй байгаа юу? <button
+				type="button"
+				on:click={() => dispatch('openRegister')}
+				class="font-medium text-red-600 hover:underline">Яг одоо бүртгүүлэх?</button
 			>
 		</p>
 	</div>

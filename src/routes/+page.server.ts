@@ -3,12 +3,11 @@ import type { Restaurant } from '$lib/types/restaurant';
 import { restaurantActions, restaurantStore } from '$lib/stores/restaurant';
 import { get } from 'svelte/store';
 
-export const load: PageServerLoad = async ({  url }) => {
+export const load: PageServerLoad = async ({ url }) => {
 	const searchTerm = url.searchParams.get('search') || '';
 	try {
 		await restaurantActions.loadRestaurants();
-		const { restaurants }: { restaurants: Restaurant[] } =  get(restaurantStore);
-
+		const { restaurants }: { restaurants: Restaurant[] } = get(restaurantStore);
 
 		return {
 			restaurants,

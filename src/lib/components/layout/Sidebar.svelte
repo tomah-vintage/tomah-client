@@ -11,10 +11,23 @@
 	function close() {
 		dispatch('close');
 	}
+
+	function handleKeydown(event: KeyboardEvent) {
+		if (event.key === 'Escape') {
+			close();
+		}
+	}
 </script>
 
 {#if show}
-	<div class="fixed inset-0 z-40" on:click={close} style="background-color: rgba(0, 0, 0, 0.3);" />
+	<div
+		class="fixed inset-0 z-40"
+		on:click={close}
+		on:keydown={handleKeydown}
+		role="button"
+		tabindex="0"
+		style="background-color: rgba(0, 0, 0, 0.3);"
+	></div>
 {/if}
 <div
 	class="fixed top-0 left-0 z-50 flex h-full w-80 transform flex-col bg-white shadow-lg transition-transform duration-300 ease-in-out {show

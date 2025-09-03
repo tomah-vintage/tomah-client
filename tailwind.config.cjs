@@ -44,8 +44,14 @@ module.exports = {
 					'"Segoe UI Symbol"',
 					'"Noto Color Emoji"'
 				]
+			},
+			gridTemplateColumns: {
+				'auto-fill-minmax-280px': 'repeat(auto-fill, minmax(280px, 1fr))'
 			}
 		}
 	},
-	plugins: [require('@skeletonlabs/skeleton/tailwind/skeleton.cjs')()]
+	plugins: [
+		require('@skeletonlabs/skeleton/tailwind/skeleton.cjs')(),
+		require('@tailwindcss/line-clamp')
+	]
 };

@@ -3,6 +3,7 @@
 	import Button from '$lib/components/common/Button.svelte';
 	import { Menu, MapPin, Search, ShoppingCart } from 'lucide-svelte';
 	import { goto } from '$app/navigation';
+	import { page } from '$app/stores';
 	import QpickTextLogo from '../assets/QpickTextLogo.svelte';
 	import Modal from '$lib/components/common/Modal.svelte';
 	import LoginForm from '$lib/components/auth/LoginForm.svelte';
@@ -18,9 +19,20 @@
 	let showOrder = false;
 
 	let searchTerm = '';
+	let debounceTimeout: NodeJS.Timeout;
 
-	function handleSearch() {
-		goto(`/?search=${searchTerm}`);
+	function handleSearch(value: string) {
+		clearTimeout(debounceTimeout);
+		debounceTimeout = setTimeout(() => {
+			const currentPath = $page.url.pathname;
+			if (currentPath !== '/search') {
+				goto(`/search?q=${value}`);
+			} else {
+				// If already on search page, update the URL to trigger new search
+				// This will be handled by the reactive statement in +page.svelte
+				goto(`/search?q=${value}`, { replaceState: true });
+			}
+		}, 300); // Debounce for 300ms
 	}
 	function handleOpenRegister() {
 		showLoginModal = false;
@@ -56,12 +68,12 @@
 
 		<!-- Center -->
 		<div class="hidden flex-1 items-center justify-center space-x-4 lg:flex">
-			<button
+			<!-- <button
 				class="flex items-center space-x-2 rounded-lg bg-gray-100 px-4 py-3 text-sm whitespace-nowrap"
 			>
 				<MapPin class="h-5 w-5 text-gray-500" />
 				<span>Ойр байгаа байршил</span>
-			</button>
+			</button> -->
 			<div class="relative w-full max-w-lg">
 				<div class="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3">
 					<Search class="h-5 w-5 text-gray-400" />
@@ -71,8 +83,9 @@
 					placeholder="Хайл, Ресторан"
 					class="w-full rounded-lg border-transparent bg-gray-100 py-3 pr-4 pl-10 focus:border-red-500 focus:ring-red-500"
 					bind:value={searchTerm}
+					on:input={() => handleSearch(searchTerm)}
 					on:keydown={(e) => {
-						if (e.key === 'Enter') handleSearch();
+						if (e.key === 'Enter') handleSearch(searchTerm);
 					}}
 				/>
 			</div>

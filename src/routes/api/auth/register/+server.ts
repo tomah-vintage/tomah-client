@@ -21,7 +21,7 @@ export const POST: RequestHandler = async ({ request }) => {
 		});
 
 		if (externalApiResponse.ok) {
-			await externalApiResponse.json()
+			await externalApiResponse.json();
 
 			return json({ message: 'Registration successful' }, { status: 200 });
 		} else {
