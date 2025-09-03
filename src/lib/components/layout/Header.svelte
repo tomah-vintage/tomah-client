@@ -12,10 +12,6 @@
 	let showLoginModal = false;
 	let showRegisterModal = false;
 
-	function handleLogout() {
-		authStore.logout();
-	}
-
 	let searchTerm = '';
 	function handleSearch() {
 		goto(`/?search=${searchTerm}`);
@@ -81,10 +77,13 @@
 				</a>
 			</div>
 
-			{#if $authStore.isAuthenticated}
+			{#if $authStore.loading}
 				<div class="hidden items-center space-x-4 lg:flex">
-					<span class="text-sm">Hello, {$authStore.user?.name || 'User'}</span>
-					<Button label="Logout" on:click={handleLogout} variant="secondary" />
+					<div class="h-5 w-28 animate-pulse rounded bg-gray-200"></div>
+				</div>
+			{:else if $authStore.isAuthenticated}
+				<div class="hidden items-center space-x-4 lg:flex">
+					<span class="text-sm">Hello, {$authStore.user?.first_name || 'User'}</span>
 				</div>
 			{:else}
 				<div class="hidden items-center space-x-4 lg:flex">
@@ -109,11 +108,11 @@
 </header>
 
 <Modal showModal={showLoginModal} on:close={() => (showLoginModal = false)}>
-	<LoginForm on:openRegister={handleOpenRegister} />
+	<LoginForm on:openRegister={handleOpenRegister} on:close={() => (showLoginModal = false)} />
 </Modal>
 
 <Modal showModal={showRegisterModal} on:close={() => (showRegisterModal = false)}>
-	<RegisterForm on:switchToLogin={handleOpenLogin} />
+	<RegisterForm on:switchToLogin={handleOpenLogin} on:close={() => (showRegisterModal = false)} />
 </Modal>
 
 <style lang="postcss">

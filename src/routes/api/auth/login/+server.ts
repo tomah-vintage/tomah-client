@@ -19,14 +19,23 @@ export const POST: RequestHandler = async ({ request, cookies }) => {
 			return json({ error: errorData.message || 'Authentication failed' }, { status: backendResponse.status });
 		}
 
-		const { access } = await backendResponse.json();
+		const { access, refresh } = await backendResponse.json();
 
 		cookies.set('token', access, {
 			path: '/',
-			httpOnly: true,
+			httpOnly: false,
 			secure: process.env.NODE_ENV === 'production',
 			maxAge: 60 * 60 * 24 * 7 // 1 week
 		});
+
+		if (refresh) {
+			cookies.set('refresh_token', refresh, {
+				path: '/',
+				httpOnly: false,
+				secure: process.env.NODE_ENV === 'production',
+				maxAge: 60 * 60 * 24 * 30 // 30 days
+			});
+		}
 
 		return json({ success: true, token: access });
 	} catch (error) {
