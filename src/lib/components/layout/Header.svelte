@@ -8,9 +8,11 @@
 	import Modal from '$lib/components/common/Modal.svelte';
 	import LoginForm from '$lib/components/auth/LoginForm.svelte';
 	import RegisterForm from '$lib/components/auth/RegisterForm.svelte';
+	import Sidebar from '$lib/components/layout/Sidebar.svelte';
 
 	let showLoginModal = false;
 	let showRegisterModal = false;
+	let showSidebar = false;
 
 	let searchTerm = '';
 	function handleSearch() {
@@ -19,20 +21,26 @@
 	function handleOpenRegister() {
 		showLoginModal = false;
 		showRegisterModal = true;
+		showSidebar = false;
 	}
 	function handleOpenLogin() {
 		showRegisterModal = false;
 		showLoginModal = true;
+		showSidebar = false;
 	}
 
 	$: totalItems = $cartStore.items.reduce((acc, item) => acc + item.quantity, 0);
+
+	$: if (typeof document !== 'undefined') {
+		document.body.classList.toggle('no-scroll', showSidebar);
+	}
 </script>
 
 <header class="bg-white p-4 shadow-[0_2px_2px_0_rgba(0,0,0,0.15)]">
 	<div class="container mx-auto flex items-center justify-between">
 		<!-- Left Side -->
 		<div class="flex items-center space-x-4">
-			<button class="p-2 lg:hidden">
+			<button on:click={() => (showSidebar = true)} class="p-2 cursor-pointer">
 				<Menu class="h-6 w-6" />
 			</button>
 			<a href="/">
@@ -114,6 +122,13 @@
 <Modal showModal={showRegisterModal} on:close={() => (showRegisterModal = false)}>
 	<RegisterForm on:switchToLogin={handleOpenLogin} on:close={() => (showRegisterModal = false)} />
 </Modal>
+
+<Sidebar
+	show={showSidebar}
+	on:close={() => (showSidebar = false)}
+	on:openLogin={handleOpenLogin}
+	on:openRegister={handleOpenRegister}
+/>
 
 <style lang="postcss">
 </style>

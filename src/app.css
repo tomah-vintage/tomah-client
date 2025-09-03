@@ -7,6 +7,10 @@ body {
 	height: 100vh;
 }
 
+.no-scroll {
+	overflow: hidden;
+}
+
 @layer utilities {
 	.text-primary-blue {
 		color: #2a85ff;
