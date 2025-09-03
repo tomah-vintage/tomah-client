@@ -1,5 +1,6 @@
 <script lang="ts">
 	import { authStore } from '$lib/stores/auth';
+	// import { cartStore } from '$lib/stores/cart';
 	import Button from '$lib/components/common/Button.svelte';
 	import { Menu, MapPin, Search, ShoppingCart } from 'lucide-svelte';
 	import { goto } from '$app/navigation';
@@ -79,7 +80,7 @@
 					<span
 						class="absolute top-0 right-0 flex h-4 w-4 items-center justify-center rounded-full bg-red-500 text-xs text-white"
 					>
-						{totalItems}
+						<!-- {totalItems} -->
 					</span>
 				</a>
 			</div>

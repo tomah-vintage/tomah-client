@@ -25,6 +25,13 @@
 	</div>
 	<div class="flex items-center justify-between border-b border-slate-300">
 		<div class="flex space-x-4">
+			{#if categories.length < 1}
+			<div
+			class="px-4 py-2 font-semibold text-[#222222]"
+		>
+		Үндсэн хоол
+		</div>
+		{/if}
 			{#each categories as category}
 				<button
 					class="px-4 py-2 font-semibold text-[#222222]"
