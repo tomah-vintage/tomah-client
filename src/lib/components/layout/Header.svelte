@@ -1,6 +1,5 @@
 <script lang="ts">
 	import { authStore } from '$lib/stores/auth';
-	// import { cartStore } from '$lib/stores/cart';
 	import Button from '$lib/components/common/Button.svelte';
 	import { Menu, MapPin, Search, ShoppingCart } from 'lucide-svelte';
 	import { goto } from '$app/navigation';
@@ -9,12 +8,17 @@
 	import LoginForm from '$lib/components/auth/LoginForm.svelte';
 	import RegisterForm from '$lib/components/auth/RegisterForm.svelte';
 	import Sidebar from '$lib/components/layout/Sidebar.svelte';
+	import { cart, cartQuantity } from '$lib/stores/cart';
+	import OrderModel from '../order/OrderModel.svelte';
+	import Orders from '../order/Orders.svelte';
 
 	let showLoginModal = false;
 	let showRegisterModal = false;
 	let showSidebar = false;
+	let showOrder = false;
 
 	let searchTerm = '';
+
 	function handleSearch() {
 		goto(`/?search=${searchTerm}`);
 	}
@@ -29,7 +33,9 @@
 		showSidebar = false;
 	}
 
-	$: totalItems = $cartStore.items.reduce((acc, item) => acc + item.quantity, 0);
+	const openModal = () => (showOrder = true);
+	const closeModal = () => (showOrder = false);
+
 
 	$: if (typeof document !== 'undefined') {
 		document.body.classList.toggle('no-scroll', showSidebar);
@@ -40,7 +46,7 @@
 	<div class="container mx-auto flex items-center justify-between">
 		<!-- Left Side -->
 		<div class="flex items-center space-x-4">
-			<button on:click={() => (showSidebar = true)} class="p-2 cursor-pointer">
+			<button on:click={() => (showSidebar = true)} class="cursor-pointer p-2">
 				<Menu class="h-6 w-6" />
 			</button>
 			<a href="/">
@@ -75,14 +81,14 @@
 		<!-- Right Side -->
 		<div class="flex items-center space-x-2 sm:space-x-6">
 			<div class="relative p-2">
-				<a href="/order">
+				<button on:click={openModal}>
 					<ShoppingCart class="h-6 w-6" />
 					<span
 						class="absolute top-0 right-0 flex h-4 w-4 items-center justify-center rounded-full bg-red-500 text-xs text-white"
 					>
-						<!-- {totalItems} -->
+						{$cartQuantity}
 					</span>
-				</a>
+				</button>
 			</div>
 
 			{#if $authStore.loading}
@@ -122,6 +128,10 @@
 <Modal showModal={showRegisterModal} on:close={() => (showRegisterModal = false)}>
 	<RegisterForm on:switchToLogin={handleOpenLogin} on:close={() => (showRegisterModal = false)} />
 </Modal>
+
+<OrderModel open={showOrder} onClose={closeModal}>
+	<Orders onClose={closeModal}/>
+</OrderModel>
 
 <Sidebar
 	show={showSidebar}

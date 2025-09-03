@@ -10,6 +10,6 @@
 	<h1 class="text-3xl font-bold">{restaurant.name}</h1>
 </div>
 
-<p class="text-slate-500 flex items-center gap-1"><MapPin size={16}/>{restaurant.address}</p>
-<p class="text-slate-500 flex items-center gap-1"> <Phone size={16}/>{restaurant.address}</p>
-<p class="text-slate-500 flex items-center gap-1"><Clock size={16}/>{restaurant.address}</p>
+<p class="text-gray-500 flex items-center gap-1"><MapPin size={16}/>{restaurant.address}</p>
+<p class="text-gray-500 flex items-center gap-1"> <Phone size={16}/>{restaurant.address}</p>
+<p class="text-gray-500 flex items-center gap-1"><Clock size={16}/>{restaurant.address}</p>

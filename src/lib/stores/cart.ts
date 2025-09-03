@@ -12,16 +12,15 @@ const createCart = () => {
 		}
 	};
 
-	const addItem = (itemToAdd: Omit<CartItem, 'quantity'>) => {
+	const addItem = (itemToAdd: Omit<CartItem, 'quantity'>, quantity: number = 1) => {
 		update((items) => {
 			const existingItem = items.find((i) => i.id === itemToAdd.id);
 			let newItems;
+			const qty = Math.max(1, quantity);
 			if (existingItem) {
-				newItems = items.map((i) =>
-					i.id === itemToAdd.id ? { ...i, quantity: i.quantity + 1 } : i
-				);
+				newItems = items.map((i) => (i.id === itemToAdd.id ? { ...i, quantity: i.quantity + qty } : i));
 			} else {
-				newItems = [...items, { ...itemToAdd, quantity: 1 }];
+				newItems = [...items, { ...itemToAdd, quantity: qty }];
 			}
 			syncWithLocalStorage(newItems);
 			return newItems;
@@ -57,7 +56,8 @@ const createCart = () => {
 		addItem,
 		removeItem,
 		updateQuantity,
-		clearCart
+		clearCart,
+		initialValue
 	};
 };
 

@@ -22,7 +22,7 @@
 
 <div class="my-6">
 	<p class="text-2xl font-bold">Сэтгэгдэл</p>
-	<p class="text-sm text-slate-400">Бидэнд санал хүсэлтээ илгээгээрэй</p>
+	<p class="text-sm text-gray-400">Бидэнд санал хүсэлтээ илгээгээрэй</p>
 
 	<div class="my-4 flex gap-4">
 		{#each options as option}

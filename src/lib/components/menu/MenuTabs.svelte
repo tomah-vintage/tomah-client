@@ -14,7 +14,7 @@
 	<div class="mb-5 flex justify-between">
 		<div>
 			<p class="text-lg font-semibold">Меню</p>
-			<p class="text-sm text-slate-400">10:00 өглөө-21:30 орой</p>
+			<p class="text-sm text-gray-500">10:00 өглөө-21:30 орой</p>
 		</div>
 		<input
 			type="text"
@@ -23,7 +23,7 @@
 			class="rounded-lg border p-2 w-xl"
 		/>
 	</div>
-	<div class="flex items-center justify-between border-b border-slate-300">
+	<div class="flex items-center justify-between border-b border-gray-300">
 		<div class="flex space-x-4">
 			{#if categories.length < 1}
 			<div
