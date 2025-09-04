@@ -17,7 +17,7 @@
 </script>
 
 <div
-	class="restaurant-card relative mb-3 flex h-[248px] w-[300px] cursor-pointer flex-col rounded-2xl bg-white hover:border hover:border-gray-300 hover:shadow-2xl" 
+	class="restaurant-card relative mb-3 flex h-[248px] w-[300px] cursor-pointer flex-col rounded-2xl bg-white hover:shadow-2xl" 
 	style="box-shadow: 0 11px 3px 0 rgba(0, 0, 0, 0.00), 0 0 10.2px 0 rgba(0, 0, 0, 0.10);"
 	role="button"
 	tabindex="0"

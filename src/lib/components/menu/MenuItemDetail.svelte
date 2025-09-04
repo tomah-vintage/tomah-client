@@ -4,6 +4,7 @@
 
 	export let item: MenuItem
     export let onClose = () => {};
+	export let restaurantId: number;
 
     let quantity = 1;
 
@@ -13,7 +14,7 @@
     };
 
     function addToCart() {
-		cart.addItem(item, quantity);
+		cart.addItem({...item, restaurant_id: restaurantId }, quantity);
 		onClose()
 	}
 

@@ -13,7 +13,8 @@
 	// Ensure data is available and has the expected structure
 	$: categories = data.categories || [];
 	$: menuItems = data.menuItems || [];
-
+	$: restaurantId = parseInt(data.restaurant.id, 10);
+	
 	let selectedCategoryId = categories ? categories[0]?.id : '';
 	let searchTerm = '';
 
@@ -24,9 +25,9 @@
 
 <div class="mt-3 w-full">
 	<ImageGallery images={data.restaurant?.restaurant_img_urls || []} />
-	<FeaturedItems items={menuItems} />
-	<MenuTabs {categories} bind:selectedCategoryId bind:searchTerm />
-	<MenuList items={filteredItems} />
+	<FeaturedItems items={menuItems} {restaurantId} />
+	<MenuTabs categories={categories} bind:selectedCategoryId bind:searchTerm />
+	<MenuList items={filteredItems} {restaurantId} />
 	<InfoPanel restaurant={data.restaurant} />
 	<Map />
 	<Reviews reviews={data.restaurant?.reviews || []} />

@@ -5,6 +5,7 @@
 	import MenuItemDetail from './MenuItemDetail.svelte';
 
 	export let item: MenuItem;
+	export let restaurantId: number;
 
 	let showModal = false;
 
@@ -21,7 +22,7 @@
 	>
 		<Plus size={24} class="text-[#DC2625]" />
 	</button>
-	<img src={item.img_urls} alt={item.name} class="h-[220px] w-[280px] rounded-t-2xl object-cover" />
+	<img src={item.img_urls[0]} alt={item.name} class="h-[220px] w-[280px] rounded-t-2xl object-cover" />
 	<div class="px-5 py-3.5">
 		<p class="font-bold">{item.name}</p>
 		<p class="mb-4 text-xs text-gray-500">{item.description}</p>
@@ -30,5 +31,5 @@
 </div>
 
 <Model open={showModal} onClose={closeModal} width="600px">
-	<MenuItemDetail item={item} onClose={closeModal}/>
+	<MenuItemDetail item={item} onClose={closeModal} restaurantId={restaurantId} />
 </Model>

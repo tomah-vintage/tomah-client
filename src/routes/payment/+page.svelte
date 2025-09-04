@@ -8,7 +8,7 @@
 		<h2 class="mb-4 text-lg font-bold">Төлбөрийн нөхцлүүд</h2>
 
 		<!-- Order Summary -->
-		<div class="mb-4 rounded-lg border p-4">
+		<div class="mb-4 rounded-lg border border-gray-300 p-4">
 			<p class="mb-2 font-semibold">Төлбөрийн дэлгэрэнгүй</p>
 			<div class="flex justify-between text-sm">
 				<span>Нийт дүн:</span>
@@ -29,7 +29,7 @@
 		</div>
 
 		<!-- Payer type -->
-		<div class="mb-4 rounded-lg border p-4">
+		<div class="mb-4 rounded-lg border border-gray-300 p-4">
 			<div class="flex items-center gap-6">
 				<label class="flex items-center gap-2">
 					<input type="radio" bind:group={payerType} value="person" />
@@ -44,7 +44,7 @@
 				type="text"
 				placeholder="Регистрийн дугаар"
 				bind:value={regNumber}
-				class="mt-3 w-full rounded border px-3 py-2 text-sm"
+				class="mt-3 w-full rounded border px-3 py-2 text-sm border-gray-300"
 				disabled={payerType !== 'company'}
 			/>
 		</div>
@@ -53,18 +53,24 @@
 		<div class="mb-4">
 			<p class="mb-2 font-semibold">Төлбөрийн хэрэгслүүд</p>
 			<div class="flex flex-wrap gap-2">
-				<img src="/pay/qpay.png" class="h-10" alt="QPay" />
-				<img src="/pay/applepay.png" class="h-10" alt="Apple Pay" />
-				<img src="/pay/mongopay.png" class="h-10" alt="MonPay" />
-				<img src="/pay/socialpay.png" class="h-10" alt="SocialPay" />
+				<img src="/src/lib/assets/pay/qpay.png" class="h-10" alt="QPay" />
+				<img src="/src/lib/assets/pay/applepay.png" class="h-10" alt="Apple Pay" />
+				<img src="/src/lib/assets/pay/monpay.png" class="h-10" alt="MonPay" />
+				<img src="/src/lib/assets/pay/social.png" class="h-10" alt="SocialPay" />
+				<img src="/src/lib/assets/pay/golomt.png" class="h-10" alt="SocialPay" />
+				<img src="/src/lib/assets/pay/khanbank.png" class="h-10" alt="SocialPay" />
+				<img src="/src/lib/assets/pay/khas.png" class="h-10" alt="SocialPay" />
+				<img src="/src/lib/assets/pay/tdb.png" class="h-10" alt="SocialPay" />
+				<img src="/src/lib/assets/pay/turiin.png" class="h-10" alt="SocialPay" />
 				<!-- add more -->
 			</div>
 		</div>
 
 		<!-- QR Code -->
-		<div class="rounded-lg border p-4 text-center">
+		<div class="rounded-lg border border-gray-300 p-4 text-center">
 			<p class="mb-2 text-sm">QR уншуулна уу</p>
-			<img src="/qr-example.png" alt="QR" class="mx-auto h-40 w-40" />
+			<!-- <img src="/qr-example.png" alt="QR" class="mx-auto h-40 w-40" /> -->
+			 <div class="mx-auto h-40 w-40 border border-gray-300"></div>
 			<p class="mt-2 text-xs text-gray-500">
 				Жич: Хэрэв та төлбөрөө хийсэн бол “Төлбөрийг баталгаажуулах” товчийг дарна уу.
 			</p>

@@ -4,6 +4,7 @@
 
 	export let items: MenuItem[];
 	export let limit = 4;
+	export let restaurantId: number;
 
 	function loadMore() {
 		limit += 4;
@@ -13,7 +14,7 @@
 <div class="mt-4">
 	<div class="grid grid-cols-1 gap-4 md:grid-cols-3 lg:grid-cols-4">
 		{#each items.slice(0, limit) as item}
-			<MenuCard {item} />
+			<MenuCard {item} {restaurantId} />
 		{/each}
 	</div>
 </div>

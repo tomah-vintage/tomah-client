@@ -34,7 +34,7 @@
 		? 'translate-x-0'
 		: '-translate-x-full'}"
 >
-	<div class="flex items-center justify-between border-b p-4">
+	<div class="flex items-center justify-between border-b p-4 border-gray-300">
 		{#if $authStore.isAuthenticated}
 			<div class="flex items-center space-x-3 rounded-lg p-2">
 				<User class="h-6 w-6 text-gray-600" />
@@ -60,13 +60,13 @@
 				</a>
 			</li>
 			<li>
-				<a href="/" class="flex items-center space-x-3 rounded-lg px-4 py-2 hover:bg-gray-100">
+				<a on:click={close} href="/how_to_work" class="flex items-center space-x-3 rounded-lg px-4 py-2 hover:bg-gray-100">
 					<HelpCircle class="h-5 w-5 text-gray-600" />
 					<span>Тусламж</span>
 				</a>
 			</li>
 			<li>
-				<a href="/" class="flex items-center space-x-3 rounded-lg px-4 py-2 hover:bg-gray-100">
+				<a on:click={close} href="/profile" class="flex items-center space-x-3 rounded-lg px-4 py-2 hover:bg-gray-100">
 					<Settings class="h-5 w-5 text-gray-600" />
 					<span>Тохиргоо</span>
 				</a>
@@ -74,7 +74,7 @@
 		</ul>
 		<hr class="my-4" />
 	</nav>
-	<div class="border-t p-4">
+	<div class="border-t p-4 border-gray-300">
 		{#if $authStore.isAuthenticated}
 			<button
 				on:click={() => authStore.logout()}

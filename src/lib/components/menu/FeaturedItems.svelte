@@ -3,6 +3,7 @@
 	import MenuCard from './MenuCard.svelte';
 
 	export let items: MenuItem[];
+	export let restaurantId: number;
 </script>
 
 <div class="mb-4">
@@ -14,7 +15,7 @@
 		  </div>
 		{/if}
 		{#each items as item}
-			<MenuCard {item} />
+			<MenuCard {item} {restaurantId} />
 		{/each}
 	</div>
 </div>

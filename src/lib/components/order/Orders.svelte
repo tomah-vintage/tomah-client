@@ -2,14 +2,26 @@
 	import { cartTotal, cart } from '$lib/stores/cart';
 	import type { CartItem } from '$lib/types/cart';
 	import { goto } from '$app/navigation';
+	import { authStore } from '$lib/stores/auth';
+	import { apiFetch } from '$lib/utils/api';
+	import { env } from '$env/dynamic/public';
+	import Modal from '$lib/components/common/Modal.svelte';
+	import LoginForm from '$lib/components/auth/LoginForm.svelte';
+	import RegisterForm from '$lib/components/auth/RegisterForm.svelte';
 
-	export let onClose :()=>{}
+	export let onClose: () => {};
+	let showLoginModal = false;
+	let showRegisterModal = false;
 
-	let orderItems = cart.initialValue;
+	function handleOpenRegister() {
+		showLoginModal = false;
+		showRegisterModal = true;
+	}
 
-	// console.log($cartTotal); // uncomment if you want to observe changes
-
-	// export let orderItems = [];
+	function handleOpenLogin() {
+		showRegisterModal = false;
+		showLoginModal = true;
+	}
 
 	const increaseItemQuantity = (item: CartItem) => () => {
 		cart.updateQuantity(item.id, item.quantity + 1);
@@ -19,9 +31,37 @@
 		cart.updateQuantity(item.id, item.quantity - 1);
 	};
 
-	function handlePay() {
-		goto('/payment');
-		onClose()
+	async function handlePay() {
+		// Build payload from current stores
+		const userId = $authStore.user?.id;
+		if (!userId) return handleOpenLogin();
+
+		const items = $cart.map((i) => ({
+			menu_item: i.id,
+			quantity: i.quantity,
+			unit_price: i.price
+		}));
+		const payload = {
+			user: userId,
+			restaurant: $cart[0].restaurant_id,
+			order_status: 'PENDING',
+			total_price: $cartTotal,
+			table: null,
+			box: null,
+			order_type: 'DINE_IN',
+			items
+		};
+
+		try {
+			await apiFetch(`${env.PUBLIC_BACKEND_URL}/api/order/`, {
+				method: 'POST',
+				body: JSON.stringify(payload)
+			});
+			onClose && onClose();
+			goto('/payment');
+		} catch (e) {
+			console.error('Failed to create order', e);
+		}
 	}
 </script>
 
@@ -29,7 +69,7 @@
 
 <!-- Example cart content -->
 <div class="space-y-4">
-	{#each orderItems as item}
+	{#each $cart as item}
 		<div class="flex items-center gap-3 border-b pb-3 border-slate-200">
 			<img src={item.img_urls[0]} class="h-16 w-16 rounded-lg object-cover" alt="food" />
 			<div class="flex-1">
@@ -37,11 +77,11 @@
 				<p class="font-semibold text-red-500">{item.price}₮</p>
 			</div>
 			<div class="flex items-center gap-2">
-				<button on:click={increaseItemQuantity(item)} class="rounded bg-gray-200 px-2 py-1"
+				<button on:click={decreaseItemQuantity(item)} class="rounded bg-gray-200 px-2 py-1"
 					>-</button
 				>
 				<span>{item.quantity}</span>
-				<button on:click={decreaseItemQuantity(item)} class="rounded bg-gray-200 px-2 py-1"
+				<button on:click={increaseItemQuantity(item)} class="rounded bg-gray-200 px-2 py-1"
 					>+</button
 				>
 			</div>
@@ -52,22 +92,29 @@
 <!-- Footer -->
 <div class="mt-6">
 	<p class="font-semibold">Төлбөрийн дэлэгрэнгүй</p>
-	<div class="flex justify-between text-sm mt-6 text-slate-700">
+	<div class="mt-6 flex justify-between text-sm text-slate-700">
 		<span>Нийт дүн:</span>
 		<span>{$cartTotal.toLocaleString()}₮</span>
 	</div>
 
-	
-	<div class="flex justify-between text-sm text-slate-700 mt-2">
+	<div class="mt-2 flex justify-between text-sm text-slate-700">
 		<span>Хямдрал:</span>
 		<span>-0₮</span>
 	</div>
-	<div class="mt-2 flex border-t pt-4 border-slate-200 justify-between font-semibold text-slate-700">
+	<div class="mt-2 flex justify-between border-t pt-4 border-slate-200 font-semibold text-slate-700">
 		<span>Төлөх дүн:</span>
 		<span>{$cartTotal.toLocaleString()}₮</span>
 	</div>
 
-	<button class="mt-4 w-full rounded-lg bg-red-500 py-3 text-white hover:bg-red-600" on:click={handlePay}>
+	<button disabled={$cart.length < 1} class="mt-4 w-full rounded-lg bg-red-500 py-3 text-white hover:bg-red-600 disabled:bg-red-400" on:click={handlePay}>
 		Төлбөр төлөх
 	</button>
 </div>
+
+<Modal showModal={showLoginModal} on:close={() => (showLoginModal = false)}>
+	<LoginForm on:openRegister={handleOpenRegister} on:close={() => (showLoginModal = false)} />
+</Modal>
+
+<Modal showModal={showRegisterModal} on:close={() => (showRegisterModal = false)}>
+	<RegisterForm on:switchToLogin={handleOpenLogin} on:close={() => (showRegisterModal = false)} />
+</Modal>
