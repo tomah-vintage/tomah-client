@@ -6,11 +6,21 @@ export interface SearchQuery {
 
 export interface SearchResultItem {
 	id: string;
-	type: 'restaurant' | 'menuItem'; // Or other types as needed
+	type: 'restaurant' | 'menuItem';
 	name: string;
 	description?: string;
 	imageUrl?: string;
-	// Add other relevant properties based on type
+	rating?: number;
+	address?: string;
+	hours?: string;
+	location?: {
+		lat: number;
+		lng: number;
+	};
+	// For menu items
+	restaurantId?: string;
+	restaurantName?: string;
+	price?: number;
 }
 
 export interface SearchState {
