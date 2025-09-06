@@ -10,8 +10,8 @@ export const GET: RequestHandler = async ({ url }) => {
 	const category = url.searchParams.get('category');
 
 	try {
-		const backendUrl = new URL(`${PUBLIC_BACKEND_URL}/api/restaurants`);
-		backendUrl.searchParams.append('q', query);
+		const backendUrl = new URL(`${PUBLIC_BACKEND_URL}/api/restaurants/search/`);
+		backendUrl.searchParams.append('name', query);
 		if (typeFilter) backendUrl.searchParams.append('type', typeFilter);
 		if (sortBy) backendUrl.searchParams.append('sortBy', sortBy);
 		if (category) backendUrl.searchParams.append('category', category);
