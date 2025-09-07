@@ -12,9 +12,9 @@
 		{placeholder}
 		bind:value
 		on:keydown
-		class="w-full rounded-lg border-transparent bg-gray-100 py-3 pr-4 pl-4 focus:border-red-500 focus:ring-red-500 {error
-			? 'border-red-500'
-			: ''} {className}"
+		class="w-full rounded-lg border-2 border-transparent bg-neutral-100 py-3 pr-4 pl-4 transition-all duration-200 
+		focus:border-primary focus:ring-2 focus:ring-primary-200 focus:bg-white focus:shadow-md
+		{error ? 'border-error bg-error/5' : 'hover:bg-neutral-50'} {className}"
 	/>
 	{#if error}
 		<span class="mt-1 text-sm text-red-500">{error}</span>

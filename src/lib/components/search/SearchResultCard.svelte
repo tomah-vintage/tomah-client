@@ -23,13 +23,19 @@
 </script>
 
 <div
-	class="flex h-full cursor-pointer flex-col overflow-hidden rounded-lg border border-gray-200 bg-white shadow-sm transition-all duration-200 ease-in-out hover:shadow-lg"
+	class="flex h-full cursor-pointer flex-col overflow-hidden rounded-lg border border-neutral-200 bg-white shadow-sm 
+	transition-all duration-300 ease-out hover:shadow-lg hover:-translate-y-1 hover:border-primary-200
+	focus:outline-none focus:ring-2 focus:ring-primary-200 focus:ring-offset-2 transform"
 	on:click={navigateToItem}
 	on:keydown={(e) => {
-		if (e.key === 'Enter') navigateToItem();
+		if (e.key === 'Enter' || e.key === ' ') {
+			e.preventDefault();
+			navigateToItem();
+		}
 	}}
 	role="button"
 	tabindex="0"
+	aria-label="View {item.name} details"
 >
 	<div class="relative">
 		{#if item.imageUrl}

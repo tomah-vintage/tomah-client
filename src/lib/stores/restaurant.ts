@@ -10,7 +10,7 @@ export interface RestaurantState {
 
 export const restaurantStore = writable<RestaurantState>({
 	restaurants: [],
-	loading: false,
+	loading: true,
 	error: undefined
 });
 

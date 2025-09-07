@@ -8,7 +8,7 @@
 	import { SkeletonLoader } from '$lib/components/common';
 
 	let restaurants: Restaurant[] = [];
-	let loading = false;
+	let loading = true;
 	let error: string | null = null;
 
 	onMount(() => {
@@ -34,12 +34,17 @@
 		<SkeletonLoader type="carousel" />
 		<SkeletonLoader type="list" />
 	{:else if error}
-		<div class="py-8 text-center text-red-500">
-			<p>Error: {error}</p>
-			<p>Please try again later.</p>
+		<div class="py-8 text-center">
+			<div class="bg-error/10 border border-error/20 rounded-lg p-8 max-w-md mx-auto">
+				<div class="text-error text-lg font-medium mb-2">Something went wrong</div>
+				<div class="text-error/80 mb-4">Error: {error}</div>
+				<div class="text-neutral-600">Please try again later.</div>
+			</div>
 		</div>
 	{:else}
-		<RestaurantCarousel {restaurants} on:viewRestaurant={handleViewRestaurant} />
-		<RestaurantMain {restaurants} />
+		<div class="animate-fadeInUp">
+			<RestaurantCarousel {restaurants} on:viewRestaurant={handleViewRestaurant} />
+			<RestaurantMain {restaurants} />
+		</div>
 	{/if}
 </div>

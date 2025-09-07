@@ -17,6 +17,7 @@
 	let showRegisterModal = false;
 	let showSidebar = false;
 	let showOrder = false;
+	let showMobileSearch = false;
 
 	let searchTerm = '';
 	let debounceTimeout: NodeJS.Timeout;
@@ -50,7 +51,7 @@
 
 
 	$: if (typeof document !== 'undefined') {
-		document.body.classList.toggle('no-scroll', showSidebar);
+		document.body.classList.toggle('no-scroll', showSidebar || showMobileSearch);
 	}
 </script>
 
@@ -81,7 +82,8 @@
 				<input
 					type="text"
 					placeholder="Хайл, Ресторан"
-					class="w-full rounded-lg border-transparent bg-gray-100 py-3 pr-4 pl-10 focus:border-red-500 focus:ring-red-500"
+					class="w-full rounded-lg border-2 border-transparent bg-neutral-100 py-3 pr-4 pl-10 
+					focus:border-primary focus:ring-2 focus:ring-primary-200 focus:bg-white hover:bg-neutral-50 transition-all duration-200"
 					bind:value={searchTerm}
 					on:input={() => handleSearch(searchTerm)}
 					on:keydown={(e) => {
@@ -127,12 +129,65 @@
 					/>
 				</div>
 			{/if}
-			<button class="p-2 lg:hidden">
+			<button 
+				class="p-2 lg:hidden transition-colors hover:bg-neutral-100 rounded-lg"
+				on:click={() => showMobileSearch = !showMobileSearch}
+				aria-label="Toggle mobile search"
+			>
 				<Search class="h-6 w-6" />
 			</button>
 		</div>
 	</div>
 </header>
+
+<!-- Mobile Search Overlay -->
+{#if showMobileSearch}
+	<div 
+		class="fixed inset-0 z-50 bg-black/50 lg:hidden"
+		on:click={() => showMobileSearch = false}
+		role="button"
+		tabindex="-1"
+		on:keydown={(e) => {
+			if (e.key === 'Escape') showMobileSearch = false;
+		}}
+	>
+		<div 
+			class="absolute top-0 left-0 right-0 bg-white p-4 shadow-lg"
+			on:click|stopPropagation
+			role="dialog"
+			aria-label="Mobile search"
+		>
+			<div class="flex items-center gap-3">
+				<div class="flex-1 relative">
+					<div class="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3">
+						<Search class="h-5 w-5 text-neutral-400" />
+					</div>
+					<input
+						type="text"
+						placeholder="Хайл, Ресторан"
+						class="w-full rounded-lg border-2 border-transparent bg-neutral-100 py-3 pr-4 pl-10 
+						focus:border-primary focus:ring-2 focus:ring-primary-200 focus:bg-white transition-all duration-200"
+						bind:value={searchTerm}
+						on:input={() => handleSearch(searchTerm)}
+						on:keydown={(e) => {
+							if (e.key === 'Enter') {
+								handleSearch(searchTerm);
+								showMobileSearch = false;
+							}
+						}}
+						autofocus
+					/>
+				</div>
+				<button 
+					class="px-4 py-3 text-neutral-600 hover:text-neutral-800 transition-colors"
+					on:click={() => showMobileSearch = false}
+				>
+					Cancel
+				</button>
+			</div>
+		</div>
+	</div>
+{/if}
 
 <Modal showModal={showLoginModal} on:close={() => (showLoginModal = false)}>
 	<LoginForm on:openRegister={handleOpenRegister} on:close={() => (showLoginModal = false)} />

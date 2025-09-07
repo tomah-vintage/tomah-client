@@ -31,6 +31,7 @@
 			role="dialog"
 			aria-modal="true"
 			tabindex="-1"
+			on:click|stopPropagation
 		>
 			<button on:click={closeModal} class="absolute top-4 right-4">
 				<X class="h-6 w-6 text-gray-500" />

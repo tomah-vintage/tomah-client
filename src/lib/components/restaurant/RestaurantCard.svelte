@@ -1,29 +1,29 @@
 <script lang="ts">
 	import type { Restaurant } from '$lib/types/restaurant';
-	import { createEventDispatcher } from 'svelte';
-	import { Clock, MapPin, Heart, Star } from 'lucide-svelte'; // Added Heart and Star
+	import { Clock, MapPin, Heart, Star } from 'lucide-svelte';
 	import { goto } from '$app/navigation';
-
-	const dispatch = createEventDispatcher<{
-		view: Restaurant;
-	}>();
 
 	export let restaurant: Restaurant;
 
 	function activate() {
-		dispatch('view', restaurant);
 		goto(`/restaurant/${restaurant.id}`);
 	}
 </script>
 
 <div
-	class="restaurant-card relative mb-3 flex h-[248px] w-[300px] cursor-pointer flex-col rounded-2xl bg-white hover:shadow-2xl" 
-	style="box-shadow: 0 11px 3px 0 rgba(0, 0, 0, 0.00), 0 0 10.2px 0 rgba(0, 0, 0, 0.10);"
+	class="restaurant-card relative mb-3 flex h-[248px] w-[300px] cursor-pointer flex-col rounded-2xl bg-white
+	shadow-[0_11px_3px_0_rgba(0,0,0,0.00),_0_0_10.2px_0_rgba(0,0,0,0.10)]
+	focus:outline-none"
 	role="button"
 	tabindex="0"
 	aria-label={`View ${restaurant.name}`}
 	on:click={activate}
-	on:keydown={() => {}}
+	on:keydown={(e) => {
+		if (e.key === 'Enter' || e.key === ' ') {
+			e.preventDefault();
+			activate();
+		}
+	}}
 >
 	<img
 		src={restaurant.logo}
@@ -40,8 +40,10 @@
 	{/if}
 
 	<!-- Heart Icon -->
-	<div class="absolute top-2 right-2 rounded-full bg-white p-2 shadow-md">
-		<Heart size={20} class="text-gray-500" />
+	<div
+		class="absolute top-2 right-2 rounded-full bg-white p-2 shadow-md transition-all duration-200 hover:scale-110 hover:shadow-lg"
+	>
+		<Heart size={20} class="hover:text-primary text-neutral-500 transition-colors duration-200" />
 	</div>
 
 	<!-- Rating Badge -->
