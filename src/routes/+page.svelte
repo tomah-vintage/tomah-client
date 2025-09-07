@@ -29,7 +29,7 @@
 	<meta name="description" content="Tomah is a restaurant ordering app" />
 </svelte:head>
 
-<div class="container mx-auto flex flex-col gap-10 py-8">
+<div class="container mx-auto flex flex-col gap-10 py-8 px-4 sm:px-6 lg:px-8">
 	{#if loading}
 		<SkeletonLoader type="carousel" />
 		<SkeletonLoader type="list" />

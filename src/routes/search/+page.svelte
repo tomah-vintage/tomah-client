@@ -7,8 +7,11 @@
 	import { onMount } from 'svelte';
 	import { page } from '$app/stores';
 	import { parseSearchUrl } from '$lib/utils/search';
+	import { List, MapPin } from 'lucide-svelte';
 
 	export let data: PageData;
+
+	let viewMode: 'list' | 'map' = 'list';
 
 	$: currentQuery = parseSearchUrl($page.url);
 
@@ -20,12 +23,16 @@
 		searchActions.performSearch(currentQuery);
 	}
 
-	$: mapLocations = $searchStore.results
+	$: mapRestaurants = $searchStore.results
 		.filter((item) => item.type === 'restaurant' && item.location)
 		.map((item) => ({
+			id: item.id,
 			lat: item.location!.lat,
 			lng: item.location!.lng,
-			name: item.name
+			name: item.name,
+			imageUrl: item.imageUrl,
+			rating: item.rating,
+			address: item.address
 		}));
 </script>
 
@@ -35,14 +42,35 @@
 </svelte:head>
 
 <div class="container mx-auto px-4 py-8">
-	<div class="grid grid-cols-1 gap-8 lg:grid-cols-2">
-		<div>
-			{#if !$searchStore.loading && $searchStore.results}
-				<div class="mb-4">
-					<h1 class="text-2xl font-bold">{$searchStore.results.length} илэрц</h1>
-				</div>
-			{/if}
+	{#if !$searchStore.loading && $searchStore.results}
+		<div class="mb-6 flex items-center justify-between">
+			<h1 class="text-2xl font-bold">{$searchStore.results.length} илэрц</h1>
+			
+			<!-- View Toggle -->
+			<div class="flex rounded-lg bg-neutral-100 p-1 lg:hidden">
+				<button
+					class="flex items-center gap-2 rounded-md px-3 py-2 text-sm font-medium transition-colors
+					{viewMode === 'list' ? 'bg-white text-primary shadow-sm' : 'text-neutral-600 hover:text-neutral-800'}"
+					on:click={() => viewMode = 'list'}
+				>
+					<List size={16} />
+					List
+				</button>
+				<button
+					class="flex items-center gap-2 rounded-md px-3 py-2 text-sm font-medium transition-colors
+					{viewMode === 'map' ? 'bg-white text-primary shadow-sm' : 'text-neutral-600 hover:text-neutral-800'}"
+					on:click={() => viewMode = 'map'}
+				>
+					<MapPin size={16} />
+					Map
+				</button>
+			</div>
+		</div>
+	{/if}
 
+	<div class="grid grid-cols-1 gap-8 lg:grid-cols-2">
+		<!-- List View -->
+		<div class="lg:block {viewMode === 'map' ? 'hidden lg:block' : ''}">
 			<SearchFilterSort />
 
 			<main class="mt-6">
@@ -78,9 +106,10 @@
 			</main>
 		</div>
 
-		<div class="hidden lg:block" style="height: 716px;">
+		<!-- Map View -->
+		<div class="lg:block {viewMode === 'list' ? 'hidden lg:block' : ''}" style="height: 716px;">
 			<div class="sticky top-24 h-full">
-				<Map locations={mapLocations} />
+				<Map restaurants={mapRestaurants} />
 			</div>
 		</div>
 	</div>

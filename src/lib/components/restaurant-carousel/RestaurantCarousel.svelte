@@ -30,7 +30,7 @@
 	}
 </script>
 
-<div class="relative w-full" bind:clientWidth={containerWidth}>
+<div class="relative w-full mb-8" bind:clientWidth={containerWidth}>
 	{#if loading}
 		<div></div>
 	{:else if restaurants.length > 0 && containerWidth}

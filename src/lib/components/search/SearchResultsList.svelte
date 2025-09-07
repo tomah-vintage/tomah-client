@@ -16,16 +16,18 @@
 			rating: item.rating,
 			restaurant_img_urls: item.imageUrl ? [item.imageUrl] : [],
 			lat: item.location?.lat,
-			lng: item.location?.lng
+			lng: item.location?.lng,
+			// Note: search results might not have full open_hours data
+			// The RestaurantCard will fall back to openingHours if open_hours is not available
 		};
 	}
 </script>
 
 <div class="search-results-list">
-	<div class="grid grid-cols-1 gap-6 md:grid-cols-2">
+	<div class="grid grid-cols-1 gap-8 sm:grid-cols-2 lg:grid-cols-1 xl:grid-cols-2 2xl:grid-cols-2">
 		{#each results as item (item.id)}
 			{#if item.type === 'restaurant'}
-				<RestaurantCard restaurant={adaptToRestaurant(item)} />
+				<RestaurantCard restaurant={adaptToRestaurant(item)} variant="grid" />
 			{:else}
 				<SearchResultCard {item} />
 			{/if}
