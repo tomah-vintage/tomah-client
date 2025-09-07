@@ -1,170 +1,238 @@
-<script>
-	import { Camera, Eye, EyeOff } from 'lucide-svelte';
-	import { createEventDispatcher } from 'svelte';
+<script lang="ts">
+	import { CheckCircle, AlertTriangle, LoaderCircle } from 'lucide-svelte';
+	import { onMount } from 'svelte';
+	import { authStore } from '$lib/stores/auth';
+	import { apiFetch } from '$lib/utils/api';
+	import { env } from '$env/dynamic/public';
+	import { ProfileImageUploader, ProfileForm, PasswordChangeForm } from '$lib/components/profile';
 
-	const dispatch = createEventDispatcher();
+	let isSaving = false;
+	let message = '';
+	let messageType = 'success';
 
-	let showPassword = false;
-	let showConfirmPassword = false;
+	let formData = {
+		first_name: '',
+		last_name: '',
+		email: '',
+		phone: ''
+	};
 
-	// function togglePasswordVisibility(field) {
-	// 	if (field === 'password') {
-	// 		showPassword = !showPassword;
-	// 	} else if (field === 'confirmPassword') {
-	// 		showConfirmPassword = !showConfirmPassword;
-	// 	}
-	// }
+	let passwordData = {
+		new_password: '',
+		confirm_password: ''
+	};
 
-	function handleContinue() {
-		// Dispatch an event or perform an action on continue
-		dispatch('continue');
+	let errors: Record<string, string> = {};
+	let selectedImage: File | null = null;
+	let imagePreview: string | null = null;
+
+	$: user = $authStore.user;
+
+	onMount(async () => {
+		if (!$authStore.user && !$authStore.loading) {
+			await authStore.revalidate();
+		}
+	});
+
+	function validateForm() {
+		const newErrors: Record<string, string> = {};
+
+		if (!formData.first_name.trim()) {
+			newErrors.first_name = 'Нэр заавал бөглөнө үү';
+		}
+
+		if (!formData.last_name.trim()) {
+			newErrors.last_name = 'Овог заавал бөглөнө үү';
+		}
+
+		if (!formData.email.trim()) {
+			newErrors.email = 'И-мэйл заавал бөглөнө үү';
+		} else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.email)) {
+			newErrors.email = 'И-мэйл хаяг буруу байна';
+		}
+
+		errors = newErrors;
+		return Object.keys(newErrors).length === 0;
 	}
 
-	function handlePasswordChange() {
-		// Dispatch an event or perform an action on password change
-		dispatch('password-change');
+	function validatePassword() {
+		if (!passwordData.new_password && !passwordData.confirm_password) {
+			return true;
+		}
+
+		if (passwordData.new_password.length < 6) {
+			errors = { ...errors, password: 'Нууц үг дор хаяж 6 тэмдэгт байх ёстой' };
+			return false;
+		}
+
+		if (passwordData.new_password !== passwordData.confirm_password) {
+			errors = { ...errors, password: 'Нууц үг таарахгүй байна' };
+			return false;
+		}
+
+		delete errors.password;
+		return true;
 	}
 
-	function handleClose() {
-		// Dispatch a close event
-		dispatch('close');
+	function handleImageSelect(event: CustomEvent<File>) {
+		selectedImage = event.detail;
+
+		// Create preview
+		const reader = new FileReader();
+		reader.onload = (e) => {
+			imagePreview = e.target?.result as string;
+		};
+		reader.readAsDataURL(selectedImage);
+
+		// Clear any previous image errors
+		if (errors.image) {
+			const newErrors = { ...errors };
+			delete newErrors.image;
+			errors = newErrors;
+		}
+	}
+
+	function handleImageError(event: CustomEvent<string>) {
+		errors = { ...errors, image: event.detail };
+		selectedImage = null;
+		imagePreview = null;
+	}
+
+	async function handleProfileUpdate(event: CustomEvent<typeof formData>) {
+		formData = event.detail;
+
+		if (!validateForm()) return;
+
+		isSaving = true;
+		message = '';
+
+		try {
+			if (!user?.id) throw new Error('User not authenticated');
+
+			// Upload image first if selected
+			let profileImageUrl = null;
+			if (selectedImage) {
+				const imageFormData = new FormData();
+				imageFormData.append('profile_image', selectedImage);
+
+				const imageResponse = (await apiFetch(
+					`${env.PUBLIC_BACKEND_URL}/api/upload/`,
+					{
+						method: 'POST',
+						body: imageFormData
+					},
+					'file'
+				)) as any;
+
+				profileImageUrl = imageResponse.profile_image_url;
+			}
+
+			// Update profile data
+			const updateData: any = {
+				first_name: formData.first_name,
+				last_name: formData.last_name,
+				email: formData.email,
+				role: user.role
+			};
+
+			if (profileImageUrl) {
+				updateData.profile_image = profileImageUrl;
+			}
+
+			await apiFetch(`${env.PUBLIC_BACKEND_URL}/api/users/${user.id}/`, {
+				method: 'PUT',
+				body: JSON.stringify(updateData)
+			});
+
+			// Clear selected image after successful upload
+			selectedImage = null;
+			imagePreview = null;
+
+			await authStore.revalidate();
+			message = 'Профайл амжилттай шинэчлэгдлээ';
+			messageType = 'success';
+
+			setTimeout(() => {
+				message = '';
+			}, 3000);
+		} catch (error) {
+			console.error('Profile update failed:', error);
+			message = 'Профайл шинэчлэхэд алдаа гарлаа';
+			messageType = 'error';
+		} finally {
+			isSaving = false;
+		}
+	}
+
+	async function handlePasswordChange(event: CustomEvent<typeof passwordData>) {
+		passwordData = event.detail;
+
+		if (!validatePassword()) return;
+		if (!passwordData.new_password) return;
+
+		isSaving = true;
+		message = '';
+
+		try {
+			if (!user?.id) throw new Error('User not authenticated');
+
+			await apiFetch(`${env.PUBLIC_BACKEND_URL}/api/users/${user.id}/change-password/`, {
+				method: 'POST',
+				body: JSON.stringify({
+					new_password: passwordData.new_password
+				})
+			});
+
+			passwordData = { new_password: '', confirm_password: '' };
+			message = 'Нууц үг амжилттай солигдлоо';
+			messageType = 'success';
+
+			setTimeout(() => {
+				message = '';
+			}, 3000);
+		} catch (error) {
+			console.error('Password change failed:', error);
+			message = 'Нууц үг солихоос алдаа гарлаа';
+			messageType = 'error';
+		} finally {
+			isSaving = false;
+		}
 	}
 </script>
 
-<div class="mx-auto w-[600px] rounded-lg p-8">
-	<h2 class="mb-6 text-start text-2xl font-bold text-gray-800">Тохиргоо</h2>
-
-	<div class="mb-6 flex items-start justify-start">
-		<div class="relative">
-			<img
-				src="/src/lib/assets/logo.png"
-				alt="Profile"
-				class="h-24 w-24 rounded-full border-4 border-gray-300 object-cover dark:border-gray-600"
-			/>
-			<div
-				class="absolute right-0 bottom-0 rounded-full border border-gray-300 bg-white p-1 dark:border-gray-600 dark:bg-gray-700"
-			>
-				<Camera class="h-4 w-4 text-gray-600 dark:text-gray-400" />
-			</div>
-		</div>
+<div class="mx-auto my-8 w-full max-w-2xl rounded-lg bg-white p-6 shadow-sm dark:bg-gray-800">
+	<div class="mb-6 flex items-center justify-between">
+		<h2 class="text-2xl font-bold text-gray-900 dark:text-white">Профайл тохиргоо</h2>
+		{#if $authStore.loading}
+			<LoaderCircle class="h-5 w-5 animate-spin text-gray-500" />
+		{/if}
 	</div>
 
-	<div class="mb-8 grid grid-cols-2 gap-4">
-		<div>
-			<label for="last-name" class="block text-sm font-medium text-gray-700 dark:text-gray-300"
-				>Овог</label
-			>
-			<input
-				type="text"
-				id="last-name"
-				class="mt-1 block w-full rounded-md border border-gray-700 p-2 px-4"
-				value="Baymbaa"
-			/>
-		</div>
-		<div>
-			<label for="first-name" class="block text-sm font-medium text-gray-700 dark:text-gray-300"
-				>Нэр</label
-			>
-			<input
-				type="text"
-				id="first-name"
-				class="mt-1 block w-full rounded-md border border-gray-700 p-2 px-4"
-				value="Tungaa"
-			/>
-		</div>
-		<div>
-			<label for="email" class="block text-sm font-medium text-gray-700 dark:text-gray-300"
-				>Имэйл</label
-			>
-			<input
-				type="email"
-				id="email"
-				class="mt-1 block w-full rounded-md border border-gray-700 p-2 px-4"
-				value="Tungaa@gmail.com"
-			/>
-		</div>
-		<div>
-			<label for="phone" class="block text-sm font-medium text-gray-700 dark:text-gray-300"
-				>Утас</label
-			>
-			<input
-				type="tel"
-				id="phone"
-				class="mt-1 block w-full rounded-md border border-gray-700 p-2 px-4"
-				value="99090899"
-			/>
-		</div>
-	</div>
-
-	<div class="flex w-full justify-end">
-		<button
-			on:click={handleContinue}
-			class="w-1/2 rounded-md bg-red-600 px-4 py-2 font-semibold text-white hover:bg-red-700"
+	{#if message}
+		<div
+			class="mb-4 flex items-center rounded-lg p-3 {messageType === 'success'
+				? 'border border-green-200 bg-green-50 text-green-800 dark:border-green-800 dark:bg-green-900/20 dark:text-green-300'
+				: 'border border-red-200 bg-red-50 text-red-800 dark:border-red-800 dark:bg-red-900/20 dark:text-red-300'}"
 		>
-			Үргэлжлүүлэх
-		</button>
-	</div>
+			{#if messageType === 'success'}
+				<CheckCircle class="mr-2 h-4 w-4" />
+			{:else}
+				<AlertTriangle class="mr-2 h-4 w-4" />
+			{/if}
+			{message}
+		</div>
+	{/if}
 
-	<div class="relative my-8">
-		<div class="absolute inset-0 flex items-center">
-			<div class="w-full border-t border-gray-300 dark:border-gray-600"></div>
-		</div>
-		<div class="relative flex justify-center text-sm">
-			<span
-				class="bg-white px-2 text-lg font-bold text-gray-800 dark:bg-gray-800 dark:text-gray-200"
-			>
-				Нууц үг сэргээх
-			</span>
-		</div>
-	</div>
+	<ProfileImageUploader
+		{user}
+		{selectedImage}
+		{imagePreview}
+		{errors}
+		on:imageSelect={handleImageSelect}
+		on:imageError={handleImageError}
+	/>
 
-	<div class="mb-4 grid grid-cols-2 gap-4">
-		<div class="relative">
-			<label for="new-password" class="sr-only">Шинэ нууц үг</label>
-			<input
-				type={showPassword ? 'text' : 'password'}
-				id="new-password"
-				placeholder="Шинэ нууц үг"
-				class="mt-1 block w-full rounded-md border border-gray-700 p-2 px-4"
-			/>
-			<!-- <div
-				class="absolute right-0 flex cursor-pointer items-center pr-3"
-				on:click={() => togglePasswordVisibility('password')}
-			>
-				{#if showPassword}
-					<EyeOff class="h-5 w-5 text-gray-400" />
-				{:else}
-					<Eye class="h-5 w-5 text-gray-400" />
-				{/if}
-			</div> -->
-		</div>
-		<div class="relative">
-			<label for="confirm-password" class="sr-only">Нууц үг дахин оруулана уу</label>
-			<input
-				type={showConfirmPassword ? 'text' : 'password'}
-				id="confirm-password"
-				placeholder="Нууц үг дахин оруулана уу"
-				class="mt-1 block w-full rounded-md border border-gray-700 p-2 px-4"
-			/>
-			<!-- <div
-				class="absolute inset-y-0 right-0 flex cursor-pointer items-center pr-3"
-				on:click={() => togglePasswordVisibility('confirmPassword')}
-			>
-				{#if showConfirmPassword}
-					<EyeOff class="h-5 w-5 text-gray-400" />
-				{:else}
-					<Eye class="h-5 w-5 text-gray-400" />
-				{/if}
-			</div> -->
-		</div>
-	</div>
+	<ProfileForm {user} {formData} {errors} {isSaving} on:submit={handleProfileUpdate} />
 
-	<div class="flex w-full justify-end">
-		<button
-			on:click={handlePasswordChange}
-			class="w-1/2 rounded-md bg-red-600 px-4 py-2 font-semibold text-white hover:bg-red-700"
-		>
-			Үргэлжлүүлэх
-		</button>
-	</div>
+	<PasswordChangeForm {passwordData} {errors} {isSaving} on:submit={handlePasswordChange} />
 </div>
