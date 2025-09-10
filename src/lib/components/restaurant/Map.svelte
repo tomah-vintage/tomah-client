@@ -155,7 +155,7 @@
 	}
 </script>
 
-<div bind:this={mapElement} style="height: 100%; min-height: 500px;" class="rounded-lg"></div>
+<div bind:this={mapElement} style="height: 100%; min-height: 300px;" class="rounded-xl border border-gray-200 shadow-sm"></div>
 
 <style>
 	:global(.custom-restaurant-marker) {
