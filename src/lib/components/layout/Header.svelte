@@ -49,7 +49,6 @@
 	const openModal = () => (showOrder = true);
 	const closeModal = () => (showOrder = false);
 
-
 	$: if (typeof document !== 'undefined') {
 		document.body.classList.toggle('no-scroll', showSidebar || showMobileSearch);
 	}
@@ -82,8 +81,8 @@
 				<input
 					type="text"
 					placeholder="Хайл, Ресторан"
-					class="w-full rounded-lg border-2 border-transparent bg-neutral-100 py-3 pr-4 pl-10 
-					focus:border-primary focus:ring-2 focus:ring-primary-200 focus:bg-white hover:bg-neutral-50 transition-all duration-200"
+					class="focus:border-primary focus:ring-primary-200 w-full rounded-lg border-2 border-transparent bg-neutral-100 py-3
+					pr-4 pl-10 transition-all duration-200 hover:bg-neutral-50 focus:bg-white focus:ring-2"
 					bind:value={searchTerm}
 					on:input={() => handleSearch(searchTerm)}
 					on:keydown={(e) => {
@@ -129,9 +128,9 @@
 					/>
 				</div>
 			{/if}
-			<button 
-				class="p-2 lg:hidden transition-colors hover:bg-neutral-100 rounded-lg"
-				on:click={() => showMobileSearch = !showMobileSearch}
+			<button
+				class="rounded-lg p-2 transition-colors hover:bg-neutral-100 lg:hidden"
+				on:click={() => (showMobileSearch = !showMobileSearch)}
 				aria-label="Toggle mobile search"
 			>
 				<Search class="h-6 w-6" />
@@ -142,31 +141,31 @@
 
 <!-- Mobile Search Overlay -->
 {#if showMobileSearch}
-	<div 
+	<div
 		class="fixed inset-0 z-50 bg-black/50 lg:hidden"
-		on:click={() => showMobileSearch = false}
+		on:click={() => (showMobileSearch = false)}
 		role="button"
 		tabindex="-1"
 		on:keydown={(e) => {
 			if (e.key === 'Escape') showMobileSearch = false;
 		}}
 	>
-		<div 
-			class="absolute top-0 left-0 right-0 bg-white p-4 shadow-lg"
+		<div
+			class="absolute top-0 right-0 left-0 bg-white p-4 shadow-lg"
 			on:click|stopPropagation
 			role="dialog"
 			aria-label="Mobile search"
 		>
 			<div class="flex items-center gap-3">
-				<div class="flex-1 relative">
+				<div class="relative flex-1">
 					<div class="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3">
 						<Search class="h-5 w-5 text-neutral-400" />
 					</div>
 					<input
 						type="text"
 						placeholder="Хайл, Ресторан"
-						class="w-full rounded-lg border-2 border-transparent bg-neutral-100 py-3 pr-4 pl-10 
-						focus:border-primary focus:ring-2 focus:ring-primary-200 focus:bg-white transition-all duration-200"
+						class="focus:border-primary focus:ring-primary-200 w-full rounded-lg border-2 border-transparent bg-neutral-100 py-3
+						pr-4 pl-10 transition-all duration-200 focus:bg-white focus:ring-2"
 						bind:value={searchTerm}
 						on:input={() => handleSearch(searchTerm)}
 						on:keydown={(e) => {
@@ -178,9 +177,9 @@
 						autofocus
 					/>
 				</div>
-				<button 
-					class="px-4 py-3 text-neutral-600 hover:text-neutral-800 transition-colors"
-					on:click={() => showMobileSearch = false}
+				<button
+					class="px-4 py-3 text-neutral-600 transition-colors hover:text-neutral-800"
+					on:click={() => (showMobileSearch = false)}
 				>
 					Cancel
 				</button>
@@ -198,7 +197,7 @@
 </Modal>
 
 <OrderModel open={showOrder} onClose={closeModal}>
-	<Orders onClose={closeModal}/>
+	<Orders onClose={closeModal} />
 </OrderModel>
 
 <Sidebar

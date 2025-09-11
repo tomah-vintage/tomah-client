@@ -13,6 +13,7 @@ export interface SearchResultItem {
 	rating?: number;
 	address?: string;
 	hours?: string;
+	restaurant_img_urls: string[];
 	location?: {
 		lat: number;
 		lng: number;

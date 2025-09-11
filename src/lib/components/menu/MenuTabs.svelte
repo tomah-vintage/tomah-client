@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { onMount } from 'svelte';
+	import { createQuery } from '$lib/utils/query';
 	import type { MenuCategory } from '$lib/types/menu';
 	import { PUBLIC_BACKEND_URL } from '$env/static/public';
 
@@ -7,25 +7,28 @@
 	export let selectedCategoryId: string;
 	export let searchTerm = '';
 
-	let categories: MenuCategory[] = [];
-	let loading = true;
+	interface CategoriesResponse {
+		results?: MenuCategory[];
+	}
 
-	onMount(async () => {
-		try {
+	const categoriesQuery = createQuery<CategoriesResponse>({
+		queryKey: ['categories', restaurantId],
+		queryFn: async () => {
 			const response = await fetch(`${PUBLIC_BACKEND_URL}/api/item-category/?restaurant=${restaurantId}`);
-			const data = await response.json();
-			categories = data.results || data;
-			
-			if (categories.length > 0 && !selectedCategoryId) {
-				selectedCategoryId = categories[0].id;
+			if (!response.ok) {
+				throw new Error('Failed to load categories');
 			}
-		} catch (error) {
-			console.error('Failed to load categories:', error);
-			categories = [];
-		} finally {
-			loading = false;
+			return response.json();
 		}
 	});
+
+	$: ({ data, isLoading: loading, error } = $categoriesQuery);
+	$: categories = data?.results || [];
+	$: {
+		if (categories.length > 0 && !selectedCategoryId) {
+			selectedCategoryId = categories[0].id;
+		}
+	}
 
 	function selectCategory(categoryId: string) {
 		selectedCategoryId = categoryId;
