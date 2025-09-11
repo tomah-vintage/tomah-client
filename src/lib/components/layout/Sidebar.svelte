@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { createEventDispatcher } from 'svelte';
-	import { X, User, Heart, Percent, HelpCircle, Settings, LogOut } from 'lucide-svelte';
+	import { X, User, Heart, Percent, HelpCircle, Settings, LogOut, ShoppingBag } from 'lucide-svelte';
 	import Button from '$lib/components/common/Button.svelte';
 	import { authStore } from '$lib/stores/auth';
 
@@ -47,6 +47,12 @@
 	</div>
 	<nav class="flex-grow p-4">
 		<ul>
+			<li>
+				<a on:click={close} href="/orders" class="flex items-center space-x-3 rounded-lg px-4 py-2 hover:bg-gray-100">
+					<ShoppingBag class="h-5 w-5 text-gray-600" />
+					<span>Миний захиалгууд</span>
+				</a>
+			</li>
 			<li>
 				<a href="/" class="flex items-center space-x-3 rounded-lg px-4 py-2 hover:bg-gray-100">
 					<Heart class="h-5 w-5 text-gray-600" />
