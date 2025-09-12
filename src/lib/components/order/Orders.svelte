@@ -4,7 +4,7 @@
 	import { goto } from '$app/navigation';
 	import { authStore } from '$lib/stores/auth';
 	import { apiFetch } from '$lib/utils/api';
-	import { env } from '$env/dynamic/public';
+	import { PUBLIC_BACKEND_URL } from '$env/static/public';
 	import Modal from '$lib/components/common/Modal.svelte';
 	import LoginForm from '$lib/components/auth/LoginForm.svelte';
 	import RegisterForm from '$lib/components/auth/RegisterForm.svelte';
@@ -53,7 +53,7 @@
 		};
 
 		try {
-			await apiFetch(`${env.PUBLIC_BACKEND_URL}/api/order/`, {
+			await apiFetch(`${PUBLIC_BACKEND_URL}/api/order/`, {
 				method: 'POST',
 				body: JSON.stringify(payload)
 			});
@@ -70,7 +70,7 @@
 <!-- Example cart content -->
 <div class="space-y-4">
 	{#each $cart as item}
-		<div class="flex items-center gap-3 border-b pb-3 border-slate-200">
+		<div class="flex items-center gap-3 border-b border-slate-200 pb-3">
 			<img src={item.img_urls[0]} class="h-16 w-16 rounded-lg object-cover" alt="food" />
 			<div class="flex-1">
 				<p class="font-medium">{item.name}</p>
@@ -101,12 +101,18 @@
 		<span>Хямдрал:</span>
 		<span>-0₮</span>
 	</div>
-	<div class="mt-2 flex justify-between border-t pt-4 border-slate-200 font-semibold text-slate-700">
+	<div
+		class="mt-2 flex justify-between border-t border-slate-200 pt-4 font-semibold text-slate-700"
+	>
 		<span>Төлөх дүн:</span>
 		<span>{$cartTotal.toLocaleString()}₮</span>
 	</div>
 
-	<button disabled={$cart.length < 1} class="mt-4 w-full rounded-lg bg-red-500 py-3 text-white hover:bg-red-600 disabled:bg-red-400" on:click={handlePay}>
+	<button
+		disabled={$cart.length < 1}
+		class="mt-4 w-full rounded-lg bg-red-500 py-3 text-white hover:bg-red-600 disabled:bg-red-400"
+		on:click={handlePay}
+	>
 		Төлбөр төлөх
 	</button>
 </div>

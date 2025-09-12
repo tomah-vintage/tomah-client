@@ -1,6 +1,6 @@
 import { createQuery } from '$lib/utils/query';
 import { apiFetch } from '$lib/utils/api';
-import { env } from '$env/dynamic/public';
+import { PUBLIC_BACKEND_URL } from '$env/static/public';
 import type { SearchResultItem, SearchQuery } from '$lib/types/search';
 
 interface SearchResponse {
@@ -26,7 +26,7 @@ export function createSearchQuery(searchParams: SearchQuery) {
 
 	return createQuery<SearchResponse>({
 		queryKey: ['search', searchParams],
-		queryFn: () => apiFetch<SearchResponse>(`${env.PUBLIC_BACKEND_URL}/api/restaurants/search?${params.toString()}`),
+		queryFn: () => apiFetch<SearchResponse>(`${PUBLIC_BACKEND_URL}/api/restaurants/search?${params.toString()}`),
 		enabled: !!searchParams.query.trim()
 	});
 }
