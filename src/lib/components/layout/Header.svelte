@@ -1,7 +1,7 @@
 <script lang="ts">
 	import { authStore } from '$lib/stores/auth';
 	import Button from '$lib/components/common/Button.svelte';
-	import { Menu, MapPin, Search, ShoppingCart } from 'lucide-svelte';
+	import { Menu,  Search, ShoppingCart } from 'lucide-svelte';
 	import { goto } from '$app/navigation';
 	import { page } from '$app/stores';
 	import QpickTextLogo from '../assets/QpickTextLogo.svelte';
@@ -9,7 +9,7 @@
 	import LoginForm from '$lib/components/auth/LoginForm.svelte';
 	import RegisterForm from '$lib/components/auth/RegisterForm.svelte';
 	import Sidebar from '$lib/components/layout/Sidebar.svelte';
-	import { cart, cartQuantity } from '$lib/stores/cart';
+	import {  cartQuantity } from '$lib/stores/cart';
 	import OrderModel from '../order/OrderModel.svelte';
 	import Orders from '../order/Orders.svelte';
 
@@ -27,11 +27,11 @@
 		debounceTimeout = setTimeout(() => {
 			const currentPath = $page.url.pathname;
 			if (currentPath !== '/search') {
-				goto(`/search?q=${value}`);
+				goto(`/search?${value}`);
 			} else {
 				// If already on search page, update the URL to trigger new search
 				// This will be handled by the reactive statement in +page.svelte
-				goto(`/search?q=${value}`, { replaceState: true });
+				goto(`/search?${value}`, { replaceState: true });
 			}
 		}, 300); // Debounce for 300ms
 	}
@@ -55,10 +55,10 @@
 </script>
 
 <header class="bg-white p-4 shadow-[0_2px_2px_0_rgba(0,0,0,0.15)]">
-	<div class="container mx-auto flex items-center justify-between">
+	<div class="container mx-auto max-w-[1200px] flex items-center justify-center">
 		<!-- Left Side -->
 		<div class="flex items-center space-x-4">
-			<button on:click={() => (showSidebar = true)} class="cursor-pointer p-2">
+			<button on:click={() => (showSidebar = true)} class="cursor-pointer pr-2 py-2">
 				<Menu class="h-6 w-6" />
 			</button>
 			<a href="/">
@@ -81,8 +81,8 @@
 				<input
 					type="text"
 					placeholder="Хайл, Ресторан"
-					class="focus:border-primary focus:ring-primary-200 w-full rounded-lg border-2 border-transparent bg-neutral-100 py-3
-					pr-4 pl-10 transition-all duration-200 hover:bg-neutral-50 focus:bg-white focus:ring-2"
+					class=" w-full rounded-lg border-2 border-transparent bg-neutral-100 py-3
+					pr-4 pl-10 transition-all duration-200 hover:bg-neutral-50 focus:bg-white focus:ring-0"
 					bind:value={searchTerm}
 					on:input={() => handleSearch(searchTerm)}
 					on:keydown={(e) => {
@@ -106,15 +106,15 @@
 			</div>
 
 			{#if $authStore.loading}
-				<div class="hidden items-center space-x-4 lg:flex">
+				<div class="hidden items-center space-x-4 lg:flex mr-0">
 					<div class="h-5 w-28 animate-pulse rounded bg-gray-200"></div>
 				</div>
 			{:else if $authStore.isAuthenticated}
-				<div class="hidden items-center space-x-4 lg:flex">
+				<div class="hidden items-center space-x-4 lg:flex mr-0">
 					<span class="text-sm">Hello, {$authStore.user?.first_name || 'User'}</span>
 				</div>
 			{:else}
-				<div class="hidden items-center space-x-4 lg:flex">
+				<div class="hidden items-center space-x-4 lg:flex mr-0">
 					<button
 						on:click={() => (showLoginModal = true)}
 						class="cursor-pointer text-sm font-medium whitespace-nowrap hover:text-red-600"

@@ -4,7 +4,7 @@
 	import QpickLogo from '../assets/QpickLogo.svelte';
 </script>
 
-<footer class="bg-[#C0392B] text-white">
+<footer class="bg-[#EB1600] text-white">
 	<div class="container mx-auto px-6 py-12">
 		<div class="grid grid-cols-1 gap-8 md:grid-cols-12">
 			<div class="col-span-1 self-center md:col-span-3">

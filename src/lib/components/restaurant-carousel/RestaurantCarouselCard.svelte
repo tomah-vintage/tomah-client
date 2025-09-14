@@ -1,30 +1,15 @@
 <script lang="ts">
 	import type { Restaurant } from '$lib/types/restaurant';
-	import { goto } from '$app/navigation';
 
 	export let restaurant: Restaurant;
 
-	function handleClick() {
-		goto(`/restaurant/${restaurant.id}`);
-	}
 </script>
 
 <a
-	href="/menu/{restaurant.id}"
-	class="restaurant-carousel-card block w-[386px] transform cursor-pointer overflow-hidden rounded-lg bg-white shadow-md transition-transform duration-200 hover:scale-105"
-	on:click|preventDefault={handleClick}
+	href="/restaurant/{restaurant.id}"
+	class="restaurant-carousel-card block w-[386px] h-[249px] transform cursor-pointer overflow-hidden rounded-lg bg-white shadow-md m-1"
 >
-	<img src={restaurant.logo} alt={restaurant.name} class="h-[249px] w-full object-cover" />
-	<!-- <div class="p-4">
-    <h3 class="font-semibold text-lg text-gray-800 truncate">
-      {restaurant.name}
-    </h3>
-    <p class="text-sm text-gray-600 truncate">{restaurant.address}</p>
-  </div> -->
+	<img src={restaurant.logo} alt={restaurant.name} class="h-[249px] w-full object-cover hover:scale-105 transition-transform duration-200" />
 </a>
 
-<style lang="postcss">
-	.restaurant-carousel-card {
-		/* Add any specific styles here if needed */
-	}
-</style>
+

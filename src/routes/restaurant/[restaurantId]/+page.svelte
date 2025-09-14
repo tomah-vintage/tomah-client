@@ -19,6 +19,8 @@
 	$: ({ data: restaurant, isLoading: restaurantLoading, error: restaurantError } = $restaurantQuery);
 	$: ({ data: menuItemsResponse, isLoading: menuLoading, error: menuError } = $menuItemsQuery);
 	$: menuItems = menuItemsResponse?.results || [];
+
+	$: featureFoods = menuItems.slice(0,4)
 	
 	let selectedCategoryId = '';
 	let searchTerm = '';
@@ -47,10 +49,10 @@
 {:else if restaurant}
 	<div class="mt-3 w-full">
 		<Banner {restaurantId} />
-		<FeaturedItems items={menuItems} {restaurantId} />
+		<FeaturedItems items={featureFoods} {restaurantId} />
 		<MenuTabs {restaurantId} bind:selectedCategoryId bind:searchTerm />
 		<MenuList items={filteredItems} {restaurantId} />
-		
+
 		<!-- Left-aligned smaller sections -->
 		<div class="mt-8 space-y-6">
 			<div class="max-w-2xl">
@@ -61,7 +63,7 @@
 				<h3 class="mb-4 text-xl font-bold text-gray-900">Байршил</h3>
 				<Map />
 			</div>
-			
+
 			<div class="max-w-4xl">
 				<Reviews reviews={restaurant?.reviews || []} {restaurantId} />
 			</div>

@@ -3,13 +3,38 @@
 	import { Clock, MapPin, Heart, Star } from 'lucide-svelte';
 	import { goto } from '$app/navigation';
 	import { getRestaurantHoursDisplay, getRestaurantStatus } from '$lib/utils/restaurant';
+	import { authStore } from '$lib/stores/auth';
+	import LoginForm from '$lib/components/auth/LoginForm.svelte';
+	import RegisterForm from '$lib/components/auth/RegisterForm.svelte';
+	import { apiFetch } from '$lib/utils/api';
+	import { env } from '$env/dynamic/public';
+	import Modal from '$lib/components/common/Modal.svelte';
 
 	export let restaurant: Restaurant;
 	export let variant: 'carousel' | 'grid' = 'carousel'; // New prop to control layout
 	export let className: string = '';
 
+	let showLoginModal = false;
+	let showRegisterModal = false;
+
 	function activate() {
 		goto(`/restaurant/${restaurant.id}`);
+	}
+
+	async function handleFavorite() {
+		if ($authStore.isAuthenticated) {
+			try {
+				await apiFetch(`${env.PUBLIC_BACKEND_URL}/api/restaurant-like/`, {
+					method: 'POST',
+					body: JSON.stringify({ restaurant: restaurant.id })
+				});
+				// Optionally, update the UI to show the restaurant is favorited
+			} catch (error) {
+				console.error('Failed to favorite restaurant:', error);
+			}
+		} else {
+			showLoginModal = true
+		}
 	}
 
 	// Handle missing image gracefully
@@ -28,12 +53,22 @@
 	// Restaurant hours and status
 	$: hoursDisplay = getRestaurantHoursDisplay(restaurant);
 	$: status = getRestaurantStatus(restaurant);
+
+	function handleOpenRegister() {
+		showLoginModal = false;
+		showRegisterModal = true;
+	}
+
+	function handleOpenLogin() {
+		showRegisterModal = false;
+		showLoginModal = true;
+	}
 </script>
 
 <div
-	class="restaurant-card focus:ring-primary-200 relative cursor-pointer overflow-hidden rounded-2xl bg-white shadow-[0_8px_25px_-8px_rgba(0,0,0,0.12)] transition-all
+	class="restaurant-card focus:ring-primary-200 relative cursor-pointer overflow-hidden rounded-2xl bg-white shadow-md transition-all
 	duration-300 ease-out
-	hover:shadow-[0_20px_40px_-8px_rgba(0,0,0,0.18)] focus:ring-2 focus:ring-offset-2 focus:outline-none
+	hover:shadow-lg focus:ring-0 focus:ring-offset-0 focus:outline-none
 	{variant === 'carousel'
 		? 'mb-3 flex h-[248px] w-[300px] flex-col'
 		: 'flex min-h-[280px] w-full flex-col sm:min-h-[300px]'} {className}"
@@ -80,9 +115,7 @@
 		<!-- Heart Icon -->
 		<button
 			class="group absolute top-2 right-2 rounded-full bg-white p-2 shadow-md transition-all duration-200 hover:scale-110 hover:shadow-lg"
-			on:click|stopPropagation={() => {
-				/* Handle favorite action */
-			}}
+			on:click|stopPropagation={handleFavorite}
 			aria-label="Add to favorites"
 		>
 			<Heart
@@ -137,3 +170,11 @@
 		</div>
 	</div>
 </div>
+
+<Modal showModal={showLoginModal} on:close={() => (showLoginModal = false)}>
+	<LoginForm on:openRegister={handleOpenRegister} on:close={() => (showLoginModal = false)} />
+</Modal>
+
+<Modal showModal={showRegisterModal} on:close={() => (showRegisterModal = false)}>
+	<RegisterForm on:switchToLogin={handleOpenLogin} on:close={() => (showRegisterModal = false)} />
+</Modal>

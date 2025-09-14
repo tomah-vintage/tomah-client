@@ -47,18 +47,21 @@
 	</div>
 	<nav class="flex-grow p-4">
 		<ul>
+			{#if $authStore.isAuthenticated}
 			<li>
 				<a on:click={close} href="/orders" class="flex items-center space-x-3 rounded-lg px-4 py-2 hover:bg-gray-100">
 					<ShoppingBag class="h-5 w-5 text-gray-600" />
 					<span>Миний захиалгууд</span>
 				</a>
 			</li>
+			
 			<li>
 				<a href="/" class="flex items-center space-x-3 rounded-lg px-4 py-2 hover:bg-gray-100">
 					<Heart class="h-5 w-5 text-gray-600" />
 					<span>Миний хадгалсан</span>
 				</a>
 			</li>
+			{/if}
 			<li>
 				<a href="/" class="flex items-center space-x-3 rounded-lg px-4 py-2 hover:bg-gray-100">
 					<Percent class="h-5 w-5 text-gray-600" />
@@ -71,12 +74,15 @@
 					<span>Тусламж</span>
 				</a>
 			</li>
+
+			{#if $authStore.isAuthenticated}
 			<li>
 				<a on:click={close} href="/profile" class="flex items-center space-x-3 rounded-lg px-4 py-2 hover:bg-gray-100">
 					<Settings class="h-5 w-5 text-gray-600" />
 					<span>Тохиргоо</span>
 				</a>
 			</li>
+			{/if}
 		</ul>
 		<hr class="my-4" />
 	</nav>

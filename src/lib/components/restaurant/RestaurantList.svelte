@@ -16,7 +16,7 @@
 	function calculateCardsToShow(width: number, cardWidth: number, cardGap: number): number {
 		if (!width || width <= 0) return 1;
 		const numCards = (width + cardGap) / (cardWidth + cardGap);
-		return Math.max(1, Number(numCards.toFixed(1)));
+		return Math.max(1,  Number(numCards.toFixed(1)));
 	}
 </script>
 
@@ -40,16 +40,14 @@
 					<button
 						on:click={prev}
 						disabled={!canScrollPrev}
-						class="rounded-full border border-[#494b5733] bg-transparent p-1.5 text-[#C0C0C0] hover:bg-[#71717A] hover:text-white focus:ring-2 focus:ring-white focus:ring-offset-2 focus:outline-none"
-						class:cursor-not-allowed={!canScrollPrev}
+						class="rounded-full border border-[#494b5733] bg-white/60 disabled:bg-transparent p-1.5 text-[#222222] disabled:text-[#C0C0C0] hover:bg-[#71717A] hover:text-white"
 					>
 						<ArrowLeft size={20} />
 					</button>
 					<button
 						on:click={next}
 						disabled={!canScrollNext}
-						class="rounded-full border border-[#494b5733] bg-transparent p-1.5 text-[#C0C0C0] hover:bg-[#71717A] hover:text-white focus:ring-2 focus:ring-white focus:ring-offset-2 focus:outline-none"
-						class:cursor-not-allowed={!canScrollNext}
+						class="rounded-full border border-[#494b5733] bg-white/60 disabled:bg-transparent p-1.5 text-[#222222] disabled:text-[#C0C0C0] hover:bg-[#71717A] hover:text-white"
 					>
 						<ArrowRight size={20} />
 					</button>
