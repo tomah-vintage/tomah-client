@@ -1,6 +1,6 @@
 <script lang="ts">
 	import type { Restaurant } from '$lib/types/restaurant';
-	import { Clock, MapPin, Heart, Star } from 'lucide-svelte';
+	import { Clock, MapPin,  Star, Heart } from 'lucide-svelte';
 	import { goto } from '$app/navigation';
 	import { getRestaurantHoursDisplay, getRestaurantStatus } from '$lib/utils/restaurant';
 	import { authStore } from '$lib/stores/auth';
@@ -9,13 +9,16 @@
 	import { apiFetch } from '$lib/utils/api';
 	import { env } from '$env/dynamic/public';
 	import Modal from '$lib/components/common/Modal.svelte';
+	import { restaurantActions } from '$lib/stores/restaurant';
 
 	export let restaurant: Restaurant;
 	export let variant: 'carousel' | 'grid' = 'carousel'; // New prop to control layout
 	export let className: string = '';
+	
 
 	let showLoginModal = false;
 	let showRegisterModal = false;
+	let isLiked = restaurant.is_liked;
 
 	function activate() {
 		goto(`/restaurant/${restaurant.id}`);
@@ -24,11 +27,12 @@
 	async function handleFavorite() {
 		if ($authStore.isAuthenticated) {
 			try {
+				isLiked = !restaurant.is_liked 
 				await apiFetch(`${env.PUBLIC_BACKEND_URL}/api/restaurant-like/`, {
-					method: 'POST',
-					body: JSON.stringify({ restaurant: restaurant.id })
+					 	method: 'POST',
+					 	body: JSON.stringify({ restaurant: restaurant.id })
 				});
-				// Optionally, update the UI to show the restaurant is favorited
+				restaurantActions.loadRestaurants();
 			} catch (error) {
 				console.error('Failed to favorite restaurant:', error);
 			}
@@ -119,8 +123,9 @@
 			aria-label="Add to favorites"
 		>
 			<Heart
+			fill={isLiked  ? "#F54927": "#fff"}
 				size={20}
-				class="group-hover:text-primary text-neutral-500 transition-colors duration-200"
+				class="{isLiked ? "text-red-500 ": "text-neutral-500 "} group-hover:text-primary text-neutral-500 transition-colors duration-200"
 			/>
 		</button>
 

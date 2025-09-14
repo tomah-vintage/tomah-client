@@ -2,11 +2,13 @@
 	import SearchResultsList from '$lib/components/search/SearchResultsList.svelte';
 	import SearchFilterSort from '$lib/components/search/SearchFilterSort.svelte';
 	import Map from '$lib/components/restaurant/Map.svelte';
-	import { createSearchQuery } from '$lib/stores/searchQuery';
-	import { page } from '$app/stores';
-	import { parseSearchUrl } from '$lib/utils/search';
-	import { List, MapPin } from 'lucide-svelte';
-	import SearchPageLoader from '$lib/components/loading/SearchPageLoader.svelte';
+		import { createSearchQuery } from '$lib/stores/searchQuery';
+ 	import { page } from '$app/stores';
+ 	import { goto } from '$app/navigation';
+ 	import { parseSearchUrl, constructSearchUrl } from '$lib/utils/search';
+ 	import { List, MapPin } from 'lucide-svelte';
+ 	import SearchPageLoader from '$lib/components/loading/SearchPageLoader.svelte';
+	import type { SearchQuery } from '$lib/types/search';
 
 	let viewMode: 'list' | 'map' = 'list';
 
@@ -15,17 +17,14 @@
 	$: ({ data: searchResponse, isLoading, error } = $searchQuery);
 	$: results = searchResponse?.results || [];
 
-	$: mapRestaurants = results
-		.filter((item) => item.type === 'restaurant' && item.location)
-		.map((item) => ({
-			id: item.id,
-			lat: item.location!.lat,
-			lng: item.location!.lng,
-			name: item.name,
-			imageUrl: item.imageUrl,
-			rating: item.rating,
-			address: item.address
-		}));
+		console.log("mapRestaurants", results);
+		
+
+	function handleFilterChange(event: CustomEvent<Partial<SearchQuery>>) {
+		const newQuery = { ...currentQuery, ...event.detail };
+		const newUrl = constructSearchUrl(newQuery, $page.url.pathname);
+		goto(newUrl, { keepFocus: true, noScroll: true });
+	}
 </script>
 
 <svelte:head>
@@ -74,7 +73,7 @@
 		<div class="grid grid-cols-1 gap-8 lg:grid-cols-2">
 			<!-- List View -->
 			<div class="lg:block {viewMode === 'map' ? 'hidden lg:block' : ''}">
-				<SearchFilterSort />
+				<SearchFilterSort on:change={handleFilterChange} />
 
 				<main class="mt-6">
 					{#if !results || results.length === 0}
@@ -95,7 +94,7 @@
 			<!-- Map View -->
 			<div class="lg:block {viewMode === 'list' ? 'hidden lg:block' : ''}" style="height: 716px;">
 				<div class="sticky top-24 h-full">
-					<Map restaurants={mapRestaurants} />
+					<Map/>
 				</div>
 			</div>
 		</div>

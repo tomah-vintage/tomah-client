@@ -8,9 +8,7 @@
 	$: ({ data, isLoading: loading, error } = $bannersQuery);
 	$: allBanners = data?.results || data || [];
 	$: banners = allBanners; // Show all banners for debugging
-	
-	// Debug logging
-	$: console.log('Restaurant Banner Debug:', { restaurantId, loading, error, allBanners, banners, data });
+
 </script>
 
 {#if loading}

@@ -27,11 +27,11 @@
 		debounceTimeout = setTimeout(() => {
 			const currentPath = $page.url.pathname;
 			if (currentPath !== '/search') {
-				goto(`/search?${value}`);
+				goto(`/search?q=${value}`);
 			} else {
 				// If already on search page, update the URL to trigger new search
 				// This will be handled by the reactive statement in +page.svelte
-				goto(`/search?${value}`, { replaceState: true });
+				goto(`/search?q=${value}`, { replaceState: true });
 			}
 		}, 300); // Debounce for 300ms
 	}

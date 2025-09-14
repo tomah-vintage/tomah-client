@@ -26,4 +26,5 @@ export interface Restaurant {
 	discount?: number;
 	rating?: number;
 	average_rating?: number;
+	is_liked : boolean
 }

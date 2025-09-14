@@ -1,15 +1,16 @@
 import { apiFetch } from '$lib/utils/api';
 import { env } from '$env/dynamic/public';
 import type { PageLoad } from './$types';
-import type { Banner } from '$lib/types/banner';
 import type { Restaurant } from '$lib/types/restaurant';
-
+import { restaurantActions } from '$lib/stores/restaurant';
 
 interface RestaurantsResponse {
 	results?: Restaurant[];
 }
 
 export const load: PageLoad = async ({  }) => {
+
+	restaurantActions.loadRestaurants()
 
 	const fetchRestaurants = async () => {
 		try {

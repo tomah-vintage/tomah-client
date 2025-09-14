@@ -4,12 +4,25 @@
 	import { goto } from '$app/navigation';
 	import 'leaflet/dist/leaflet.css';
 	import type { LatLngExpression } from 'leaflet';
+	import { restaurantStore } from '$lib/stores/restaurant';
+
+	$: mapRestaurants = $restaurantStore.restaurants
+		.filter((item) =>  item.lat)
+		.map((item) => ({
+			id: item.id,
+			lat: item.lat,
+			lng: item.lng,
+			name: item.name,
+			imageUrl: item.restaurant_img_urls[0],
+			rating: item.rating,
+			address: item.address
+		}));
 
 	interface Restaurant {
 		id: string;
-		lat: number;
-		lng: number;
 		name: string;
+		lat?: number;
+		lng?: number;
 		imageUrl?: string;
 		rating?: number;
 		address?: string;
@@ -21,12 +34,12 @@
 		name: string;
 	}
 
-	export let restaurants: Restaurant[] = [];
+	export let restaurants: Restaurant[] = mapRestaurants;
 	export let locations: SimpleLocation[] = []; // For backwards compatibility
 	export let zoom: number = 13;
 
 	// Convert locations to restaurants format for internal use
-	$: displayRestaurants = restaurants.length > 0 
+	$: displayRestaurants = restaurants?.length > 0 
 		? restaurants 
 		: locations.map((loc, index) => ({
 			id: `location-${index}`,
@@ -62,9 +75,7 @@
 					const customIcon = L.divIcon({
 						className: 'custom-restaurant-marker',
 						html: `
-							<div class="marker-pin">
-								<div class="marker-icon">🍽️</div>
-							</div>
+							<div class="marker-pin"></div>
 						`,
 						iconSize: [40, 40],
 						iconAnchor: [20, 40]
@@ -164,37 +175,33 @@
 	}
 
 	:global(.marker-pin) {
-		width: 40px;
-		height: 40px;
+		width: 32px;
+		height: 32px;
 		border-radius: 50% 50% 50% 0;
 		background: #e53e3e;
 		position: absolute;
 		transform: rotate(-45deg);
 		left: 50%;
 		top: 50%;
-		margin: -20px 0 0 -20px;
+		margin: -16px 0 0 -16px;
 		box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
 		cursor: pointer;
 		transition: all 0.3s ease;
 	}
 
+	:global(.marker-pin::after) {
+		content: '';
+		width: 14px;
+		height: 14px;
+		margin: 3px 0 0 3px;
+		background: #fff;
+		position: absolute;
+		border-radius: 50%;
+	}
+
 	:global(.marker-pin:hover) {
 		transform: rotate(-45deg) scale(1.1);
 		box-shadow: 0 6px 12px rgba(0, 0, 0, 0.4);
-	}
-
-	:global(.marker-icon) {
-		width: 24px;
-		height: 24px;
-		font-size: 16px;
-		position: absolute;
-		left: 50%;
-		top: 50%;
-		transform: translate(-50%, -50%) rotate(45deg);
-		display: flex;
-		align-items: center;
-		justify-content: center;
-		color: white;
 	}
 
 	:global(.leaflet-popup-content-wrapper) {

@@ -1,17 +1,19 @@
 import type { SearchQuery, SearchResultItem } from '$lib/types/search';
 
-export const buildSearchUrl = (query: SearchQuery): string => {
+export const constructSearchUrl = (query: SearchQuery, basePath: string): string => {
 	const params = new URLSearchParams();
 	params.append('q', query.query);
 	if (query.filters) {
 		Object.entries(query.filters).forEach(([key, value]) => {
-			params.append(key, value);
+			if (value) {
+				params.append(key, value);
+			}
 		});
 	}
 	if (query.sortBy) {
 		params.append('sortBy', query.sortBy);
 	}
-	return `/search?${params.toString()}`;
+	return `${basePath}?${params.toString()}`;
 };
 
 export const parseSearchUrl = (url: URL): SearchQuery => {

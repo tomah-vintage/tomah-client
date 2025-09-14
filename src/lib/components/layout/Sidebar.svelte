@@ -56,14 +56,14 @@
 			</li>
 			
 			<li>
-				<a href="/" class="flex items-center space-x-3 rounded-lg px-4 py-2 hover:bg-gray-100">
+				<a on:click={close} href="/saved" class="flex items-center space-x-3 rounded-lg px-4 py-2 hover:bg-gray-100">
 					<Heart class="h-5 w-5 text-gray-600" />
 					<span>Миний хадгалсан</span>
 				</a>
 			</li>
 			{/if}
 			<li>
-				<a href="/" class="flex items-center space-x-3 rounded-lg px-4 py-2 hover:bg-gray-100">
+				<a on:click={close} href="/" class="flex items-center space-x-3 rounded-lg px-4 py-2 hover:bg-gray-100">
 					<Percent class="h-5 w-5 text-gray-600" />
 					<span>Урамшуулал</span>
 				</a>

@@ -12,7 +12,7 @@ interface SearchResponse {
 
 export function createSearchQuery(searchParams: SearchQuery) {
 	const params = new URLSearchParams();
-	params.append('q', searchParams.query);
+	params.append('name', searchParams.query);
 	
 	if (searchParams.filters) {
 		Object.entries(searchParams.filters).forEach(([key, value]) => {
