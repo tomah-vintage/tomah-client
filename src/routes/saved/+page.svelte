@@ -5,7 +5,7 @@
 	$: likedRestaurants = $restaurantStore.restaurants.filter(r => r.is_liked);
 </script>
 
-<div class="container mx-auto px-4 py-8">
+<div class="container mx-auto max-w-[1200px] px-4 py-8">
 	<h1 class="text-2xl font-bold mb-6">Миний хадгалсан</h1>
 
 	{#if likedRestaurants.length > 0}

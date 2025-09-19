@@ -200,7 +200,8 @@
 	}
 </script>
 
-<div class="mx-auto my-8 w-full max-w-2xl rounded-lg bg-white p-6 shadow-sm dark:bg-gray-800">
+<div class="container mx-auto max-w-[1200px] px-4 py-8">
+	<div class="mx-auto my-8 w-full max-w-2xl rounded-lg bg-white p-6 shadow-sm dark:bg-gray-800">
 	<div class="mb-6 flex items-center justify-between">
 		<h2 class="text-2xl font-bold text-gray-900 dark:text-white">Профайл тохиргоо</h2>
 		{#if $authStore.loading}
@@ -235,4 +236,5 @@
 	<ProfileForm {user} {formData} {errors} {isSaving} on:submit={handleProfileUpdate} />
 
 	<PasswordChangeForm {passwordData} {errors} {isSaving} on:submit={handlePasswordChange} />
+	</div>
 </div>

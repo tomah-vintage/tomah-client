@@ -23,7 +23,8 @@
 	<meta name="description" content="Миний захиалгуудын түүх" />
 </svelte:head>
 
-<OrdersHeader />
+<div class="container mx-auto max-w-[1200px] px-4 py-8">
+	<OrdersHeader />
 
 {#if loading}
 	<OrdersLoadingState />
@@ -34,3 +35,4 @@
 {:else if orders}
 	<OrdersList {orders} />
 {/if}
+</div>

@@ -3,7 +3,8 @@
 	let regNumber = '';
 </script>
 
-<div class="flex w-full justify-center">
+<div class="container mx-auto max-w-[1200px] px-4 py-8">
+	<div class="flex w-full justify-center">
 	<div class="relative m-5 w-[600px] self-center rounded-2xl bg-white p-6">
 		<h2 class="mb-4 text-lg font-bold">Төлбөрийн нөхцлүүд</h2>
 
@@ -78,5 +79,6 @@
 				Баталгаажуулах
 			</button>
 		</div>
+	</div>
 	</div>
 </div>

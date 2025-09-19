@@ -17,7 +17,7 @@
 </svelte:head>
 
 <div class="min-h-screen bg-gray-50">
-	<div class="container mx-auto px-4 py-8">
+	<div class="container mx-auto max-w-[1200px] px-4 py-8">
 		<h1 class="mb-8 text-center text-3xl font-bold">Your Order</h1>
 
 		<div class="grid grid-cols-1 gap-8 md:grid-cols-3">
