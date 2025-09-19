@@ -1,5 +1,5 @@
 <!-- Banner Loading -->
-<div class="mt-3 w-full">
+<div class="container mx-auto max-w-[1200px] mt-3 w-full px-4">
 	<!-- Banner Skeleton -->
 	<div class="h-64 md:h-80 lg:h-96 bg-gray-200 rounded-lg animate-pulse"></div>
 

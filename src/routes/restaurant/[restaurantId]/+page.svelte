@@ -47,7 +47,7 @@
 		</div>
 	</div>
 {:else if restaurant}
-	<div class="mt-3 w-full">
+	<div class="container mx-auto max-w-[1200px] mt-3 w-full px-4">
 		<Banner {restaurantId} />
 		<FeaturedItems items={featureFoods} {restaurantId} />
 		<MenuTabs {restaurantId} bind:selectedCategoryId bind:searchTerm />

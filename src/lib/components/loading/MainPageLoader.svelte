@@ -1,4 +1,4 @@
-<div class="container mx-auto flex flex-col gap-10 py-8 px-4 sm:px-6 lg:px-8">
+<div class="container mx-auto max-w-[1200px] flex flex-col gap-10 py-8 px-4 sm:px-6 lg:px-8">
 	<!-- Banner Loading -->
 	<div class="h-64 md:h-80 lg:h-96 bg-gray-200 rounded-lg animate-pulse"></div>
 	
