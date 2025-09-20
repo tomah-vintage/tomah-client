@@ -93,13 +93,15 @@
 
 				const marker = L.marker([restaurant.latitude, restaurant.longitude], { icon: customIcon }).addTo(map);
 
+				const restaurantIdStr = String(restaurant.id);
 				const tooltipContent = `
-					<div class="restaurant-tooltip">
-						${restaurant?.imageUrl ? `<img src="${restaurant.imageUrl}" alt="${restaurant.name}" class="tooltip-image" />` : ''}
+					<div class="restaurant-tooltip ${restaurant.id && !restaurantIdStr.startsWith('location-') ? 'clickable' : ''}">
+						${restaurant?.imageUrl ? `<img src="${restaurant.imageUrl}" alt="${restaurant.name}" class="tooltip-image" />` : `<div class="tooltip-placeholder">🏪</div>`}
 						<div class="tooltip-content">
 							<h3 class="tooltip-title">${restaurant.name}</h3>
-							${restaurant.rating ? `<div class="tooltip-rating">⭐ ${restaurant.rating}</div>` : ''}
-							${restaurant.address ? `<div class="tooltip-address">${restaurant.address}</div>` : ''}
+							${restaurant.rating && restaurant.rating > 0 ? `<div class="tooltip-rating">⭐ ${restaurant.rating.toFixed(1)}</div>` : ''}
+							${restaurant.address ? `<div class="tooltip-address">📍 ${restaurant.address}</div>` : ''}
+							${restaurant.id && !restaurantIdStr.startsWith('location-') ? '<div class="tooltip-action">Дэлгэрэнгүй үзэх</div>' : ''}
 						</div>
 					</div>
 				`;
@@ -111,7 +113,7 @@
 					offset: [0, -15]
 				});
 				
-				if (restaurant.id && !restaurant.id.startsWith('location-')) {
+				if (restaurant.id && !restaurantIdStr.startsWith('location-')) {
 					marker.on('click', () => {
 						goto(`/restaurant/${restaurant.id}`);
 					});
@@ -139,6 +141,14 @@
 						popupElement.addEventListener('mouseleave', () => {
 							marker.closePopup();
 						});
+
+						// Add click functionality to clickable tooltips
+						const tooltipDiv = popupElement.querySelector('.restaurant-tooltip.clickable');
+						if (tooltipDiv && restaurant.id && !restaurantIdStr.startsWith('location-')) {
+							tooltipDiv.addEventListener('click', () => {
+								goto(`/restaurant/${restaurant.id}`);
+							});
+						}
 					}
 				});
 			}
@@ -280,6 +290,17 @@
 		padding: 12px;
 		background: white;
 		border-radius: 8px;
+		transition: all 0.2s ease;
+	}
+
+	:global(.restaurant-tooltip.clickable) {
+		cursor: pointer;
+	}
+
+	:global(.restaurant-tooltip.clickable:hover) {
+		background: #f8fafc;
+		transform: translateY(-1px);
+		box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
 	}
 
 	:global(.tooltip-image) {
@@ -287,6 +308,18 @@
 		height: 60px;
 		border-radius: 8px;
 		object-fit: cover;
+		flex-shrink: 0;
+	}
+
+	:global(.tooltip-placeholder) {
+		width: 60px;
+		height: 60px;
+		border-radius: 8px;
+		background: #f3f4f6;
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		font-size: 24px;
 		flex-shrink: 0;
 	}
 
@@ -317,6 +350,22 @@
 		color: #6b7280;
 		margin: 2px 0 0 0;
 		line-height: 1.3;
+		display: flex;
+		align-items: center;
+		gap: 4px;
+	}
+
+	:global(.tooltip-action) {
+		font-size: 12px;
+		color: #3b82f6;
+		margin: 6px 0 0 0;
+		font-weight: 500;
+		opacity: 0.8;
+		transition: opacity 0.2s ease;
+	}
+
+	:global(.restaurant-tooltip.clickable:hover .tooltip-action) {
+		opacity: 1;
 	}
 
 	:global(.leaflet-popup-tip) {

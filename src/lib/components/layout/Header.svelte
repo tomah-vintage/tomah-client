@@ -21,10 +21,22 @@
 
 	let searchTerm = '';
 	let debounceTimeout: NodeJS.Timeout;
+	let isUserTyping = false;
+
+	// Initialize search term from URL search params
+	$: {
+		const urlQuery = $page.url.searchParams.get('q') || '';
+		// Only update if user is not actively typing and values are different
+		if (!isUserTyping && urlQuery !== searchTerm) {
+			searchTerm = urlQuery;
+		}
+	}
 
 	function handleSearch(value: string) {
+		isUserTyping = true;
 		clearTimeout(debounceTimeout);
 		debounceTimeout = setTimeout(() => {
+			isUserTyping = false;
 			const currentPath = $page.url.pathname;
 			if (currentPath !== '/search') {
 				goto(`/search?q=${value}`);
@@ -85,6 +97,7 @@
 					pr-4 pl-10 transition-all duration-200 hover:bg-neutral-50 focus:bg-white focus:ring-0"
 					bind:value={searchTerm}
 					on:input={() => handleSearch(searchTerm)}
+					on:focus={() => isUserTyping = true}
 					on:keydown={(e) => {
 						if (e.key === 'Enter') handleSearch(searchTerm);
 					}}
@@ -168,6 +181,7 @@
 						pr-4 pl-10 transition-all duration-200 focus:bg-white focus:ring-2"
 						bind:value={searchTerm}
 						on:input={() => handleSearch(searchTerm)}
+						on:focus={() => isUserTyping = true}
 						on:keydown={(e) => {
 							if (e.key === 'Enter') {
 								handleSearch(searchTerm);
