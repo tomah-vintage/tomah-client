@@ -20,7 +20,7 @@
  </script>
   
   {#if open}
-    <div 	on:click={onClose} class="fixed inset-0 bg-black/50 flex items-center justify-center z-[200]">
+    <div 	on:click={onClose} class="fixed inset-0 bg-black/50 flex items-center justify-center z-[9999]">
       <div 	on:click|stopPropagation class="bg-white rounded-2xl shadow-lg p-4 relative" style={containerStyle}>
         <!-- Close button -->
         <button

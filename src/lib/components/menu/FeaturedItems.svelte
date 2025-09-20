@@ -1,9 +1,11 @@
 <script lang="ts">
 	import type { MenuItem } from '$lib/types/menu';
+	import type { Restaurant } from '$lib/types/restaurant';
 	import MenuCard from './MenuCard.svelte';
 
 	export let items: MenuItem[];
 	export let restaurantId: number;
+	export let restaurant: Restaurant | null = null;
 </script>
 
 <div class="mb-4">
@@ -15,7 +17,7 @@
 		  </div>
 		{/if}
 		{#each items as item}
-			<MenuCard {item} {restaurantId} />
+			<MenuCard {item} {restaurantId} {restaurant} />
 		{/each}
 	</div>
 </div>

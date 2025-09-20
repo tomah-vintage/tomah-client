@@ -32,6 +32,24 @@
 			return matchesCategory && matchesSearch;
 		})
 		: [];
+
+	function getRestaurantLocation(restaurant: any) {
+		if (!restaurant) return [];
+		
+		// Check for latitude/longitude (string format)
+		const lat = restaurant.latitude || (restaurant.lat?.toString());
+		const lng = restaurant.longitude || (restaurant.lng?.toString());
+		
+		if (lat && lng && lat !== '0' && lng !== '0') {
+			return [{
+				latitude: lat,
+				longitude: lng,
+				name: restaurant.name
+			}];
+		}
+		
+		return [];
+	}
 </script>
 
 {#if restaurantLoading || menuLoading}
@@ -49,9 +67,9 @@
 {:else if restaurant}
 	<div class="container mx-auto max-w-[1200px] mt-3 w-full px-4">
 		<Banner {restaurantId} />
-		<FeaturedItems items={featureFoods} {restaurantId} />
+		<FeaturedItems items={featureFoods} {restaurantId} {restaurant} />
 		<MenuTabs {restaurantId} bind:selectedCategoryId bind:searchTerm />
-		<MenuList items={filteredItems} {restaurantId} />
+		<MenuList items={filteredItems} {restaurantId} {restaurant} />
 
 		<!-- Left-aligned smaller sections -->
 		<div class="mt-8 space-y-6">
@@ -61,7 +79,7 @@
 			
 			<div class="max-w-2xl">
 				<h3 class="mb-4 text-xl font-bold text-gray-900">Байршил</h3>
-				<Map locations={restaurant.latitude && restaurant.longitude ? [{latitude: restaurant.latitude, longitude: restaurant.longitude, name: restaurant.name}] : []} />
+				<Map locations={getRestaurantLocation(restaurant)} />
 			</div>
 
 			<div class="max-w-4xl">
