@@ -61,7 +61,7 @@
 			
 			<div class="max-w-2xl">
 				<h3 class="mb-4 text-xl font-bold text-gray-900">Байршил</h3>
-				<Map />
+				<Map locations={restaurant.latitude && restaurant.longitude ? [{latitude: restaurant.latitude, longitude: restaurant.longitude, name: restaurant.name}] : []} />
 			</div>
 
 			<div class="max-w-4xl">

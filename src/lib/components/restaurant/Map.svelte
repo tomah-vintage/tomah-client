@@ -4,74 +4,77 @@
 	import { goto } from '$app/navigation';
 	import 'leaflet/dist/leaflet.css';
 	import type { LatLngExpression } from 'leaflet';
-	import { restaurantStore } from '$lib/stores/restaurant';
+	import type { SearchResultItem } from '$lib/types/search';
 
-	$: mapRestaurants = $restaurantStore.restaurants
-		.filter((item) =>  item.lat)
-		.map((item) => ({
-			id: item.id,
-			lat: item.lat,
-			lng: item.lng,
-			name: item.name,
-			imageUrl: item.restaurant_img_urls[0],
-			rating: item.rating,
-			address: item.address
-		}));
-
-	interface Restaurant {
-		id: string;
-		name: string;
-		lat?: number;
-		lng?: number;
-		imageUrl?: string;
-		rating?: number;
-		address?: string;
-	}
-
+	export let results: SearchResultItem[] = [];
 	interface SimpleLocation {
-		lat: number;
-		lng: number;
+		latitude: string;
+		longitude: string;
 		name: string;
 	}
+	
+	let mapRestaurants = results
+		.filter((item) => item.latitude && item.longitude)
+		.map((item) => {	
+		return  {
+			id: item.id,
+			latitude: Number(item.latitude),  
+			longitude: Number(item.longitude),
+			name: item.name,
+			imageUrl: item.restaurant_img_urls?.[0] || '',
+			rating: item.average_rating || 0,
+			address: item.address || ''
+		}
 
-	export let restaurants: Restaurant[] = mapRestaurants;
-	export let locations: SimpleLocation[] = []; // For backwards compatibility
+	});
+	
+	export let locations: SimpleLocation[] = [];
 	export let zoom: number = 13;
-
-	// Convert locations to restaurants format for internal use
-	$: displayRestaurants = restaurants?.length > 0 
-		? restaurants 
-		: locations.map((loc, index) => ({
-			id: `location-${index}`,
-			lat: loc.lat,
-			lng: loc.lng,
-			name: loc.name
-		}));
+	let displayRestaurants = mapRestaurants?.length > 0 
+		? mapRestaurants 
+		: locations.filter(loc => loc.latitude && loc.longitude && 
+			!isNaN(Number(loc.latitude)) && !isNaN(Number(loc.longitude)))
+			.map((loc, index) => ({
+				id: `location-${index}`,
+				latitude: Number(loc.latitude),
+				longitude: Number(loc.longitude),
+				name: loc.name,
+				imageUrl: "",
+				rating: 0,
+				address: ""
+			}));
 
 	let mapElement: HTMLElement;
 	let map: L.Map | null = null;
 	let L: any = null;
-	let tooltipElement: HTMLElement;
 
 	onMount(async () => {
 		if (!browser) return;
 		L = await import('leaflet');
+
+		// Default Leaflet icon path configuration
+		delete L.Icon.Default.prototype._getIconUrl;
+		L.Icon.Default.mergeOptions({
+			iconRetinaUrl: 'https://unpkg.com/leaflet@1.9.4/dist/images/marker-icon-2x.png',
+			iconUrl: 'https://unpkg.com/leaflet@1.9.4/dist/images/marker-icon.png',
+			shadowUrl: 'https://unpkg.com/leaflet@1.9.4/dist/images/marker-shadow.png'
+		});
+
 		initializeMap();
 	});
 
 	afterUpdate(() => {
-		if (map && displayRestaurants) {
-			// Clear existing markers
+		if (map && displayRestaurants.length > 0) {
+			// Remove existing markers
 			map.eachLayer((layer) => {
 				if (layer instanceof L.Marker) {
-					map.removeLayer(layer);
+					map?.removeLayer(layer);
 				}
 			});
 
 			// Add new markers
 			displayRestaurants.forEach((restaurant) => {
-				if (restaurant.lat && restaurant.lng) {
-					// Create custom icon
+				if (restaurant.latitude && restaurant.longitude) {
 					const customIcon = L.divIcon({
 						className: 'custom-restaurant-marker',
 						html: `
@@ -81,13 +84,12 @@
 						iconAnchor: [20, 40]
 					});
 
-					const marker = L.marker([restaurant.lat, restaurant.lng], { icon: customIcon })
-						.addTo(map);
+					const marker = L.marker([restaurant.latitude, restaurant.longitude], { icon: customIcon }).addTo(map);
 
-					// Create custom tooltip content
+
 					const tooltipContent = `
 						<div class="restaurant-tooltip">
-							${restaurant.imageUrl ? `<img src="${restaurant.imageUrl}" alt="${restaurant.name}" class="tooltip-image" />` : ''}
+							${restaurant?.imageUrl ? `<img src="${restaurant.imageUrl}" alt="${restaurant.name}" class="tooltip-image" />` : ''}
 							<div class="tooltip-content">
 								<h3 class="tooltip-title">${restaurant.name}</h3>
 								${restaurant.rating ? `<div class="tooltip-rating">⭐ ${restaurant.rating}</div>` : ''}
@@ -96,15 +98,13 @@
 						</div>
 					`;
 
-					// Bind popup and events
-					const popup = marker.bindPopup(tooltipContent, {
+					marker.bindPopup(tooltipContent, {
 						closeOnClick: false,
 						autoClose: false,
 						closeButton: false,
 						offset: [0, -15]
 					});
 					
-					// Add click event to navigate to restaurant (only if it's a real restaurant with valid id)
 					if (restaurant.id && !restaurant.id.startsWith('location-')) {
 						marker.on('click', () => {
 							goto(`/restaurant/${restaurant.id}`);
@@ -112,20 +112,17 @@
 					}
 
 					let hoverTimeout: NodeJS.Timeout;
-
-					// Add hover events for marker
-					marker.on('mouseover', (e) => {
+					marker.on('mouseover', () => {
 						clearTimeout(hoverTimeout);
 						marker.openPopup();
 					});
 
-					marker.on('mouseout', (e) => {
+					marker.on('mouseout', () => {
 						hoverTimeout = setTimeout(() => {
 							marker.closePopup();
-						}, 100); // Small delay to allow moving to tooltip
+						}, 100); 
 					});
 
-					// Add hover events for popup content
 					marker.on('popupopen', () => {
 						const popupElement = marker.getPopup()?.getElement();
 						if (popupElement) {
@@ -141,20 +138,20 @@
 				}
 			});
 
-			// Adjust map view
 			if (displayRestaurants.length > 1) {
-				const bounds = L.latLngBounds(displayRestaurants.map(restaurant => [restaurant.lat, restaurant.lng]));
+				const bounds = L.latLngBounds(displayRestaurants.map(restaurant => [restaurant.latitude, restaurant.longitude]));
 				map.fitBounds(bounds, { padding: [50, 50] });
 			} else if (displayRestaurants.length === 1) {
-                map.setView([displayRestaurants[0].lat, displayRestaurants[0].lng], zoom);
+                map.setView([displayRestaurants[0].latitude, displayRestaurants[0].longitude], zoom);
             }
 		}
 	});
 
 	function initializeMap() {
 		if (mapElement && L && !map) {
+			
 			const initialCenter: LatLngExpression =
-				displayRestaurants.length > 0 && displayRestaurants[0].lat && displayRestaurants[0].lng ? [displayRestaurants[0].lat, displayRestaurants[0].lng] : [47.9187, 106.917];
+				displayRestaurants.length > 0 && displayRestaurants[0].latitude && displayRestaurants[0].longitude ? [displayRestaurants[0].latitude, displayRestaurants[0].longitude] : [47.9187, 106.917];
 
 			map = L.map(mapElement).setView(initialCenter, zoom);
 

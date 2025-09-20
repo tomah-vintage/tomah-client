@@ -7,16 +7,17 @@
 
 	function adaptToRestaurant(item: SearchResultItem): Restaurant {
 		return {
-			id: item.id,
-			name: item.name,
-			logo: item.imageUrl || '',
-			address: item.address || '',
-			openingHours: item.hours || '',
-			rating: item.rating,
-			restaurant_img_urls: item.restaurant_img_urls,
-			lat: item.location?.lat,
-			lng: item.location?.lng
-		};
+	id: item.id,
+	name: item.name,
+	logo: item.imageUrl || '',
+	address: item.address || '',
+	openingHours: item.hours || '',
+	rating: item.rating,
+	restaurant_img_urls: item.restaurant_img_urls,
+	lat: item.location?.lat,
+	lng: item.location?.lng,
+	is_liked: item?.isLiked || false
+};
 	}
 </script>
 

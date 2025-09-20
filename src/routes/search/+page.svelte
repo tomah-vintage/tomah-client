@@ -17,9 +17,6 @@
 	$: ({ data: searchResponse, isLoading, error } = $searchQuery);
 	$: results = searchResponse?.results || [];
 
-		console.log("mapRestaurants", results);
-		
-
 	function handleFilterChange(event: CustomEvent<Partial<SearchQuery>>) {
 		const newQuery = { ...currentQuery, ...event.detail };
 		const newUrl = constructSearchUrl(newQuery, $page.url.pathname);
@@ -94,7 +91,7 @@
 			<!-- Map View -->
 			<div class="lg:block {viewMode === 'list' ? 'hidden lg:block' : ''}" style="height: 716px;">
 				<div class="sticky top-24 h-full">
-					<Map/>
+					<Map results={results}/>
 				</div>
 			</div>
 		</div>
