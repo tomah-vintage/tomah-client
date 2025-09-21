@@ -24,9 +24,6 @@
 	{#if restaurants.length === 0}
 		<p class="text-center text-gray-500">{emptyMessage}</p>
 	{:else}
-		<div class="mb-2 flex justify-between">
-			<p class="self-center text-lg font-semibold">Хөнглөлттэй бүтээгдэхүүн</p>
-		</div>
 		{#if containerWidth}
 			<Carousel slides={restaurants} layout={{ default: cardsToShow }} gaps={{ default: CARD_GAP }}>
 				<div

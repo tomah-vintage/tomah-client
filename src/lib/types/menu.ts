@@ -13,3 +13,14 @@ export interface MenuItem {
 	meta_data: any;
 	categories: string[];
 }
+
+export interface DefaultItemCategory {
+	id: string;
+	name: string;
+	mongolian_name?: string;
+	image_url?: string;
+	is_active: boolean;
+	order_index: number;
+	created_at: string;
+	updated_at: string;
+}
