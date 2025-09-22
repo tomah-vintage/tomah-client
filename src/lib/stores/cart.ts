@@ -63,6 +63,8 @@ const createCart = () => {
 
 export const cart = createCart();
 
+export const { addItem, removeItem, updateQuantity, clearCart } = cart;
+
 export const cartTotal = writable(0);
 cart.subscribe((items) => {
 	const total = items.reduce((acc, item) => acc + item.price * item.quantity, 0);

@@ -10,6 +10,7 @@
 	import { createRestaurantQuery } from '$lib/stores/restaurantQuery';
 	import { createMenuItemsQuery } from '$lib/stores/menuQuery';
 	import RestaurantPageLoader from '$lib/components/loading/RestaurantPageLoader.svelte';
+	import { ErrorPage } from '$lib/components/common';
 
 	$: restaurantId = parseInt($page.params.restaurantId || '0', 10);
 	
@@ -55,15 +56,11 @@
 {#if restaurantLoading || menuLoading}
 	<RestaurantPageLoader />
 {:else if restaurantError || menuError}
-	<div class="mt-3 w-full p-8 text-center">
-		<div class="bg-red-50 border border-red-200 rounded-lg p-8 max-w-md mx-auto">
-			<div class="text-red-600 text-lg font-medium mb-2">Failed to load restaurant</div>
-			<div class="text-red-500 mb-4">
-				{restaurantError?.message || menuError?.message || 'Unknown error'}
-			</div>
-			<div class="text-gray-600">Please try again later.</div>
-		</div>
-	</div>
+	<ErrorPage 
+		title="Ресторан ачаалж чадсангүй"
+		message={restaurantError?.message || menuError?.message || 'Тодорхойгүй алдаа гарлаа. Дахин оролдоно уу.'}
+		statusCode={500}
+	/>
 {:else if restaurant}
 	<div class="container mx-auto max-w-[1200px] mt-3 w-full px-4">
 		<Banner {restaurantId} />

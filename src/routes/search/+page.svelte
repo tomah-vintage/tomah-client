@@ -9,6 +9,7 @@
  	import { List, MapPin } from 'lucide-svelte';
  	import SearchPageLoader from '$lib/components/loading/SearchPageLoader.svelte';
 	import type { SearchQuery } from '$lib/types/search';
+	import { ErrorPage } from '$lib/components/common';
 
 	let viewMode: 'list' | 'map' = 'list';
 
@@ -32,15 +33,11 @@
 {#if isLoading}
 	<SearchPageLoader />
 {:else if error}
-	<div class="container mx-auto max-w-[1200px] px-4 py-8">
-		<div class="py-8 text-center">
-			<div class="bg-red-50 border border-red-200 rounded-lg p-8 max-w-md mx-auto">
-				<div class="text-red-600 text-lg font-medium mb-2">Search Error</div>
-				<div class="text-red-500 mb-4">Error: {error.message || 'Failed to search'}</div>
-				<div class="text-gray-600">Please try again later.</div>
-			</div>
-		</div>
-	</div>
+	<ErrorPage 
+		title="Хайлт хийхэд алдаа гарлаа"
+		message={error.message || 'Хайлт хийхэд алдаа гарлаа. Дахин оролдоно уу.'}
+		statusCode={500}
+	/>
 {:else if results}
 	<div class="container mx-auto max-w-[1200px] px-4 py-8">
 		<div class="mb-6 flex items-center justify-between">

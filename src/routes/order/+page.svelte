@@ -1,13 +1,28 @@
 <script lang="ts">
 	import type { PageData } from './$types';
 	import { order, removeFromOrder, updateQuantity } from '$lib/stores/order';
+	import { ErrorPage } from '$lib/components/common';
+
+	let errorMessage = '';
 
 	function handleRemove(itemId: string) {
-		removeFromOrder(itemId);
+		try {
+			removeFromOrder(itemId);
+		} catch (error) {
+			errorMessage = 'Бүтээгдэхүүн хасахад алдаа гарлаа';
+		}
 	}
 
 	function handleUpdateQuantity(itemId: string, quantity: number) {
-		updateQuantity(itemId, quantity);
+		try {
+			if (quantity <= 0) {
+				errorMessage = 'Тоо ширхэг 0-аас их байх ёстой';
+				return;
+			}
+			updateQuantity(itemId, quantity);
+		} catch (error) {
+			errorMessage = 'Тоо ширхэг шинэчлэхэд алдаа гарлаа';
+		}
 	}
 </script>
 
@@ -16,6 +31,13 @@
 	<meta name="description" content="Your current order" />
 </svelte:head>
 
+{#if errorMessage}
+	<ErrorPage 
+		title="Алдаа гарлаа"
+		message={errorMessage}
+		showRefreshButton={false}
+	/>
+{:else}
 <div class="min-h-screen bg-gray-50">
 	<div class="container mx-auto max-w-[1200px] px-4 py-8">
 		<h1 class="mb-8 text-center text-3xl font-bold">Your Order</h1>
@@ -78,3 +100,4 @@
 		</div>
 	</div>
 </div>
+{/if}

@@ -5,6 +5,7 @@
 	import { apiFetch } from '$lib/utils/api';
 	import { env } from '$env/dynamic/public';
 	import { ProfileImageUploader, ProfileForm, PasswordChangeForm } from '$lib/components/profile';
+	import { ErrorPage, NotFoundPage } from '$lib/components/common';
 
 	let isSaving = false;
 	let message = '';
@@ -200,6 +201,13 @@
 	}
 </script>
 
+{#if !$authStore.user && !$authStore.loading}
+	<NotFoundPage 
+		title="Нэвтрэх шаардлагатай"
+		message="Энэ хуудсанд хандахын тулд эхлээд нэвтэрнэ үү."
+		showSearchButton={false}
+	/>
+{:else}
 <div class="container mx-auto max-w-[1200px] px-4 py-8">
 	<div class="mx-auto my-8 w-full max-w-2xl rounded-lg bg-white p-6 shadow-sm dark:bg-gray-800">
 	<div class="mb-6 flex items-center justify-between">
@@ -238,3 +246,4 @@
 	<PasswordChangeForm {passwordData} {errors} {isSaving} on:submit={handlePasswordChange} />
 	</div>
 </div>
+{/if}

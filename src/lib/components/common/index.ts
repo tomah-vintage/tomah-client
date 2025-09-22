@@ -4,3 +4,5 @@ export { default as Card } from './Card.svelte';
 export { default as Icon } from './Icon.svelte';
 export { default as SkeletonLoader } from './SkeletonLoader.svelte';
 export { default as Modal } from './Modal.svelte';
+export { default as ErrorPage } from './ErrorPage.svelte';
+export { default as NotFoundPage } from './NotFoundPage.svelte';
