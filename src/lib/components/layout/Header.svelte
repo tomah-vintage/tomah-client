@@ -6,8 +6,8 @@
 	import { page } from '$app/stores';
 	import QpickTextLogo from '../assets/QpickTextLogo.svelte';
 	import Modal from '$lib/components/common/Modal.svelte';
-	import LoginForm from '$lib/components/auth/LoginForm.svelte';
-	import RegisterForm from '$lib/components/auth/RegisterForm.svelte';
+	import OTPLogin from '$lib/components/auth/OTPLogin.svelte';
+	import OTPRegister from '$lib/components/auth/OTPRegister.svelte';
 	import Sidebar from '$lib/components/layout/Sidebar.svelte';
 	import {  cartQuantity } from '$lib/stores/cart';
 	import OrderModel from '../order/OrderModel.svelte';
@@ -203,11 +203,11 @@
 {/if}
 
 <Modal showModal={showLoginModal} on:close={() => (showLoginModal = false)}>
-	<LoginForm on:openRegister={handleOpenRegister} on:close={() => (showLoginModal = false)} />
+	<OTPLogin on:openRegister={handleOpenRegister} on:close={() => (showLoginModal = false)} />
 </Modal>
 
 <Modal showModal={showRegisterModal} on:close={() => (showRegisterModal = false)}>
-	<RegisterForm on:switchToLogin={handleOpenLogin} on:close={() => (showRegisterModal = false)} />
+	<OTPRegister on:switchToLogin={handleOpenLogin} on:close={() => (showRegisterModal = false)} />
 </Modal>
 
 <OrderModel open={showOrder} onClose={closeModal}>

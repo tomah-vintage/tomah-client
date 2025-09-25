@@ -4,8 +4,8 @@
 	import { goto } from '$app/navigation';
 	import { getRestaurantHoursDisplay, getRestaurantStatus } from '$lib/utils/restaurant';
 	import { authStore } from '$lib/stores/auth';
-	import LoginForm from '$lib/components/auth/LoginForm.svelte';
-	import RegisterForm from '$lib/components/auth/RegisterForm.svelte';
+	import OTPLogin from '$lib/components/auth/OTPLogin.svelte';
+	import OTPRegister from '$lib/components/auth/OTPRegister.svelte';
 	import { apiFetch } from '$lib/utils/api';
 	import { env } from '$env/dynamic/public';
 	import Modal from '$lib/components/common/Modal.svelte';
@@ -177,9 +177,9 @@
 </div>
 
 <Modal showModal={showLoginModal} on:close={() => (showLoginModal = false)}>
-	<LoginForm on:openRegister={handleOpenRegister} on:close={() => (showLoginModal = false)} />
+	<OTPLogin on:openRegister={handleOpenRegister} on:close={() => (showLoginModal = false)} />
 </Modal>
 
 <Modal showModal={showRegisterModal} on:close={() => (showRegisterModal = false)}>
-	<RegisterForm on:switchToLogin={handleOpenLogin} on:close={() => (showRegisterModal = false)} />
+	<OTPRegister on:switchToLogin={handleOpenLogin} on:close={() => (showRegisterModal = false)} />
 </Modal>
