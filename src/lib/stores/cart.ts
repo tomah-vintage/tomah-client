@@ -29,7 +29,16 @@ const createCart = () => {
 
 	const removeItem = (itemId: string) => {
 		update((items) => {
-			const newItems = items.filter((i) => i.id !== itemId);
+			console.log('Removing item with ID:', itemId);
+			console.log('Current items:', items.map(i => ({ id: i.id, name: i.name })));
+			const newItems = items.filter((i) => {
+				const shouldKeep = i.id !== itemId;
+				if (!shouldKeep) {
+					console.log('Found and removing item:', i.name);
+				}
+				return shouldKeep;
+			});
+			console.log('Items after removal:', newItems.map(i => ({ id: i.id, name: i.name })));
 			syncWithLocalStorage(newItems);
 			return newItems;
 		});
@@ -37,10 +46,12 @@ const createCart = () => {
 
 	const updateQuantity = (itemId: string, quantity: number) => {
 		update((items) => {
+			let newItems;
 			if (quantity <= 0) {
-				return items.filter((i) => i.id !== itemId);
+				newItems = items.filter((i) => i.id !== itemId);
+			} else {
+				newItems = items.map((i) => (i.id === itemId ? { ...i, quantity } : i));
 			}
-			const newItems = items.map((i) => (i.id === itemId ? { ...i, quantity } : i));
 			syncWithLocalStorage(newItems);
 			return newItems;
 		});

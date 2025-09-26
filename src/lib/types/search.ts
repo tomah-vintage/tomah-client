@@ -13,6 +13,12 @@ export interface SearchResultItem {
 	average_rating?: number;
 	address?: string;
 	hours?: string;
+	open_hours?: Array<{
+		day_of_week: number;
+		opening_time: string;
+		closing_time: string;
+		day_of_week_display: string;
+	}>;
 	restaurant_img_urls: string[];
 	latitude: string;
 	longitude:string;

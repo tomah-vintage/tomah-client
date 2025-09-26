@@ -6,18 +6,41 @@
 	export let results: SearchResultItem[] = [];
 
 	function adaptToRestaurant(item: SearchResultItem): Restaurant {
+		// Handle the direct mapping from search API which returns restaurant objects directly
+		if ('logo' in item && 'open_hours' in item) {
+			// Direct restaurant object from search API
+			return {
+				id: item.id,
+				name: item.name,
+				logo: (item as any).logo || '',
+				address: item.address || '',
+				openingHours: item.hours || '',
+				open_hours: (item as any).open_hours,
+				rating: item.average_rating,
+				average_rating: item.average_rating,
+				restaurant_img_urls: item.restaurant_img_urls || [],
+				latitude: item.latitude,
+				longitude: item.longitude,
+				lat: parseFloat(item.latitude),
+				lng: parseFloat(item.longitude),
+				is_liked: item?.isLiked || false
+			};
+		}
+		
+		// Fallback for other search result formats
 		return {
-	id: item.id,
-	name: item.name,
-	logo: item.imageUrl || '',
-	address: item.address || '',
-	openingHours: item.hours || '',
-	rating: item.rating,
-	restaurant_img_urls: item.restaurant_img_urls,
-	lat: item.location?.lat,
-	lng: item.location?.lng,
-	is_liked: item?.isLiked || false
-};
+			id: item.id,
+			name: item.name,
+			logo: item.imageUrl || '',
+			address: item.address || '',
+			openingHours: item.hours || '',
+			open_hours: item.open_hours,
+			rating: item.average_rating,
+			restaurant_img_urls: item.restaurant_img_urls || [],
+			lat: parseFloat(item.latitude),
+			lng: parseFloat(item.longitude),
+			is_liked: item?.isLiked || false
+		};
 	}
 </script>
 

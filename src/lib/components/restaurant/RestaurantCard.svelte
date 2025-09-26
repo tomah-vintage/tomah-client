@@ -1,6 +1,6 @@
 <script lang="ts">
 	import type { Restaurant } from '$lib/types/restaurant';
-	import { Clock, MapPin,  Star, Heart } from 'lucide-svelte';
+	import { Clock, MapPin, Star, Heart } from 'lucide-svelte';
 	import { goto } from '$app/navigation';
 	import { getRestaurantHoursDisplay, getRestaurantStatus } from '$lib/utils/restaurant';
 	import { authStore } from '$lib/stores/auth';
@@ -14,7 +14,6 @@
 	export let restaurant: Restaurant;
 	export let variant: 'carousel' | 'grid' = 'carousel'; // New prop to control layout
 	export let className: string = '';
-	
 
 	let showLoginModal = false;
 	let showRegisterModal = false;
@@ -27,17 +26,17 @@
 	async function handleFavorite() {
 		if ($authStore.isAuthenticated) {
 			try {
-				isLiked = !restaurant.is_liked 
+				isLiked = !restaurant.is_liked;
 				await apiFetch(`${env.PUBLIC_BACKEND_URL}/api/restaurant-like/`, {
-					 	method: 'POST',
-					 	body: JSON.stringify({ restaurant: restaurant.id })
+					method: 'POST',
+					body: JSON.stringify({ restaurant: restaurant.id })
 				});
 				restaurantActions.loadRestaurants();
 			} catch (error) {
 				console.error('Failed to favorite restaurant:', error);
 			}
 		} else {
-			showLoginModal = true
+			showLoginModal = true;
 		}
 	}
 
@@ -123,9 +122,11 @@
 			aria-label="Add to favorites"
 		>
 			<Heart
-			fill={isLiked  ? "#F54927": "#fff"}
+				fill={isLiked ? '#F54927' : '#fff'}
 				size={20}
-				class="{isLiked ? "text-red-500 ": "text-neutral-500 "} group-hover:text-primary text-neutral-500 transition-colors duration-200"
+				class="{isLiked
+					? 'text-red-500 '
+					: 'text-neutral-500 '} group-hover:text-primary text-neutral-500 transition-colors duration-200"
 			/>
 		</button>
 
