@@ -111,7 +111,7 @@ export const getOrderStatus = async (orderId: number): Promise<OrderStatusRespon
 
 export const redirectToPayment = (paymentUrl: string) => {
 	if (typeof window !== 'undefined') {
-		window.location.href = paymentUrl;
+		window.open(paymentUrl, '_blank');
 	}
 };
 
