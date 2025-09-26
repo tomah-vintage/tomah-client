@@ -146,15 +146,15 @@
 			<div class="mb-4">
 				<p class="mb-2 font-semibold">Төлбөрийн хэрэгслүүд</p>
 				<div class="flex flex-wrap gap-2">
-					<img src="/src/lib/assets/pay/qpay.png" class="h-10" alt="QPay" />
-					<img src="/src/lib/assets/pay/applepay.png" class="h-10" alt="Apple Pay" />
-					<img src="/src/lib/assets/pay/monpay.png" class="h-10" alt="MonPay" />
-					<img src="/src/lib/assets/pay/social.png" class="h-10" alt="SocialPay" />
-					<img src="/src/lib/assets/pay/golomt.png" class="h-10" alt="SocialPay" />
-					<img src="/src/lib/assets/pay/khanbank.png" class="h-10" alt="SocialPay" />
-					<img src="/src/lib/assets/pay/khas.png" class="h-10" alt="SocialPay" />
-					<img src="/src/lib/assets/pay/tdb.png" class="h-10" alt="SocialPay" />
-					<img src="/src/lib/assets/pay/turiin.png" class="h-10" alt="SocialPay" />
+					<img src="/pay/qpay.png" class="h-10" alt="QPay" />
+					<img src="/pay/applepay.png" class="h-10" alt="Apple Pay" />
+					<img src="/pay/monpay.png" class="h-10" alt="MonPay" />
+					<img src="/pay/social.png" class="h-10" alt="SocialPay" />
+					<img src="/pay/golomt.png" class="h-10" alt="Golomt Bank" />
+					<img src="/pay/khanbank.png" class="h-10" alt="Khan Bank" />
+					<img src="/pay/khas.png" class="h-10" alt="Khas Bank" />
+					<img src="/pay/tdb.png" class="h-10" alt="TDB Bank" />
+					<img src="/pay/turiin.png" class="h-10" alt="Turiin Bank" />
 				</div>
 			</div>
 
