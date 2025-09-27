@@ -1,7 +1,7 @@
 <script lang="ts">
 	import { authStore } from '$lib/stores/auth';
 	import Button from '$lib/components/common/Button.svelte';
-	import { Menu, Search, ShoppingCart } from 'lucide-svelte';
+	import { Menu, Search, ShoppingCart, Heart } from 'lucide-svelte';
 	import { goto } from '$app/navigation';
 	import { page } from '$app/stores';
 	import QpickTextLogo from '../assets/QpickTextLogo.svelte';
@@ -66,15 +66,23 @@
 	}
 </script>
 
-<header class="bg-white p-4 shadow-[0_2px_2px_0_rgba(0,0,0,0.15)]">
+<header class="bg-[#EF3F3D] p-3 shadow-[0_2px_2px_0_rgba(0,0,0,0.15)] lg:bg-white lg:p-4">
 	<div class="container mx-auto flex max-w-[1200px] items-center justify-between">
 		<!-- Left Side -->
-		<div class="flex items-center space-x-4">
-			<button on:click={() => (showSidebar = true)} class="cursor-pointer py-2 pr-2">
-				<Menu class="h-6 w-6" />
+		<div class="flex items-center space-x-1 lg:space-x-4">
+			<button
+				on:click={() => (showSidebar = true)}
+				class="cursor-pointer p-2.5 lg:p-0 lg:py-2 lg:pr-2"
+			>
+				<Menu class="h-6 w-6 text-white lg:text-black" />
 			</button>
 			<a href="/">
-				<QpickTextLogo />
+				<div class="hidden lg:flex">
+					<QpickTextLogo />
+				</div>
+				<div class="h-9 w-24 md:hidden">
+					<img alt="logo" src="/white-logo.png" />
+				</div>
 			</a>
 		</div>
 
@@ -93,7 +101,7 @@
 				<input
 					type="text"
 					placeholder="Хайл, Ресторан"
-					class=" w-full rounded-lg border-2 border-transparent bg-neutral-100 py-3
+					class=" w-full rounded-lg border-2 border-transparent bg-neutral-100 py-3s
 					pr-4 pl-10 transition-all duration-200 hover:bg-neutral-50 focus:bg-white focus:ring-0"
 					bind:value={searchTerm}
 					on:input={() => handleSearch(searchTerm)}
@@ -106,12 +114,18 @@
 		</div>
 
 		<!-- Right Side -->
-		<div class="flex items-center space-x-2 sm:space-x-6">
-			<div class="relative p-2">
+		<div class="flex items-center space-x-1 lg:space-x-6">
+			<!-- Heart/Favorites icon - mobile only -->
+			<button class="p-2.5 lg:hidden" on:click={() => goto('/saved')}>
+				<Heart class="h-6 w-6 text-white" />
+			</button>
+
+			<!-- Cart -->
+			<div class="relative p-2.5 lg:p-2">
 				<button on:click={openModal}>
-					<ShoppingCart class="h-6 w-6" />
+					<ShoppingCart class="h-6 w-6 text-white lg:text-black" />
 					<span
-						class="absolute top-0 right-0 flex h-4 w-4 items-center justify-center rounded-full bg-red-500 text-xs text-white"
+						class="absolute top-0 right-0 flex h-4 w-4 items-center justify-center rounded-full bg-white text-xs text-red-600 lg:bg-red-500 lg:text-white"
 					>
 						{$cartQuantity}
 					</span>
@@ -142,11 +156,11 @@
 				</div>
 			{/if}
 			<button
-				class="rounded-lg p-2 transition-colors hover:bg-neutral-100 lg:hidden"
+				class="rounded-lg p-2.5 transition-colors hover:bg-red-600 lg:hidden"
 				on:click={() => (showMobileSearch = !showMobileSearch)}
 				aria-label="Toggle mobile search"
 			>
-				<Search class="h-6 w-6" />
+				<Search class="h-6 w-6 text-white" />
 			</button>
 		</div>
 	</div>

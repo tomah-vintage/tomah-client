@@ -13,42 +13,49 @@
 	import { ErrorPage } from '$lib/components/common';
 
 	$: restaurantId = parseInt($page.params.restaurantId || '0', 10);
-	
+
 	$: restaurantQuery = createRestaurantQuery(restaurantId);
 	$: menuItemsQuery = createMenuItemsQuery(restaurantId);
-	
-	$: ({ data: restaurant, isLoading: restaurantLoading, error: restaurantError } = $restaurantQuery);
+
+	$: ({
+		data: restaurant,
+		isLoading: restaurantLoading,
+		error: restaurantError
+	} = $restaurantQuery);
 	$: ({ data: menuItemsResponse, isLoading: menuLoading, error: menuError } = $menuItemsQuery);
 	$: menuItems = menuItemsResponse?.results || [];
 
-	$: featureFoods = menuItems.slice(0,4)
-	
+	$: featureFoods = menuItems.slice(0, 4);
+
 	let selectedCategoryId = '';
 	let searchTerm = '';
 
 	$: filteredItems = Array.isArray(menuItems)
 		? menuItems.filter((menu) => {
-			const matchesCategory = !selectedCategoryId || menu.categories.includes(selectedCategoryId);
-			const matchesSearch = !searchTerm || menu.name.toLowerCase().includes(searchTerm.toLowerCase());
-			return matchesCategory && matchesSearch;
-		})
+				const matchesCategory = !selectedCategoryId || menu.categories.includes(selectedCategoryId);
+				const matchesSearch =
+					!searchTerm || menu.name.toLowerCase().includes(searchTerm.toLowerCase());
+				return matchesCategory && matchesSearch;
+			})
 		: [];
 
 	function getRestaurantLocation(restaurant: any) {
 		if (!restaurant) return [];
-		
+
 		// Check for latitude/longitude (string format)
-		const lat = restaurant.latitude || (restaurant.lat?.toString());
-		const lng = restaurant.longitude || (restaurant.lng?.toString());
-		
+		const lat = restaurant.latitude || restaurant.lat?.toString();
+		const lng = restaurant.longitude || restaurant.lng?.toString();
+
 		if (lat && lng && lat !== '0' && lng !== '0') {
-			return [{
-				latitude: lat,
-				longitude: lng,
-				name: restaurant.name
-			}];
+			return [
+				{
+					latitude: lat,
+					longitude: lng,
+					name: restaurant.name
+				}
+			];
 		}
-		
+
 		return [];
 	}
 </script>
@@ -56,13 +63,15 @@
 {#if restaurantLoading || menuLoading}
 	<RestaurantPageLoader />
 {:else if restaurantError || menuError}
-	<ErrorPage 
+	<ErrorPage
 		title="Ресторан ачаалж чадсангүй"
-		message={restaurantError?.message || menuError?.message || 'Тодорхойгүй алдаа гарлаа. Дахин оролдоно уу.'}
+		message={restaurantError?.message ||
+			menuError?.message ||
+			'Тодорхойгүй алдаа гарлаа. Дахин оролдоно уу.'}
 		statusCode={500}
 	/>
 {:else if restaurant}
-	<div class="container mx-auto max-w-[1200px] mt-3 w-full px-4">
+	<div class="container mx-auto mt-3 w-full max-w-[1200px]">
 		<Banner {restaurantId} />
 		<FeaturedItems items={featureFoods} {restaurantId} {restaurant} />
 		<MenuTabs {restaurantId} bind:selectedCategoryId bind:searchTerm />
@@ -73,7 +82,7 @@
 			<div class="max-w-2xl">
 				<InfoPanel {restaurant} />
 			</div>
-			
+
 			<div class="max-w-2xl">
 				<h3 class="mb-4 text-xl font-bold text-gray-900">Байршил</h3>
 				<Map locations={getRestaurantLocation(restaurant)} />
