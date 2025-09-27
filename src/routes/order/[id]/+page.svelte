@@ -32,7 +32,7 @@
 <div class="container mx-auto px-4 py-8">
 	<div class="mb-6">
 		<button 
-			on:click={() => goto('/')}
+			on:click={() => goto('/orders')}
 			class="flex items-center text-gray-600 hover:text-gray-800"
 		>
 			<svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
