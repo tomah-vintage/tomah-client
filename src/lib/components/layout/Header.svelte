@@ -1,7 +1,7 @@
 <script lang="ts">
 	import { authStore } from '$lib/stores/auth';
 	import Button from '$lib/components/common/Button.svelte';
-	import { Menu,  Search, ShoppingCart } from 'lucide-svelte';
+	import { Menu, Search, ShoppingCart } from 'lucide-svelte';
 	import { goto } from '$app/navigation';
 	import { page } from '$app/stores';
 	import QpickTextLogo from '../assets/QpickTextLogo.svelte';
@@ -9,7 +9,7 @@
 	import OTPLogin from '$lib/components/auth/OTPLogin.svelte';
 	import OTPRegister from '$lib/components/auth/OTPRegister.svelte';
 	import Sidebar from '$lib/components/layout/Sidebar.svelte';
-	import {  cartQuantity } from '$lib/stores/cart';
+	import { cartQuantity } from '$lib/stores/cart';
 	import OrderModel from '../order/OrderModel.svelte';
 	import Orders from '../order/Orders.svelte';
 
@@ -67,10 +67,10 @@
 </script>
 
 <header class="bg-white p-4 shadow-[0_2px_2px_0_rgba(0,0,0,0.15)]">
-	<div class="container mx-auto max-w-[1200px] flex items-center justify-center">
+	<div class="container mx-auto flex max-w-[1200px] items-center justify-between">
 		<!-- Left Side -->
 		<div class="flex items-center space-x-4">
-			<button on:click={() => (showSidebar = true)} class="cursor-pointer pr-2 py-2">
+			<button on:click={() => (showSidebar = true)} class="cursor-pointer py-2 pr-2">
 				<Menu class="h-6 w-6" />
 			</button>
 			<a href="/">
@@ -97,7 +97,7 @@
 					pr-4 pl-10 transition-all duration-200 hover:bg-neutral-50 focus:bg-white focus:ring-0"
 					bind:value={searchTerm}
 					on:input={() => handleSearch(searchTerm)}
-					on:focus={() => isUserTyping = true}
+					on:focus={() => (isUserTyping = true)}
 					on:keydown={(e) => {
 						if (e.key === 'Enter') handleSearch(searchTerm);
 					}}
@@ -119,15 +119,15 @@
 			</div>
 
 			{#if $authStore.loading}
-				<div class="hidden items-center space-x-4 lg:flex mr-0">
+				<div class="mr-0 hidden items-center space-x-4 lg:flex">
 					<div class="h-5 w-28 animate-pulse rounded bg-gray-200"></div>
 				</div>
 			{:else if $authStore.isAuthenticated}
-				<div class="hidden items-center space-x-4 lg:flex mr-0">
+				<div class="mr-0 hidden items-center space-x-4 lg:flex">
 					<span class="text-sm">Hello, {$authStore.user?.first_name || 'User'}</span>
 				</div>
 			{:else}
-				<div class="hidden items-center space-x-4 lg:flex mr-0">
+				<div class="mr-0 hidden items-center space-x-4 lg:flex">
 					<button
 						on:click={() => (showLoginModal = true)}
 						class="cursor-pointer text-sm font-medium whitespace-nowrap hover:text-red-600"
@@ -181,7 +181,7 @@
 						pr-4 pl-10 transition-all duration-200 focus:bg-white focus:ring-2"
 						bind:value={searchTerm}
 						on:input={() => handleSearch(searchTerm)}
-						on:focus={() => isUserTyping = true}
+						on:focus={() => (isUserTyping = true)}
 						on:keydown={(e) => {
 							if (e.key === 'Enter') {
 								handleSearch(searchTerm);

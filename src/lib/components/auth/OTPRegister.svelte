@@ -139,6 +139,8 @@
 
 			const decoded: any = jwtDecode(result.access);
 			authStore.login(decoded);
+			// Fetch full user data after registration
+			await authStore.revalidate();
 			dispatch('close');
 		} else {
 			error = ERROR_MESSAGES[result.error || ''] || result.error || ERROR_MESSAGES['Registration failed'];

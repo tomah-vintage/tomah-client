@@ -30,6 +30,8 @@
 			const { token } = await response.json();
 			const decoded: any = jwtDecode(token);
 			authStore.login(decoded);
+			// Fetch full user data after login
+			await authStore.revalidate();
 			dispatch('close');
 		} else {
 			const { error: errorMessage } = await response.json();
