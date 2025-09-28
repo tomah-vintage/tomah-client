@@ -2,6 +2,7 @@
 	import { cart, cartTotal, clearCart } from '$lib/stores/cart';
 	import { authStore } from '$lib/stores/auth';
 	import { createOrder, redirectToPayment, type CreateOrderRequest } from '$lib/utils/order';
+	import { currentTable } from '$lib/stores/table';
 	import { goto } from '$app/navigation';
 	import { onMount } from 'svelte';
 
@@ -11,6 +12,17 @@
 	let orderError = '';
 	let discount = 0;
 	let packagingFee = 2000; // Fixed packaging fee
+	
+	// Order type selection - default based on table presence
+	$: hasTable = $currentTable !== null;
+	let orderType: 'TAKE_OUT' | 'DINE_IN' = 'TAKE_OUT';
+	
+	// Initialize order type based on table presence
+	$: {
+		if (hasTable && orderType === 'TAKE_OUT') {
+			orderType = 'DINE_IN';
+		}
+	}
 
 	// Calculate final amount to pay
 	$: finalAmount = Math.max(0, $cartTotal - discount + packagingFee);
@@ -48,9 +60,14 @@
 
 			const orderData: CreateOrderRequest = {
 				restaurant: $cart[0].restaurant_id,
-				order_type: 'TAKE_OUT', // Default to take out, could be configurable
+				order_type: orderType,
 				items
 			};
+
+			// Add table ID if dine-in order and table is available
+			if (orderType === 'DINE_IN' && $currentTable) {
+				orderData.table = parseInt($currentTable.id);
+			}
 
 			const result = await createOrder(orderData);
 
@@ -120,6 +137,28 @@
 					<span>{finalAmount.toLocaleString()}₮</span>
 				</div>
 			</div>
+
+			<!-- Order Type Selection (only show when table is available) -->
+			{#if hasTable}
+				<div class="mb-4 rounded-lg border border-gray-300 p-4">
+					<p class="mb-3 font-semibold">Захиалгын төрөл</p>
+					<div class="flex items-center gap-6">
+						<label class="flex items-center gap-2">
+							<input type="radio" bind:group={orderType} value="TAKE_OUT" />
+							Авч явах
+						</label>
+						<label class="flex items-center gap-2">
+							<input type="radio" bind:group={orderType} value="DINE_IN" />
+							Ширээний дээр идэх (Ширээ #{$currentTable?.id})
+						</label>
+					</div>
+					{#if orderType === 'DINE_IN'}
+						<div class="mt-2 text-sm text-blue-600">
+							Та ширээ #{$currentTable?.id}-д захиалга хүлээн авах болно
+						</div>
+					{/if}
+				</div>
+			{/if}
 
 			<!-- Payer type -->
 			<div class="mb-4 rounded-lg border border-gray-300 p-4">

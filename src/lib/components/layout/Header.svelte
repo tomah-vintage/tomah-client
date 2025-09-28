@@ -10,6 +10,7 @@
 	import OTPRegister from '$lib/components/auth/OTPRegister.svelte';
 	import Sidebar from '$lib/components/layout/Sidebar.svelte';
 	import { cartQuantity } from '$lib/stores/cart';
+	import { qrOrigin } from '$lib/stores/table';
 	import OrderModel from '../order/OrderModel.svelte';
 	import Orders from '../order/Orders.svelte';
 
@@ -61,6 +62,19 @@
 	const openModal = () => (showOrder = true);
 	const closeModal = () => (showOrder = false);
 
+	// Handle logo click with QR origin redirect
+	function handleLogoClick() {
+		const qrUrl = qrOrigin.getRestaurantUrl();
+		
+		if (qrUrl) {
+			console.log('QR origin found, navigating to:', qrUrl);
+			goto(qrUrl);
+		} else {
+			console.log('No QR origin, going to home');
+			goto('/');
+		}
+	}
+
 	$: if (typeof document !== 'undefined') {
 		document.body.classList.toggle('no-scroll', showSidebar || showMobileSearch);
 	}
@@ -76,14 +90,14 @@
 			>
 				<Menu class="h-6 w-6 text-white lg:text-black" />
 			</button>
-			<a href="/">
+			<button on:click={handleLogoClick} class="cursor-pointer">
 				<div class="hidden lg:flex">
 					<QpickTextLogo />
 				</div>
 				<div class="h-9 w-24 md:hidden">
 					<img alt="logo" src="/white-logo.png" />
 				</div>
-			</a>
+			</button>
 		</div>
 
 		<!-- Center -->
