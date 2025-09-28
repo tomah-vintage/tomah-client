@@ -5,6 +5,7 @@
 	import MenuTabs from '$lib/components/menu/MenuTabs.svelte';
 	import MenuList from '$lib/components/menu/MenuList.svelte';
 	import InfoPanel from '$lib/components/restaurant/InfoPanel.svelte';
+	import OpeningHours from '$lib/components/restaurant/OpeningHours.svelte';
 	import Map from '$lib/components/restaurant/Map.svelte';
 	import Reviews from '$lib/components/reviews/Reviews.svelte';
 	import { createRestaurantQuery } from '$lib/stores/restaurantQuery';
@@ -81,6 +82,10 @@
 		<div class="mt-8 space-y-6">
 			<div class="max-w-2xl">
 				<InfoPanel {restaurant} />
+			</div>
+
+			<div class="max-w-2xl">
+				<OpeningHours {restaurant} />
 			</div>
 
 			<div class="max-w-2xl">

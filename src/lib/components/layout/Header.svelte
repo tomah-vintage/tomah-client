@@ -101,7 +101,7 @@
 				<input
 					type="text"
 					placeholder="Хайл, Ресторан"
-					class=" w-full rounded-lg border-2 border-transparent bg-neutral-100 py-3s
+					class=" w-full rounded-lg border-2 border-transparent bg-neutral-100 py-3
 					pr-4 pl-10 transition-all duration-200 hover:bg-neutral-50 focus:bg-white focus:ring-0"
 					bind:value={searchTerm}
 					on:input={() => handleSearch(searchTerm)}
