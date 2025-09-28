@@ -44,7 +44,7 @@ export const POST: RequestHandler = async ({ request, cookies }) => {
 			total_price: totalPrice.toFixed(2)
 		};
 
-		const backendResponse = await fetch(`${PUBLIC_BACKEND_URL}/api/order/create/`, {
+		let backendResponse = await fetch(`${PUBLIC_BACKEND_URL}/api/order/create/`, {
 			method: 'POST',
 			headers: {
 				'Authorization': finalAuthHeader,
@@ -53,10 +53,61 @@ export const POST: RequestHandler = async ({ request, cookies }) => {
 			body: JSON.stringify(backendOrderData)
 		});
 
+		// Check if token is invalid and try to refresh
+		if (backendResponse.status === 401) {
+			const errorData = await backendResponse.json();
+			
+			// Check for specific JWT token errors
+			if (errorData.code === 'token_not_valid' || 
+				errorData.detail?.includes('token not valid') ||
+				errorData.detail?.includes('Token is invalid or expired')) {
+				
+				// Try to refresh the token
+				const refreshToken = cookies.get('refresh_token');
+				if (refreshToken) {
+					try {
+						const refreshResponse = await fetch(`${PUBLIC_BACKEND_URL}/api/auth/token/refresh/`, {
+							method: 'POST',
+							headers: {
+								'Content-Type': 'application/json'
+							},
+							body: JSON.stringify({ refresh: refreshToken })
+						});
+
+						if (refreshResponse.ok) {
+							const refreshData = await refreshResponse.json();
+							
+							// Update cookies with new tokens
+							cookies.set('token', refreshData.access, {
+								path: '/',
+								httpOnly: false,
+								secure: true,
+								sameSite: 'lax',
+								maxAge: 60 * 60 * 24 * 7 // 7 days
+							});
+
+							// Retry the original request with new token
+							backendResponse = await fetch(`${PUBLIC_BACKEND_URL}/api/order/create/`, {
+								method: 'POST',
+								headers: {
+									'Authorization': `Bearer ${refreshData.access}`,
+									'Content-Type': 'application/json'
+								},
+								body: JSON.stringify(backendOrderData)
+							});
+						}
+					} catch (refreshError) {
+						console.error('Token refresh failed:', refreshError);
+					}
+				}
+			}
+		}
+
 		if (!backendResponse.ok) {
 			const errorData = await backendResponse.json();
+			console.log('Backend error:', errorData);
 			return json(
-				{ error: errorData.error || 'Failed to create order' },
+				{ error: errorData.error || errorData.detail || 'Failed to create order' },
 				{ status: backendResponse.status }
 			);
 		}

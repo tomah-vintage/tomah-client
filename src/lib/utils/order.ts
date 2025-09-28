@@ -1,4 +1,4 @@
-import { apiFetch, getAuthToken } from '$lib/utils/api';
+import { apiFetch } from '$lib/utils/api';
 import { env } from '$env/dynamic/public';
 
 export interface OrderItem {
@@ -48,64 +48,34 @@ export interface OrderStatusResponse {
 
 export const createOrder = async (orderData: CreateOrderRequest): Promise<OrderResponse> => {
 	try {
-		const token = getAuthToken();
-		if (!token) {
-			return { success: false, error: 'Authentication required' };
-		}
-
-		const response = await fetch('/api/order/create/', {
+		const data = await apiFetch('/api/order/create/', {
 			method: 'POST',
-			headers: {
-				'Authorization': `Bearer ${token}`,
-				'Content-Type': 'application/json'
-			},
 			body: JSON.stringify(orderData)
 		});
 
-		const data = await response.json();
-
-		if (!response.ok) {
-			return { 
-				success: false, 
-				error: data.error || `Order creation failed: ${response.status}` 
-			};
-		}
-
 		return { success: true, order: data };
-	} catch (error) {
-		console.error('Network error creating order:', error);
-		return { success: false, error: 'Network error occurred' };
+	} catch (error: any) {
+		console.error('Error creating order:', error);
+		return { 
+			success: false, 
+			error: error.message || error.detail || 'Order creation failed'
+		};
 	}
 };
 
 export const getOrderStatus = async (orderId: number): Promise<OrderStatusResponse> => {
 	try {
-		const token = getAuthToken();
-		if (!token) {
-			return { success: false, error: 'Authentication required' };
-		}
-
-		const response = await fetch(`/api/order/${orderId}/`, {
-			method: 'GET',
-			headers: {
-				'Authorization': `Bearer ${token}`,
-				'Content-Type': 'application/json'
-			}
+		const data = await apiFetch(`/api/order/${orderId}/`, {
+			method: 'GET'
 		});
 
-		const data = await response.json();
-
-		if (!response.ok) {
-			return { 
-				success: false, 
-				error: data.error || `Failed to get order status: ${response.status}` 
-			};
-		}
-
 		return { success: true, order: data };
-	} catch (error) {
-		console.error('Network error getting order status:', error);
-		return { success: false, error: 'Network error occurred' };
+	} catch (error: any) {
+		console.error('Error getting order status:', error);
+		return { 
+			success: false, 
+			error: error.message || error.detail || 'Failed to get order status'
+		};
 	}
 };
 
@@ -113,6 +83,54 @@ export const redirectToPayment = (paymentUrl: string) => {
 	if (typeof window !== 'undefined') {
 		window.open(paymentUrl, '_blank');
 	}
+};
+
+export const pollOrderPaymentStatus = async (
+	orderId: number,
+	onStatusChange: (order: Order) => void,
+	intervalMs: number = 3000,
+	maxAttempts: number = 60
+): Promise<Order | null> => {
+	let attempts = 0;
+	
+	return new Promise((resolve) => {
+		const poll = async () => {
+			attempts++;
+			
+			const response = await getOrderStatus(orderId);
+			
+			if (response.success && response.order) {
+				onStatusChange(response.order);
+				
+				// Check if payment is completed
+				if (response.order.payment?.status === 'PAID') {
+					resolve(response.order);
+					return;
+				}
+				
+				// Check if order status is PREPARING (indicates payment was successful)
+				if (response.order.order_status === 'PREPARING') {
+					resolve(response.order);
+					return;
+				}
+				
+				// Check if payment failed or expired
+				if (response.order.payment?.status === 'FAILED' || response.order.payment?.status === 'EXPIRED') {
+					resolve(response.order);
+					return;
+				}
+			}
+			
+			// Continue polling if max attempts not reached
+			if (attempts < maxAttempts) {
+				setTimeout(poll, intervalMs);
+			} else {
+				resolve(null); // Timeout
+			}
+		};
+		
+		poll();
+	});
 };
 
 export const ORDER_STATUS_LABELS: Record<string, string> = {

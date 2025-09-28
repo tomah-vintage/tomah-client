@@ -3,6 +3,7 @@
 	import { Header, Footer } from '$lib/components/layout';
 	import { onMount } from 'svelte';
 	import { authStore } from '$lib/stores/auth';
+	import ToastContainer from '$lib/components/common/ToastContainer.svelte';
 
 	onMount(() => {
 		// Auth store will handle initialization from cookies
@@ -17,3 +18,6 @@
 	</main>
 	<Footer />
 </div>
+
+<!-- Toast notifications -->
+<ToastContainer />
