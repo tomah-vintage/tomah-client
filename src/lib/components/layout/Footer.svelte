@@ -19,14 +19,14 @@
 				<ul class="space-y-2 text-sm">
 					<li><a href="/" class="hover:underline">Шийдлүүд</a></li>
 					<li><a href="/" class="hover:underline">Үнийн санал</a></li>
-					<li><a href="/" class="hover:underline">Түгээмэл асуултууд</a></li>
+					<li><a href="/faq" class="hover:underline">Түгээмэл асуултууд</a></li>
 				</ul>
 			</div>
 
 			<div class="col-span-1 md:col-span-2">
 				<h3 class="mb-4 font-bold">Компани</h3>
 				<ul class="space-y-2 text-sm">
-					<li><a href="/" class="hover:underline">Хэрхэн ажилладаг вэ</a></li>
+					<li><a href="/how_to_work" class="hover:underline">Хэрхэн ажилладаг вэ</a></li>
 				</ul>
 			</div>
 
