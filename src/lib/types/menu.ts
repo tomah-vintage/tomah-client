@@ -12,6 +12,7 @@ export interface MenuItem {
 	img_urls: string;
 	meta_data: any;
 	categories: string[];
+	is_available: boolean;
 }
 
 export interface DefaultItemCategory {

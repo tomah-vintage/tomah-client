@@ -1,7 +1,7 @@
 <script lang="ts">
 	import type { MenuItem } from '$lib/types/menu';
 	import type { Restaurant, OpenHours } from '$lib/types/restaurant';
-	import { Plus, Clock } from 'lucide-svelte';
+	import { Plus, Clock, X } from 'lucide-svelte';
 	import Model from '../order/OrderModel.svelte';
 	import MenuItemDetail from './MenuItemDetail.svelte';
 	import { isRestaurantOpen, getNextOpeningTimeMongolian } from '$lib/utils/restaurant';
@@ -19,6 +19,9 @@
 	const handleCardClick = () => {
 		if (!restaurantIsOpen) {
 			showClosedWarning = true;
+		} else if (!item.is_available) {
+			// Do nothing for unavailable items
+			return;
 		} else {
 			showModal = true;
 		}
@@ -30,13 +33,16 @@
 
 <button
 	on:click={handleCardClick}
-	class="relative flex w-[280px] cursor-pointer flex-col gap-1 rounded-2xl bg-white shadow-md 
-	hover:shadow-lg transition-all duration-300 ease-out transform hover:-translate-y-1 hover:scale-[1.02]
-	{!restaurantIsOpen ? 'opacity-75' : ''}"
+	class="relative flex w-[280px] flex-col gap-1 rounded-2xl bg-white shadow-md 
+	transition-all duration-300 ease-out
+	{!restaurantIsOpen || !item.is_available ? 'opacity-60 cursor-not-allowed' : 'cursor-pointer hover:shadow-lg transform hover:-translate-y-1 hover:scale-[1.02]'}"
 	aria-label="Add {item.name} to cart"
+	disabled={!restaurantIsOpen || !item.is_available}
 >
 	<div class="absolute top-1/2 right-6 z-20 -translate-y-1/2 rounded-full bg-white/80 p-2 shadow-md">
-		{#if restaurantIsOpen}
+		{#if !item.is_available}
+			<X size={24} class="text-red-500" />
+		{:else if restaurantIsOpen}
 			<Plus size={24} class="text-primary" />
 		{:else}
 			<Clock size={24} class="text-gray-500" />
@@ -46,7 +52,12 @@
 	<div class="px-5 py-3.5 text-left">
 		<p class="font-bold text-left">{item.name}</p>
 		<p class="mb-4 text-xs text-gray-500 text-left">{item.description}</p>
-		<p class="font-semibold text-red-500 text-left">{item.price}₮</p>
+		<div class="flex items-center justify-between">
+			<p class="font-semibold text-red-500 text-left">{item.price}₮</p>
+			{#if !item.is_available}
+				<span class="text-xs text-red-500 font-medium bg-red-50 px-2 py-1 rounded">Дууссан</span>
+			{/if}
+		</div>
 	</div>
 </button>
 
