@@ -22,7 +22,7 @@
 {:then highlights}
     {@const sortedHighlights = highlights.sort((a, b) => a.order_index - b.order_index)}
     {@const bannerHighlights = sortedHighlights.filter(h => h.highlight_type === 'BANNER')}
-    {@const featuredHighlights = sortedHighlights.filter(h => h.highlight_type === 'FEATURED')}
+    {@const featuredHighlights = sortedHighlights.filter(h => h.highlight_type === 'FEATURED' || h.highlight_type === 'BADGE')}
     <div class="container mx-auto max-w-[1200px] justify-center flex flex-col gap-10 py-8">
         {#each bannerHighlights as banner}
             <RestaurantCarousel restaurants={banner.restaurants} on:viewRestaurant={handleViewRestaurant} />
