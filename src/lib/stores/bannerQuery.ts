@@ -1,7 +1,7 @@
 import { createQuery } from '$lib/utils/query';
 import { apiFetch } from '$lib/utils/api';
 import { env } from '$env/dynamic/public';
-import type { Banner } from '$lib/types/banner';
+import type { Banner, PlatformBanner } from '$lib/types/banner';
 
 interface BannersResponse {
 	results?: Banner[];
@@ -30,6 +30,19 @@ export function createRestaurantBannersQuery(restaurantId: number) {
 			console.log('Fetching restaurant banners from:', url);
 			const result = await apiFetch<BannersResponse>(url);
 			console.log('Restaurant Banner API response:', result);
+			return result;
+		}
+	});
+}
+
+export function createPlatformBannersQuery() {
+	return createQuery<PlatformBanner[]>({
+		queryKey: ['platform-banners'],
+		queryFn: async () => {
+			const url = `${env.PUBLIC_BACKEND_URL}/api/platform-banner/`;
+			console.log('Fetching platform banners from:', url);
+			const result = await apiFetch<PlatformBanner[]>(url);
+			console.log('Platform Banner API response:', result);
 			return result;
 		}
 	});
