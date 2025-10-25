@@ -33,7 +33,7 @@
 
 <button
 	on:click={handleCardClick}
-	class="relative flex w-[280px] flex-col gap-1 rounded-2xl bg-white shadow-md 
+	class="relative flex w-full md:w-[280px] flex-col gap-1 rounded-2xl bg-white shadow-md 
 	transition-all duration-300 ease-out
 	{!restaurantIsOpen || !item.is_available ? 'opacity-60 cursor-not-allowed' : 'cursor-pointer hover:shadow-lg transform hover:-translate-y-1 hover:scale-[1.02]'}"
 	aria-label="Add {item.name} to cart"
@@ -48,7 +48,7 @@
 			<Clock size={24} class="text-gray-500" />
 		{/if}
 	</div>
-	<img src={item.img_urls[0]} alt={item.name} class="h-[220px] w-[280px] rounded-t-2xl object-cover" />
+	<img src={item.img_urls[0]} alt={item.name} class="h-[150px] md:h-[220px] w-full md:w-[280px] rounded-t-2xl object-cover" />
 	<div class="px-5 py-3.5 text-left">
 		<p class="font-bold text-left">{item.name}</p>
 		<p class="mb-4 text-xs text-gray-500 text-left">{item.description}</p>

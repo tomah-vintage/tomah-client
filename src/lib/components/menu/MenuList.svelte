@@ -15,7 +15,7 @@
 </script>
 
 <div class="mt-4">
-	<div class="grid grid-cols-1 gap-4 md:grid-cols-3 lg:grid-cols-4">
+	<div class="grid grid-cols-2 gap-4 md:grid-cols-3 lg:grid-cols-4">
 		{#each items.slice(0, limit) as item}
 			<MenuCard {item} {restaurantId} {restaurant} />
 		{/each}

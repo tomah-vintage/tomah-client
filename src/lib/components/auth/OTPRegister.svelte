@@ -218,7 +218,7 @@
 
 			<Button 
 				type="submit" 
-				label={loading ? 'Илгээж байна...' : 'OTP код илгээх'} 
+				label={loading ? 'Илгээж байна...' : 'Бүртгүүлэх'} 
 				variant="primary" 
 				className="w-full bg-red-600"
 				disabled={loading}

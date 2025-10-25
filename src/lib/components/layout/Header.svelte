@@ -1,7 +1,7 @@
 <script lang="ts">
 	import { authStore } from '$lib/stores/auth';
 	import Button from '$lib/components/common/Button.svelte';
-	import { Menu, Search, ShoppingCart, Heart } from 'lucide-svelte';
+	import { Menu, Search, ShoppingCart, Heart, MapPin } from 'lucide-svelte';
 	import { goto } from '$app/navigation';
 	import { page } from '$app/stores';
 	import QpickTextLogo from '../assets/QpickTextLogo.svelte';
@@ -18,7 +18,6 @@
 	let showRegisterModal = false;
 	let showSidebar = false;
 	let showOrder = false;
-	let showMobileSearch = false;
 
 	let searchTerm = '';
 	let debounceTimeout: NodeJS.Timeout;
@@ -76,7 +75,7 @@
 	}
 
 	$: if (typeof document !== 'undefined') {
-		document.body.classList.toggle('no-scroll', showSidebar || showMobileSearch);
+		document.body.classList.toggle('no-scroll', showSidebar);
 	}
 </script>
 
@@ -169,66 +168,37 @@
 					/>
 				</div>
 			{/if}
-			<button
-				class="rounded-lg p-2.5 transition-colors hover:bg-red-600 lg:hidden"
-				on:click={() => (showMobileSearch = !showMobileSearch)}
-				aria-label="Toggle mobile search"
-			>
-				<Search class="h-6 w-6 text-white" />
-			</button>
 		</div>
 	</div>
 </header>
 
-<!-- Mobile Search Overlay -->
-{#if showMobileSearch}
-	<div
-		class="fixed inset-0 z-50 bg-black/50 lg:hidden"
-		on:click={() => (showMobileSearch = false)}
-		role="button"
-		tabindex="-1"
-		on:keydown={(e) => {
-			if (e.key === 'Escape') showMobileSearch = false;
-		}}
-	>
-		<div
-			class="absolute top-0 right-0 left-0 bg-white p-4 shadow-lg"
-			on:click|stopPropagation
-			role="dialog"
-			aria-label="Mobile search"
-		>
-			<div class="flex items-center gap-3">
-				<div class="relative flex-1">
-					<div class="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3">
-						<Search class="h-5 w-5 text-neutral-400" />
-					</div>
-					<input
-						type="text"
-						placeholder="Хайл, Ресторан"
-						class="focus:border-primary focus:ring-primary-200 w-full rounded-lg border-2 border-transparent bg-neutral-100 py-3
-						pr-4 pl-10 transition-all duration-200 focus:bg-white focus:ring-2"
-						bind:value={searchTerm}
-						on:input={() => handleSearch(searchTerm)}
-						on:focus={() => (isUserTyping = true)}
-						on:keydown={(e) => {
-							if (e.key === 'Enter') {
-								handleSearch(searchTerm);
-								showMobileSearch = false;
-							}
-						}}
-						autofocus
-					/>
-				</div>
-				<button
-					class="px-4 py-3 text-neutral-600 transition-colors hover:text-neutral-800"
-					on:click={() => (showMobileSearch = false)}
-				>
-					Cancel
+<!-- Mobile Search Bar - Visible below header on mobile, hidden on restaurant pages -->
+<div class="bg-white p-3 shadow-sm lg:hidden" class:hidden={$page.route.id === '/restaurant/[restaurantId]'}>
+	<div class="container mx-auto max-w-[1200px]">
+		<div class="relative">
+			<div class="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3">
+				<Search class="h-5 w-5 text-gray-400" />
+			</div>
+			<input
+				type="text"
+				placeholder="Хоол, Ресторан"
+				class="w-full rounded-lg border-2 border-transparent bg-neutral-100 py-3 pr-12 pl-10 transition-all duration-200 hover:bg-neutral-50 focus:bg-white focus:ring-0"
+				bind:value={searchTerm}
+				on:input={() => handleSearch(searchTerm)}
+				on:focus={() => (isUserTyping = true)}
+				on:keydown={(e) => {
+					if (e.key === 'Enter') handleSearch(searchTerm);
+				}}
+			/>
+			<div class="absolute inset-y-0 right-0 flex items-center pr-3">
+				<button class="rounded-full bg-gray-100 p-2">
+					<MapPin class="h-5 w-5 text-gray-600" />
 				</button>
 			</div>
 		</div>
 	</div>
-{/if}
+</div>
+
 
 <Modal showModal={showLoginModal} on:close={() => (showLoginModal = false)}>
 	<OTPLogin on:openRegister={handleOpenRegister} on:close={() => (showLoginModal = false)} />
