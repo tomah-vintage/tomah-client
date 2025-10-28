@@ -88,7 +88,12 @@
 			<!-- Map View -->
 			<div class="lg:block {viewMode === 'list' ? 'hidden lg:block' : ''}" style="height: 716px;">
 				<div class="sticky top-24 h-full">
-					<Map results={results}/>
+					<Map 
+						results={results}
+						searchLatitude={currentQuery.latitude}
+						searchLongitude={currentQuery.longitude}
+						searchRadius={currentQuery.radius}
+					/>
 				</div>
 			</div>
 		</div>

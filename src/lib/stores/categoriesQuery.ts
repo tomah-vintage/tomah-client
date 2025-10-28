@@ -12,10 +12,13 @@ export function createCategoriesQuery() {
 				return response;
 			} catch (error) {
 				console.error('Failed to fetch categories:', error);
-				throw error;
+				// Return empty array to fall back to default categories
+				return [];
 			}
 		},
 		staleTime: 5 * 60 * 1000, // 5 minutes
-		retry: 1,
+		retry: 2,
+		retryDelay: 1000, // 1 second
+		gcTime: 10 * 60 * 1000, // 10 minutes
 	});
 }

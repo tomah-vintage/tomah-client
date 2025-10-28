@@ -8,6 +8,9 @@ export const GET: RequestHandler = async ({ url }) => {
 	const typeFilter = url.searchParams.get('type');
 	const sortBy = url.searchParams.get('sortBy') || 'relevance';
 	const category = url.searchParams.get('category');
+	const latitude = url.searchParams.get('latitude');
+	const longitude = url.searchParams.get('longitude');
+	const radius = url.searchParams.get('radius');
 
 	try {
 		const backendUrl = new URL(`${PUBLIC_BACKEND_URL}/api/restaurants/search/`);
@@ -15,6 +18,9 @@ export const GET: RequestHandler = async ({ url }) => {
 		if (typeFilter) backendUrl.searchParams.append('type', typeFilter);
 		if (sortBy) backendUrl.searchParams.append('sortBy', sortBy);
 		if (category) backendUrl.searchParams.append('category', category);
+		if (latitude) backendUrl.searchParams.append('latitude', latitude);
+		if (longitude) backendUrl.searchParams.append('longitude', longitude);
+		if (radius) backendUrl.searchParams.append('radius', radius);
 
 		const response = await fetch(backendUrl.toString());
 

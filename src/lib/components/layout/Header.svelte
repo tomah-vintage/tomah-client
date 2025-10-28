@@ -13,11 +13,14 @@
 	import { qrOrigin } from '$lib/stores/table';
 	import OrderModel from '../order/OrderModel.svelte';
 	import Orders from '../order/Orders.svelte';
+	import LocationModal from '$lib/components/location/LocationModal.svelte';
+	import { locationStore } from '$lib/stores/location';
 
 	let showLoginModal = false;
 	let showRegisterModal = false;
 	let showSidebar = false;
 	let showOrder = false;
+	let showLocationModal = false;
 
 	let searchTerm = '';
 	let debounceTimeout: NodeJS.Timeout;
@@ -38,12 +41,24 @@
 		debounceTimeout = setTimeout(() => {
 			isUserTyping = false;
 			const currentPath = $page.url.pathname;
+			
+			// Build search URL with location parameters if available
+			const searchParams = new URLSearchParams();
+			searchParams.set('q', value);
+			
+			if ($locationStore.latitude && $locationStore.longitude) {
+				searchParams.set('latitude', $locationStore.latitude.toString());
+				searchParams.set('longitude', $locationStore.longitude.toString());
+				searchParams.set('radius', $locationStore.radius.toString());
+			}
+			
+			const searchUrl = `/search?${searchParams.toString()}`;
+			
 			if (currentPath !== '/search') {
-				goto(`/search?q=${value}`);
+				goto(searchUrl);
 			} else {
 				// If already on search page, update the URL to trigger new search
-				// This will be handled by the reactive statement in +page.svelte
-				goto(`/search?q=${value}`, { replaceState: true });
+				goto(searchUrl, { replaceState: true });
 			}
 		}, 300); // Debounce for 300ms
 	}
@@ -60,6 +75,17 @@
 
 	const openModal = () => (showOrder = true);
 	const closeModal = () => (showOrder = false);
+
+	function handleLocationSelected(event: CustomEvent<{ latitude: number; longitude: number; radius: number; address?: string }>) {
+		const { latitude, longitude, radius, address } = event.detail;
+		locationStore.setLocation(latitude, longitude, address);
+		locationStore.setRadius(radius);
+		
+		// If there's a search term, trigger a new search with location
+		if (searchTerm.trim()) {
+			handleSearch(searchTerm);
+		}
+	}
 
 	// Handle logo click with QR origin redirect
 	function handleLogoClick() {
@@ -101,12 +127,13 @@
 
 		<!-- Center -->
 		<div class="hidden flex-1 items-center justify-center space-x-4 lg:flex">
-			<!-- <button
-				class="flex items-center space-x-2 rounded-lg bg-gray-100 px-4 py-3 text-sm whitespace-nowrap"
+			<button
+				on:click={() => (showLocationModal = true)}
+				class="flex items-center space-x-2 rounded-lg bg-gray-100 px-4 py-3 text-sm whitespace-nowrap hover:bg-gray-200 transition-colors"
 			>
 				<MapPin class="h-5 w-5 text-gray-500" />
-				<span>Ойр байгаа байршил</span>
-			</button> -->
+				<span>{$locationStore.address || 'Ойр байгаа байршил'}</span>
+			</button>
 			<div class="relative w-full max-w-lg">
 				<div class="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3">
 					<Search class="h-5 w-5 text-gray-400" />
@@ -191,7 +218,10 @@
 				}}
 			/>
 			<div class="absolute inset-y-0 right-0 flex items-center pr-3">
-				<button class="rounded-full bg-gray-100 p-2">
+				<button 
+					on:click={() => (showLocationModal = true)}
+					class="rounded-full bg-gray-100 p-2 hover:bg-gray-200 transition-colors"
+				>
 					<MapPin class="h-5 w-5 text-gray-600" />
 				</button>
 			</div>
@@ -217,6 +247,12 @@
 	on:close={() => (showSidebar = false)}
 	on:openLogin={handleOpenLogin}
 	on:openRegister={handleOpenRegister}
+/>
+
+<LocationModal 
+	bind:showModal={showLocationModal}
+	on:close={() => (showLocationModal = false)}
+	on:locationSelected={handleLocationSelected}
 />
 
 <style lang="postcss">

@@ -35,8 +35,8 @@
 		'сүши': Fish
 	};
 
-	$: showLoading = categoriesLoading && !apiCategories;
-	$: categories = apiCategories && apiCategories.length > 0 
+	$: showLoading = categoriesLoading && !apiCategories && !categoriesError;
+	$: categories = apiCategories && apiCategories.length > 0 && !categoriesError
 		? apiCategories
 			.filter(cat => cat.is_active)
 			.map(cat => ({

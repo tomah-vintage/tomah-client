@@ -2,6 +2,9 @@ export interface SearchQuery {
 	query: string;
 	filters?: Record<string, string>;
 	sortBy?: string;
+	latitude?: number;
+	longitude?: number;
+	radius?: number;
 }
 
 export interface SearchResultItem {

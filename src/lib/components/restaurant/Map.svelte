@@ -7,6 +7,10 @@
 	import type { SearchResultItem } from '$lib/types/search';
 
 	export let results: SearchResultItem[] = [];
+	export let searchLatitude: number | undefined = undefined;
+	export let searchLongitude: number | undefined = undefined;
+	export let searchRadius: number | undefined = undefined;
+	
 	interface SimpleLocation {
 		latitude: string;
 		longitude: string;
@@ -64,13 +68,43 @@
 	});
 
 	// Reactive statement to add markers when both map and restaurants are ready
-	$: if (map && displayRestaurants.length > 0) {
+	$: if (map && (displayRestaurants.length > 0 || (searchLatitude && searchLongitude))) {
 		// Remove existing markers
 		map.eachLayer((layer) => {
 			if (layer instanceof L.Marker) {
 				map?.removeLayer(layer);
 			}
 		});
+
+		// Add user location marker if search coordinates are provided
+		if (searchLatitude && searchLongitude) {
+			const userIcon = L.divIcon({
+				className: 'custom-user-marker',
+				html: `
+					<div class="user-marker-pin">
+						<div class="user-marker-inner">
+							<svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor">
+								<circle cx="12" cy="12" r="10"/>
+								<circle cx="12" cy="12" r="3" fill="white"/>
+							</svg>
+						</div>
+					</div>
+				`,
+				iconSize: [32, 32],
+				iconAnchor: [16, 16]
+			});
+
+			const userMarker = L.marker([searchLatitude, searchLongitude], { icon: userIcon }).addTo(map);
+			userMarker.bindPopup(`
+				<div class="user-tooltip">
+					<div class="tooltip-content">
+						<h3 class="tooltip-title">Таны байршил</h3>
+						<div class="tooltip-address">📍 ${searchLatitude.toFixed(4)}, ${searchLongitude.toFixed(4)}</div>
+						${searchRadius ? `<div class="tooltip-radius">🔍 ${searchRadius}км радиуст хайж байна</div>` : ''}
+					</div>
+				</div>
+			`);
+		}
 
 		// Add new markers
 		displayRestaurants.forEach((restaurant) => {
@@ -165,10 +199,20 @@
 	function initializeMap() {
 		if (mapElement && L && !map) {
 			
-			const initialCenter: LatLngExpression =
-				displayRestaurants.length > 0 && displayRestaurants[0].latitude && displayRestaurants[0].longitude ? [displayRestaurants[0].latitude, displayRestaurants[0].longitude] : [47.9187, 106.917];
+			let initialCenter: LatLngExpression;
+			let initialZoom = zoom;
+			
+			// Priority: 1. Search coordinates, 2. First restaurant, 3. Default location
+			if (searchLatitude && searchLongitude) {
+				initialCenter = [searchLatitude, searchLongitude];
+				initialZoom = searchRadius ? Math.max(11, 16 - Math.log2(searchRadius)) : 13;
+			} else if (displayRestaurants.length > 0 && displayRestaurants[0].latitude && displayRestaurants[0].longitude) {
+				initialCenter = [displayRestaurants[0].latitude, displayRestaurants[0].longitude];
+			} else {
+				initialCenter = [47.9187, 106.917]; // Default center
+			}
 
-			map = L.map(mapElement).setView(initialCenter, zoom);
+			map = L.map(mapElement).setView(initialCenter, initialZoom);
 
 			// Use CartoDB Positron - clean, minimal but more lively than grayscale
 			L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png', {
@@ -200,6 +244,58 @@
 	:global(.custom-restaurant-marker) {
 		background: transparent;
 		border: none;
+	}
+
+	:global(.custom-user-marker) {
+		background: transparent;
+		border: none;
+	}
+
+	:global(.user-marker-pin) {
+		width: 32px;
+		height: 32px;
+		position: relative;
+		cursor: pointer;
+		transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+	}
+
+	:global(.user-marker-pin::before) {
+		content: '';
+		position: absolute;
+		top: 50%;
+		left: 50%;
+		transform: translate(-50%, -50%);
+		width: 32px;
+		height: 32px;
+		background: linear-gradient(135deg, #3b82f6 0%, #2563eb 50%, #1d4ed8 100%);
+		border-radius: 50%;
+		border: 4px solid #ffffff;
+		box-shadow: 0 4px 12px rgba(59, 130, 246, 0.4);
+	}
+
+	:global(.user-marker-inner) {
+		position: absolute;
+		top: 50%;
+		left: 50%;
+		transform: translate(-50%, -50%);
+		width: 20px;
+		height: 20px;
+		background: white;
+		border-radius: 50%;
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		z-index: 10;
+		color: #1d4ed8;
+	}
+
+	:global(.user-marker-pin:hover) {
+		transform: scale(1.1);
+	}
+
+	:global(.user-marker-pin:hover::before) {
+		background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 50%, #1e40af 100%);
+		box-shadow: 0 6px 20px rgba(59, 130, 246, 0.6);
 	}
 
 	:global(.marker-pin) {
