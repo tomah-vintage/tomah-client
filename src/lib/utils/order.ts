@@ -53,7 +53,7 @@ export const createOrder = async (orderData: CreateOrderRequest): Promise<OrderR
 			body: JSON.stringify(orderData)
 		});
 
-		return { success: true, order: data };
+		return { success: true, order: data as Order };
 	} catch (error: any) {
 		console.error('Error creating order:', error);
 		return { 
@@ -69,7 +69,7 @@ export const getOrderStatus = async (orderId: number): Promise<OrderStatusRespon
 			method: 'GET'
 		});
 
-		return { success: true, order: data };
+		return { success: true, order: data as Order };
 	} catch (error: any) {
 		console.error('Error getting order status:', error);
 		return { 

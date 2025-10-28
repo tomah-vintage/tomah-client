@@ -152,7 +152,7 @@
 							<div class="space-y-2">
 								{#each order.items as item}
 									<div class="flex justify-between text-sm">
-										<span class="text-gray-600">{item.menu_item.name} x{item.quantity}</span>
+										<span class="text-gray-600">{(item.menu_item as any)?.name || 'Menu Item'} x{item.quantity}</span>
 										<span class="font-medium">{(parseInt(item.unit_price) * item.quantity).toLocaleString()}₮</span>
 									</div>
 								{/each}
@@ -162,9 +162,9 @@
 
 					<!-- Action buttons -->
 					<div class="space-y-3">
-						{#if order.payment?.status === 'PAID' || order.order_status === 'PREPARING'}
+						{#if order && (order.payment?.status === 'PAID' || order.order_status === 'PREPARING')}
 							<button
-								on:click={() => goto(`/order/${order.id}`)}
+								on:click={() => order && goto(`/order/${order.id}`)}
 								class="w-full rounded-lg bg-red-500 py-3 text-white font-medium hover:bg-red-600"
 							>
 								Захиалгын дэлгэрэнгүй харах
@@ -184,7 +184,7 @@
 							</button>
 						{:else}
 							<button
-								on:click={() => goto(`/order/${order.id}`)}
+								on:click={() => order && goto(`/order/${order.id}`)}
 								class="w-full rounded-lg bg-red-500 py-3 text-white font-medium hover:bg-red-600"
 							>
 								Захиалгын дэлгэрэнгүй харах

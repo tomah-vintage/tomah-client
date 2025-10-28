@@ -39,6 +39,6 @@ export function createSearchQuery(searchParams: SearchQuery) {
 	return createQuery<SearchResponse>({
 		queryKey: ['search', searchParams],
 		queryFn: () => apiFetch<SearchResponse>(`${PUBLIC_BACKEND_URL}/api/restaurants/search?${params.toString()}`),
-		enabled: () => !!searchParams.query.trim() || (searchParams.latitude && searchParams.longitude)
+		enabled: Boolean(searchParams.query.trim() || (searchParams.latitude && searchParams.longitude))
 	});
 }

@@ -5,7 +5,7 @@
 	import { createEventDispatcher } from 'svelte';
 	import Button from '../common/Button.svelte';
 	import Card from '../common/Card.svelte';
-	import Icon from '../common/Icon.svelte';
+	import { X, Trash2 } from 'lucide-svelte';
 
 	const dispatch = createEventDispatcher();
 
@@ -61,7 +61,7 @@
 	<div class="flex justify-between items-center border-b pb-4 mb-4">
 		<h2 class="text-2xl font-bold">Your Cart</h2>
 		<button on:click={() => dispatch('close')} class="text-gray-500 hover:text-gray-800">
-			<Icon name="close" />
+			<X size={20} />
 		</button>
 	</div>
 
@@ -93,7 +93,7 @@
 								</button>
 							</div>
 							<button on:click={() => removeItem(item.id)} class="text-red-500 hover:text-red-700">
-								<Icon name="trash" />
+								<Trash2 size={16} />
 							</button>
 						</div>
 					</div>
@@ -111,9 +111,12 @@
 			{#if errorMessage}
 				<p class="text-red-500 text-sm text-center">{errorMessage}</p>
 			{/if}
-			<Button on:click={handlePlaceOrder} class="w-full" size="lg" disabled={isLoading}>
-				{isLoading ? 'Placing Order...' : 'Place Order'}
-			</Button>
+			<Button 
+				on:click={handlePlaceOrder} 
+				className="w-full" 
+				label={isLoading ? 'Placing Order...' : 'Place Order'} 
+				disabled={isLoading} 
+			/>
 		</div>
 	{/if}
 </Card>

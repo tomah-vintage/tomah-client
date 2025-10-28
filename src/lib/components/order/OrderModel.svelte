@@ -20,8 +20,23 @@
  </script>
   
   {#if open}
-    <div 	on:click={onClose} class="fixed inset-0 bg-black/50 flex items-center justify-center z-[9999]">
-      <div 	on:click|stopPropagation class="bg-white rounded-2xl shadow-lg p-4 relative" style={containerStyle}>
+    <div 	
+      on:click={onClose} 
+      on:keydown={(e) => e.key === 'Escape' && onClose()}
+      class="fixed inset-0 bg-black/50 flex items-center justify-center z-[9999]"
+      role="button"
+      tabindex="0"
+      aria-label="Close modal"
+    >
+      <div 	
+        on:click|stopPropagation 
+        on:keydown={() => {}}
+        class="bg-white rounded-2xl shadow-lg p-4 relative" 
+        style={containerStyle}
+        role="dialog"
+        aria-modal="true"
+        tabindex="-1"
+      >
         <!-- Close button -->
         <button
           class="absolute top-3 right-3 text-gray-500 hover:text-black"

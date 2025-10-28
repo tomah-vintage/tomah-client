@@ -40,7 +40,7 @@
 	});
 </script>
 
-<div class="relative overflow-hidden rounded-lg" on:mouseenter={stopAutoSlide} on:mouseleave={startAutoSlide}>
+<div class="relative overflow-hidden rounded-lg" on:mouseenter={stopAutoSlide} on:mouseleave={startAutoSlide} role="region" aria-label="Banner carousel">
 	<div class="relative h-64 md:h-80 lg:h-96">
 		{#each banners as banner, index}
 			<div
@@ -86,7 +86,7 @@
 					class="h-2 w-2 rounded-full transition-colors {index === currentIndex ? 'bg-white' : 'bg-white/50'}"
 					on:click={() => goToSlide(index)}
 					aria-label="Go to banner {index + 1}"
-				/>
+				></button>
 			{/each}
 		</div>
 	{/if}

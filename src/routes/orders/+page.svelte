@@ -61,8 +61,8 @@
 				apiFetch(`${env.PUBLIC_BACKEND_URL}/api/restaurants/`)
 			]);
 
-			orders = ordersResponse?.results || ordersResponse || [];
-			restaurants = restaurantsResponse?.results || restaurantsResponse || [];
+			orders = (ordersResponse as any)?.results || (ordersResponse as Order[]) || [];
+			restaurants = (restaurantsResponse as any)?.results || (restaurantsResponse as Restaurant[]) || [];
 			
 			// Group orders by restaurant
 			groupOrders();

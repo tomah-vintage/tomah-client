@@ -83,7 +83,7 @@
 						: 'bg-gray-100 hover:bg-gray-200'}"
 				>
 					<div class="w-8 h-8 flex items-center justify-center">
-						{#if category.image_url}
+						{#if 'image_url' in category && category.image_url}
 							<img 
 								src={category.image_url} 
 								alt={category.name}

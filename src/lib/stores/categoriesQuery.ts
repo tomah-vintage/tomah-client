@@ -17,8 +17,6 @@ export function createCategoriesQuery() {
 			}
 		},
 		staleTime: 5 * 60 * 1000, // 5 minutes
-		retry: 2,
-		retryDelay: 1000, // 1 second
-		gcTime: 10 * 60 * 1000, // 10 minutes
+		retry: 2
 	});
 }
