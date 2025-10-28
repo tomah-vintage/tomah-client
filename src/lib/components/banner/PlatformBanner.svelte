@@ -4,6 +4,7 @@
 	import type { PlatformBanner } from '$lib/types/banner';
 	import { onMount } from 'svelte';
 	import { ArrowLeft, ArrowRight } from 'lucide-svelte';
+	import BannerSkeleton from '$lib/components/loading/BannerSkeleton.svelte';
 
 	const platformBannersQuery = createPlatformBannersQuery();
 	let carouselContainer: HTMLElement;
@@ -153,7 +154,7 @@
 		{/if}
 	</section>
 {:else if $platformBannersQuery.isLoading}
-	<div class="platform-banners-loading">Loading banners...</div>
+	<BannerSkeleton />
 {:else if $platformBannersQuery.error}
 	<div class="platform-banners-error">Error: {$platformBannersQuery.error.message}</div>
 {/if}
