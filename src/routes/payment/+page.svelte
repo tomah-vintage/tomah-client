@@ -21,6 +21,7 @@
 	import PayerTypeSelector from '$lib/components/payment/PayerTypeSelector.svelte';
 	import PaymentMethods from '$lib/components/payment/PaymentMethods.svelte';
 	import TimeSelectionModal from '$lib/components/order/TimeSelectionModal.svelte';
+	import PaymentResultModal from '$lib/components/payment/PaymentResultModal.svelte';
 	import { Clock } from 'lucide-svelte';
 
 	// State variables
@@ -35,6 +36,11 @@
 	let currentOrder: Order | null = null;
 	let isPollingPayment = false;
 	let paymentPollingError = '';
+
+	// Payment result modal state
+	let showPaymentResultModal = false;
+	let paymentSuccess = false;
+	let paymentResultMessage = '';
 
 	// Order type management
 	$: hasTable = $currentTable !== null;
@@ -97,11 +103,13 @@
 				(updatedOrder) => {
 					currentOrder = updatedOrder;
 
-					// Show status updates via toast
+					// Show status updates
 					if (updatedOrder.payment?.status === 'PAID') {
-						showSuccess('Төлбөр амжилттай төлөгдлөө!', 'Захиалга баталгаажлаа');
+						paymentSuccess = true;
+						paymentResultMessage = 'Таны захиалга амжилттай баталгаажлаа';
 					} else if (updatedOrder.order_status === 'PREPARING') {
-						showSuccess('Төлбөр амжилттай төлөгдлөө!', 'Хоол бэлтгэж эхэллээ');
+						paymentSuccess = true;
+						paymentResultMessage = 'Хоол бэлтгэж эхэллээ';
 					}
 				},
 				3000, // Poll every 3 seconds
@@ -109,19 +117,22 @@
 			);
 
 			if (finalOrder) {
-				// Payment completed, redirect to success page
-				goto(`/payment/success?orderId=${finalOrder.id}`);
+				// Payment completed, show success modal
+				paymentSuccess = true;
+				paymentResultMessage = 'Таны захиалга амжилттай баталгаажлаа';
+				showPaymentResultModal = true;
 			} else {
 				// Polling timeout
-				showError('Цаг хэтэрлээ', 'Төлбөрийн статус шалгах хугацаа дууссан');
-				goto(`/payment/success?orderId=${orderId}`);
+				paymentSuccess = false;
+				paymentResultMessage = 'Төлбөрийн статус шалгах хугацаа дууссан';
+				showPaymentResultModal = true;
 			}
 		} catch (error) {
 			console.error('Payment polling error:', error);
 			paymentPollingError = 'Төлбөрийн статус шалгахад алдаа гарлаа';
-			showError('Алдаа гарлаа', 'Төлбөрийн статус шалгахад алдаа гарлаа');
-			// Still redirect to success page to show current status
-			goto(`/payment/success?orderId=${orderId}`);
+			paymentSuccess = false;
+			paymentResultMessage = 'Төлбөрийн статус шалгахад алдаа гарлаа';
+			showPaymentResultModal = true;
 		} finally {
 			isPollingPayment = false;
 		}
@@ -343,4 +354,28 @@
 	{restaurantHours}
 	on:close={() => (showTimeModal = false)}
 	on:confirm={handleTimeConfirm}
+/>
+
+<!-- Payment Result Modal -->
+<PaymentResultModal
+	bind:showModal={showPaymentResultModal}
+	success={paymentSuccess}
+	title={paymentSuccess ? 'Төлбөр амжилттай!' : 'Төлбөр амжилтгүй'}
+	message={paymentResultMessage}
+	orderId={currentOrder?.id || null}
+	amount={currentOrder?.total_price ? parseFloat(currentOrder.total_price).toLocaleString() : ''}
+	on:close={() => {
+		showPaymentResultModal = false;
+		if (paymentSuccess && currentOrder) {
+			goto(`/orders`);
+		}
+	}}
+	on:viewReceipt={(e) => {
+		showPaymentResultModal = false;
+		goto(`/receipt/${e.detail.orderId}`);
+	}}
+	on:viewOrder={(e) => {
+		showPaymentResultModal = false;
+		goto(`/order/${e.detail.orderId}`);
+	}}
 />

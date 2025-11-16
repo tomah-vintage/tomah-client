@@ -1,7 +1,7 @@
 <script lang="ts">
 	import { authStore } from '$lib/stores/auth';
 	import Button from '$lib/components/common/Button.svelte';
-	import { Menu, Search, ShoppingCart, Heart, MapPin } from 'lucide-svelte';
+	import { Menu, Search, ShoppingCart, Heart, MapPin, QrCode } from 'lucide-svelte';
 	import { goto } from '$app/navigation';
 	import { page } from '$app/stores';
 	import QpickTextLogo from '../assets/QpickTextLogo.svelte';
@@ -14,6 +14,7 @@
 	import OrderModel from '../order/OrderModel.svelte';
 	import Orders from '../order/Orders.svelte';
 	import LocationModal from '$lib/components/location/LocationModal.svelte';
+	import QRScanner from '$lib/components/qr/QRScanner.svelte';
 	import { locationStore } from '$lib/stores/location';
 
 	let showLoginModal = false;
@@ -21,6 +22,7 @@
 	let showSidebar = false;
 	let showOrder = false;
 	let showLocationModal = false;
+	let showQRScanner = false;
 
 	let searchTerm = '';
 	let debounceTimeout: NodeJS.Timeout;
@@ -41,19 +43,19 @@
 		debounceTimeout = setTimeout(() => {
 			isUserTyping = false;
 			const currentPath = $page.url.pathname;
-			
+
 			// Build search URL with location parameters if available
 			const searchParams = new URLSearchParams();
 			searchParams.set('q', value);
-			
+
 			if ($locationStore.latitude && $locationStore.longitude) {
 				searchParams.set('latitude', $locationStore.latitude.toString());
 				searchParams.set('longitude', $locationStore.longitude.toString());
 				searchParams.set('radius', $locationStore.radius.toString());
 			}
-			
+
 			const searchUrl = `/search?${searchParams.toString()}`;
-			
+
 			if (currentPath !== '/search') {
 				goto(searchUrl);
 			} else {
@@ -76,11 +78,13 @@
 	const openModal = () => (showOrder = true);
 	const closeModal = () => (showOrder = false);
 
-	function handleLocationSelected(event: CustomEvent<{ latitude: number; longitude: number; radius: number; address?: string }>) {
+	function handleLocationSelected(
+		event: CustomEvent<{ latitude: number; longitude: number; radius: number; address?: string }>
+	) {
 		const { latitude, longitude, radius, address } = event.detail;
 		locationStore.setLocation(latitude, longitude, address);
 		locationStore.setRadius(radius);
-		
+
 		// If there's a search term, trigger a new search with location
 		if (searchTerm.trim()) {
 			handleSearch(searchTerm);
@@ -90,7 +94,7 @@
 	// Handle logo click with QR origin redirect
 	function handleLogoClick() {
 		const qrUrl = qrOrigin.getRestaurantUrl();
-		
+
 		if (qrUrl) {
 			console.log('QR origin found, navigating to:', qrUrl);
 			goto(qrUrl);
@@ -129,7 +133,7 @@
 		<div class="hidden flex-1 items-center justify-center space-x-4 lg:flex">
 			<button
 				on:click={() => (showLocationModal = true)}
-				class="flex items-center space-x-2 rounded-lg bg-gray-100 px-4 py-3 text-sm whitespace-nowrap hover:bg-gray-200 transition-colors"
+				class="flex items-center space-x-2 rounded-lg bg-gray-100 px-4 py-3 text-sm whitespace-nowrap transition-colors hover:bg-gray-200"
 			>
 				<MapPin class="h-5 w-5 text-gray-500" />
 				<span>{$locationStore.address || 'Ойр байгаа байршил'}</span>
@@ -155,6 +159,11 @@
 
 		<!-- Right Side -->
 		<div class="flex items-center space-x-1 lg:space-x-6">
+			<!-- QR Scanner - mobile only -->
+			<button class="p-2.5 lg:hidden" on:click={() => (showQRScanner = true)}>
+				<QrCode class="h-6 w-6 text-white" />
+			</button>
+
 			<!-- Heart/Favorites icon - mobile only -->
 			<button class="p-2.5 lg:hidden" on:click={() => goto('/saved')}>
 				<Heart class="h-6 w-6 text-white" />
@@ -200,7 +209,10 @@
 </header>
 
 <!-- Mobile Search Bar - Visible below header on mobile, hidden on restaurant pages -->
-<div class="bg-white p-3 shadow-sm lg:hidden" class:hidden={$page.route.id === '/restaurant/[restaurantId]'}>
+<div
+	class="bg-white p-3 shadow-sm lg:hidden"
+	class:hidden={$page.route.id === '/restaurant/[restaurantId]'}
+>
 	<div class="container mx-auto max-w-[1200px]">
 		<div class="relative">
 			<div class="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3">
@@ -218,9 +230,9 @@
 				}}
 			/>
 			<div class="absolute inset-y-0 right-0 flex items-center pr-3">
-				<button 
+				<button
 					on:click={() => (showLocationModal = true)}
-					class="rounded-full bg-gray-100 p-2 hover:bg-gray-200 transition-colors"
+					class="rounded-full bg-gray-100 p-2 transition-colors hover:bg-gray-200"
 				>
 					<MapPin class="h-5 w-5 text-gray-600" />
 				</button>
@@ -228,7 +240,6 @@
 		</div>
 	</div>
 </div>
-
 
 <Modal showModal={showLoginModal} on:close={() => (showLoginModal = false)}>
 	<OTPLogin on:openRegister={handleOpenRegister} on:close={() => (showLoginModal = false)} />
@@ -249,10 +260,22 @@
 	on:openRegister={handleOpenRegister}
 />
 
-<LocationModal 
+<LocationModal
 	bind:showModal={showLocationModal}
 	on:close={() => (showLocationModal = false)}
 	on:locationSelected={handleLocationSelected}
+/>
+
+<QRScanner
+	bind:showModal={showQRScanner}
+	on:close={() => (showQRScanner = false)}
+	on:scanned={(e) => {
+		const { restaurantId, tableId } = e.detail;
+		if (restaurantId) {
+			const url = `/restaurant/${restaurantId}${tableId ? `?table=${tableId}` : ''}`;
+			goto(url);
+		}
+	}}
 />
 
 <style lang="postcss">
