@@ -26,6 +26,7 @@
 			<div class="col-span-1 md:col-span-2">
 				<h3 class="mb-4 font-bold">Компани</h3>
 				<ul class="space-y-2 text-sm">
+					<li><a href="/about" class="hover:underline">Бидний тухай</a></li>
 					<li><a href="/how_to_work" class="hover:underline">Хэрхэн ажилладаг вэ</a></li>
 				</ul>
 			</div>

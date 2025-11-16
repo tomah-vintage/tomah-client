@@ -6,6 +6,7 @@
 	import { env } from '$env/dynamic/public';
 	import { ProfileImageUploader, ProfileForm, PasswordChangeForm } from '$lib/components/profile';
 	import { ErrorPage, NotFoundPage } from '$lib/components/common';
+	import { showProfileUpdateSuccess, showPasswordChangeSuccess } from '$lib/stores/successModal';
 
 	let isSaving = false;
 	let message = '';
@@ -150,12 +151,7 @@
 			imagePreview = null;
 
 			await authStore.revalidate();
-			message = 'Профайл амжилттай шинэчлэгдлээ';
-			messageType = 'success';
-
-			setTimeout(() => {
-				message = '';
-			}, 3000);
+			showProfileUpdateSuccess();
 		} catch (error) {
 			console.error('Profile update failed:', error);
 			message = 'Профайл шинэчлэхэд алдаа гарлаа';
@@ -185,12 +181,7 @@
 			});
 
 			passwordData = { new_password: '', confirm_password: '' };
-			message = 'Нууц үг амжилттай солигдлоо';
-			messageType = 'success';
-
-			setTimeout(() => {
-				message = '';
-			}, 3000);
+			showPasswordChangeSuccess();
 		} catch (error) {
 			console.error('Password change failed:', error);
 			message = 'Нууц үг солихоос алдаа гарлаа';
@@ -202,48 +193,48 @@
 </script>
 
 {#if !$authStore.user && !$authStore.loading}
-	<NotFoundPage 
+	<NotFoundPage
 		title="Нэвтрэх шаардлагатай"
 		message="Энэ хуудсанд хандахын тулд эхлээд нэвтэрнэ үү."
 		showSearchButton={false}
 	/>
 {:else}
-<div class="container mx-auto max-w-[1200px] px-4 py-8">
-	<div class="mx-auto my-8 w-full max-w-2xl rounded-lg bg-white p-6 shadow-sm dark:bg-gray-800">
-	<div class="mb-6 flex items-center justify-between">
-		<h2 class="text-2xl font-bold text-gray-900 dark:text-white">Профайл тохиргоо</h2>
-		{#if $authStore.loading}
-			<LoaderCircle class="h-5 w-5 animate-spin text-gray-500" />
-		{/if}
-	</div>
+	<div class="container mx-auto max-w-[1200px] px-4 py-8">
+		<div class="mx-auto my-8 w-full max-w-2xl rounded-lg bg-white p-6 shadow-sm dark:bg-gray-800">
+			<div class="mb-6 flex items-center justify-between">
+				<h2 class="text-2xl font-bold text-gray-900 dark:text-white">Профайл тохиргоо</h2>
+				{#if $authStore.loading}
+					<LoaderCircle class="h-5 w-5 animate-spin text-gray-500" />
+				{/if}
+			</div>
 
-	{#if message}
-		<div
-			class="mb-4 flex items-center rounded-lg p-3 {messageType === 'success'
-				? 'border border-green-200 bg-green-50 text-green-800 dark:border-green-800 dark:bg-green-900/20 dark:text-green-300'
-				: 'border border-red-200 bg-red-50 text-red-800 dark:border-red-800 dark:bg-red-900/20 dark:text-red-300'}"
-		>
-			{#if messageType === 'success'}
-				<CheckCircle class="mr-2 h-4 w-4" />
-			{:else}
-				<AlertTriangle class="mr-2 h-4 w-4" />
+			{#if message}
+				<div
+					class="mb-4 flex items-center rounded-lg p-3 {messageType === 'success'
+						? 'border border-green-200 bg-green-50 text-green-800 dark:border-green-800 dark:bg-green-900/20 dark:text-green-300'
+						: 'border border-red-200 bg-red-50 text-red-800 dark:border-red-800 dark:bg-red-900/20 dark:text-red-300'}"
+				>
+					{#if messageType === 'success'}
+						<CheckCircle class="mr-2 h-4 w-4" />
+					{:else}
+						<AlertTriangle class="mr-2 h-4 w-4" />
+					{/if}
+					{message}
+				</div>
 			{/if}
-			{message}
+
+			<ProfileImageUploader
+				{user}
+				{selectedImage}
+				{imagePreview}
+				{errors}
+				on:imageSelect={handleImageSelect}
+				on:imageError={handleImageError}
+			/>
+
+			<ProfileForm {user} {formData} {errors} {isSaving} on:submit={handleProfileUpdate} />
+
+			<PasswordChangeForm {passwordData} {errors} {isSaving} on:submit={handlePasswordChange} />
 		</div>
-	{/if}
-
-	<ProfileImageUploader
-		{user}
-		{selectedImage}
-		{imagePreview}
-		{errors}
-		on:imageSelect={handleImageSelect}
-		on:imageError={handleImageError}
-	/>
-
-	<ProfileForm {user} {formData} {errors} {isSaving} on:submit={handleProfileUpdate} />
-
-	<PasswordChangeForm {passwordData} {errors} {isSaving} on:submit={handlePasswordChange} />
 	</div>
-</div>
 {/if}

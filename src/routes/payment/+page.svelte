@@ -1,7 +1,13 @@
 <script lang="ts">
 	import { cart, clearCart } from '$lib/stores/cart';
 	import { authStore } from '$lib/stores/auth';
-	import { createOrder, redirectToPayment, pollOrderPaymentStatus, type CreateOrderRequest, type Order } from '$lib/utils/order';
+	import {
+		createOrder,
+		redirectToPayment,
+		pollOrderPaymentStatus,
+		type CreateOrderRequest,
+		type Order
+	} from '$lib/utils/order';
 	import { currentTable } from '$lib/stores/table';
 	import { calculatePaymentTotal, shouldShowPackagingFee } from '$lib/utils/payment';
 	import { goto } from '$app/navigation';
@@ -14,6 +20,8 @@
 	import OrderTypeSelector from '$lib/components/payment/OrderTypeSelector.svelte';
 	import PayerTypeSelector from '$lib/components/payment/PayerTypeSelector.svelte';
 	import PaymentMethods from '$lib/components/payment/PaymentMethods.svelte';
+	import TimeSelectionModal from '$lib/components/order/TimeSelectionModal.svelte';
+	import { Clock } from 'lucide-svelte';
 
 	// State variables
 	let payerType: 'person' | 'company' = 'person';
@@ -22,7 +30,7 @@
 	let orderError = '';
 	let discount = 0;
 	let packagingFee = 2000;
-	
+
 	// Payment polling state
 	let currentOrder: Order | null = null;
 	let isPollingPayment = false;
@@ -31,6 +39,11 @@
 	// Order type management
 	$: hasTable = $currentTable !== null;
 	let orderType: 'TAKE_OUT' | 'DINE_IN' = 'TAKE_OUT';
+
+	// Time selection
+	let showTimeModal = false;
+	let scheduledTime: { date: string; time: string; isAsap: boolean } | null = null;
+	let restaurantHours = { open: '09:00', close: '22:00' }; // Default hours, should come from restaurant data
 
 	// Payment calculations
 	$: paymentCalculation = calculatePaymentTotal($cart, orderType, discount, packagingFee);
@@ -42,7 +55,7 @@
 			goto('/');
 			return;
 		}
-		
+
 		// Initialize order type based on table presence
 		if ($currentTable && orderType === 'TAKE_OUT') {
 			orderType = 'DINE_IN';
@@ -58,6 +71,22 @@
 		regNumber = event.detail;
 	}
 
+	function handleTimeConfirm(event: CustomEvent<{ date: string; time: string; isAsap: boolean }>) {
+		scheduledTime = event.detail;
+		console.log('Scheduled time:', scheduledTime);
+		// Force reactivity update
+		scheduledTime = { ...scheduledTime };
+	}
+
+	function getTimeDisplayText(): string {
+		if (!scheduledTime || scheduledTime.isAsap) {
+			return 'Яаралтай (ASAP)';
+		}
+		const dateObj = new Date(scheduledTime.date);
+		const dateStr = dateObj.toLocaleDateString('mn-MN', { month: 'short', day: 'numeric' });
+		return `${dateStr}, ${scheduledTime.time}`;
+	}
+
 	async function startPaymentPolling(orderId: number) {
 		isPollingPayment = true;
 		paymentPollingError = '';
@@ -67,7 +96,7 @@
 				orderId,
 				(updatedOrder) => {
 					currentOrder = updatedOrder;
-					
+
 					// Show status updates via toast
 					if (updatedOrder.payment?.status === 'PAID') {
 						showSuccess('Төлбөр амжилттай төлөгдлөө!', 'Захиалга баталгаажлаа');
@@ -124,6 +153,7 @@
 			const orderData: CreateOrderRequest = {
 				restaurant: $cart[0].restaurant_id,
 				order_type: orderType,
+				total_price: paymentCalculation.finalAmount.toFixed(2),
 				items
 			};
 
@@ -132,17 +162,21 @@
 				orderData.table = parseInt($currentTable.id);
 			}
 
+			// Add scheduled time if not ASAP
+			if (scheduledTime && !scheduledTime.isAsap && scheduledTime.date && scheduledTime.time) {
+				// Combine date and time into ISO 8601 format
+				const scheduledDateTime = `${scheduledTime.date}T${scheduledTime.time}:00`;
+				orderData.scheduled_time = scheduledDateTime;
+			}
+
 			const result = await createOrder(orderData);
 
 			if (result.success && result.order) {
 				currentOrder = result.order;
-				
+
 				// Show success toast
-				showSuccess(
-					'Захиалга амжилттай үүсэгдлээ!', 
-					`Захиалгын дугаар: #${result.order.id}`
-				);
-				
+				showSuccess('Захиалга амжилттай үүсэгдлээ!', `Захиалгын дугаар: #${result.order.id}`);
+
 				// Clear cart on successful order creation
 				clearCart();
 
@@ -152,9 +186,9 @@
 						'Төлбөрийн хуудас нээгдэж байна...',
 						'Төлбөр төлсний дараа автоматаар баталгаажуулагдана'
 					);
-					
+
 					redirectToPayment(result.order.payment.payment_url);
-					
+
 					// Start polling for payment status
 					startPaymentPolling(result.order.id);
 				} else {
@@ -201,6 +235,33 @@
 				<OrderTypeSelector bind:orderType />
 			{/if}
 
+			<!-- Time Selection -->
+			<div class="mb-4 rounded-lg border border-gray-200 bg-white p-4">
+				<div class="mb-3 flex items-center justify-between">
+					<div class="flex items-center gap-2">
+						<Clock class="h-5 w-5 text-gray-600" />
+						<h3 class="font-semibold text-gray-900">Хүргэлтийн цаг</h3>
+					</div>
+					<button
+						on:click={() => (showTimeModal = true)}
+						class="text-sm font-medium text-red-600 hover:text-red-700"
+					>
+						Өөрчлөх
+					</button>
+				</div>
+				<div class="rounded-lg bg-gray-50 p-3">
+					<p class="text-sm font-medium text-gray-700">
+						{getTimeDisplayText()}
+					</p>
+					{#if scheduledTime && !scheduledTime.isAsap}
+						<p class="mt-1 text-xs text-gray-500">
+							Захиалга {scheduledTime.date}
+							{scheduledTime.time} цагт бэлэн болно
+						</p>
+					{/if}
+				</div>
+			</div>
+
 			<!-- Payer Type Component -->
 			<PayerTypeSelector
 				bind:payerType
@@ -227,7 +288,9 @@
 					class="mb-3 rounded-lg border border-blue-400 bg-blue-100 px-3 py-2 text-blue-700 lg:mb-4 lg:px-4 lg:py-3"
 				>
 					<div class="flex items-center gap-2">
-						<div class="h-4 w-4 animate-spin rounded-full border-2 border-blue-600 border-t-transparent"></div>
+						<div
+							class="h-4 w-4 animate-spin rounded-full border-2 border-blue-600 border-t-transparent"
+						></div>
 						<p class="text-sm">Төлбөрийн статус шалгаж байна...</p>
 					</div>
 				</div>
@@ -273,3 +336,11 @@
 		</div>
 	</div>
 </div>
+
+<!-- Time Selection Modal -->
+<TimeSelectionModal
+	bind:showModal={showTimeModal}
+	{restaurantHours}
+	on:close={() => (showTimeModal = false)}
+	on:confirm={handleTimeConfirm}
+/>

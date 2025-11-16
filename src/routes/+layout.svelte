@@ -4,6 +4,8 @@
 	import { onMount } from 'svelte';
 	import { authStore } from '$lib/stores/auth';
 	import ToastContainer from '$lib/components/common/ToastContainer.svelte';
+	import SuccessModal from '$lib/components/common/SuccessModal.svelte';
+	import { successModalStore } from '$lib/stores/successModal';
 
 	onMount(() => {
 		// Auth store will handle initialization from cookies
@@ -21,3 +23,15 @@
 
 <!-- Toast notifications -->
 <ToastContainer />
+
+<!-- Global Success Modal -->
+<SuccessModal
+	showModal={$successModalStore.isOpen}
+	title={$successModalStore.title}
+	message={$successModalStore.message}
+	buttonText={$successModalStore.buttonText}
+	autoClose={$successModalStore.autoClose}
+	autoCloseDelay={$successModalStore.autoCloseDelay}
+	on:close={() => successModalStore.close()}
+	on:confirm={() => successModalStore.close()}
+/>
