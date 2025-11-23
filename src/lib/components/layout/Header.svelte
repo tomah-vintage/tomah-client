@@ -96,10 +96,8 @@
 		const qrUrl = qrOrigin.getRestaurantUrl();
 
 		if (qrUrl) {
-			console.log('QR origin found, navigating to:', qrUrl);
 			goto(qrUrl);
 		} else {
-			console.log('No QR origin, going to home');
 			goto('/');
 		}
 	}

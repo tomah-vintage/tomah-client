@@ -56,12 +56,10 @@
 
 	function handleTimeConfirm(event: CustomEvent) {
 		selectedSchedule = event.detail;
-		console.log('Selected schedule:', selectedSchedule);
 	}
 
 	function handleBranchSelect(event: CustomEvent) {
 		const branch = event.detail;
-		console.log('Selected branch:', branch);
 		alert(`Selected: ${branch.name}`);
 	}
 </script>

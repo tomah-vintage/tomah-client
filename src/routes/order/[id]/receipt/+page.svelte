@@ -46,7 +46,6 @@
 				error = result.error || 'Захиалгын мэдээлэл авахад алдаа гарлаа';
 			}
 		} catch (err) {
-			console.error('Error loading order:', err);
 			error = 'Сүлжээний алдаа гарлаа';
 		} finally {
 			loading = false;
@@ -62,7 +61,7 @@
 				margin: 1
 			});
 		} catch (err) {
-			console.error('Error generating QR code:', err);
+			// QR code generation failed, continue without it
 		}
 	}
 
@@ -167,9 +166,7 @@
 					<div class="rounded-lg bg-gray-50 p-4">
 						<div class="flex items-center justify-between">
 							<span class="text-sm text-gray-600">Төлөв:</span>
-							<span
-								class="rounded-full bg-green-100 px-3 py-1 text-sm font-medium text-green-700"
-							>
+							<span class="rounded-full bg-green-100 px-3 py-1 text-sm font-medium text-green-700">
 								{ORDER_STATUS_LABELS[order.order_status] || order.order_status}
 							</span>
 						</div>
@@ -179,7 +176,7 @@
 				<!-- Customer Info (if available) -->
 				{#if order.user}
 					<div class="mb-8">
-						<h3 class="mb-3 text-sm font-semibold uppercase text-gray-500">
+						<h3 class="mb-3 text-sm font-semibold text-gray-500 uppercase">
 							Харилцагчийн мэдээлэл
 						</h3>
 						<div class="rounded-lg border border-gray-200 p-4">
@@ -190,12 +187,11 @@
 
 				<!-- Order Items -->
 				<div class="mb-8">
-					<h3 class="mb-4 text-sm font-semibold uppercase text-gray-500">Захиалгын жагсаалт</h3>
+					<h3 class="mb-4 text-sm font-semibold text-gray-500 uppercase">Захиалгын жагсаалт</h3>
 					<table class="w-full">
 						<thead>
 							<tr class="border-b-2 border-gray-200">
-								<th class="pb-3 text-left text-sm font-semibold text-gray-600">Бүтээгдэхүүн</th
-								>
+								<th class="pb-3 text-left text-sm font-semibold text-gray-600">Бүтээгдэхүүн</th>
 								<th class="pb-3 text-center text-sm font-semibold text-gray-600">Тоо ширхэг</th>
 								<th class="pb-3 text-right text-sm font-semibold text-gray-600">Нэгж үнэ</th>
 								<th class="pb-3 text-right text-sm font-semibold text-gray-600">Нийт</th>
@@ -223,9 +219,7 @@
 					<div class="space-y-2">
 						<div class="flex justify-between">
 							<span class="text-gray-600">Нийт дүн:</span>
-							<span class="font-medium text-gray-900"
-								>{calculateSubtotal().toLocaleString()}₮</span
-							>
+							<span class="font-medium text-gray-900">{calculateSubtotal().toLocaleString()}₮</span>
 						</div>
 						<!-- Add tax or service fee if applicable -->
 						<!-- <div class="flex justify-between">
@@ -244,7 +238,7 @@
 				<!-- Payment Info -->
 				{#if order.payment}
 					<div class="mb-8">
-						<h3 class="mb-3 text-sm font-semibold uppercase text-gray-500">Төлбөрийн мэдээлэл</h3>
+						<h3 class="mb-3 text-sm font-semibold text-gray-500 uppercase">Төлбөрийн мэдээлэл</h3>
 						<div class="rounded-lg border border-gray-200 p-4">
 							<div class="flex justify-between">
 								<span class="text-gray-600">Төлбөрийн хэлбэр:</span>

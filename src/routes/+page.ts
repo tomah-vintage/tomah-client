@@ -23,16 +23,14 @@ interface RestaurantHighlight {
 	updated_at: string;
 }
 
-export const load: PageLoad = async ({  }) => {
-
+export const load: PageLoad = async ({}) => {
 	const fetchRestaurantHighlights = async () => {
 		try {
 			const url = `${env.PUBLIC_BACKEND_URL}/api/public-restaurant-highlights/`;
 			const highlightsData = await apiFetch<RestaurantHighlight[]>(url);
-			
+
 			return highlightsData || [];
 		} catch (error) {
-			console.error('Failed to fetch restaurant highlights:', error);
 			return []; // Return empty array on error
 		}
 	};

@@ -18,7 +18,9 @@ const createCart = () => {
 			let newItems;
 			const qty = Math.max(1, quantity);
 			if (existingItem) {
-				newItems = items.map((i) => (i.id === itemToAdd.id ? { ...i, quantity: i.quantity + qty } : i));
+				newItems = items.map((i) =>
+					i.id === itemToAdd.id ? { ...i, quantity: i.quantity + qty } : i
+				);
 			} else {
 				newItems = [...items, { ...itemToAdd, quantity: qty }];
 			}
@@ -29,16 +31,7 @@ const createCart = () => {
 
 	const removeItem = (itemId: string) => {
 		update((items) => {
-			console.log('Removing item with ID:', itemId);
-			console.log('Current items:', items.map(i => ({ id: i.id, name: i.name })));
-			const newItems = items.filter((i) => {
-				const shouldKeep = i.id !== itemId;
-				if (!shouldKeep) {
-					console.log('Found and removing item:', i.name);
-				}
-				return shouldKeep;
-			});
-			console.log('Items after removal:', newItems.map(i => ({ id: i.id, name: i.name })));
+			const newItems = items.filter((i) => i.id !== itemId);
 			syncWithLocalStorage(newItems);
 			return newItems;
 		});

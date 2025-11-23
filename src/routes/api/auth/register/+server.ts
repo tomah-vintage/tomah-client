@@ -29,7 +29,6 @@ export const POST: RequestHandler = async ({ request }) => {
 			return json({ error: errorMessage }, { status: externalApiResponse.status });
 		}
 	} catch (e) {
-		console.error('Error during registration:', e);
 		return json({ error: 'Registration failed. Please try again.' }, { status: 500 });
 	}
 };

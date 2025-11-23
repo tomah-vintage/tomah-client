@@ -48,15 +48,14 @@ export const POST: RequestHandler = async ({ request, cookies }) => {
 			});
 		}
 
-		return json({ 
-			success: true, 
-			access, 
-			refresh, 
-			user_id, 
-			message: message || 'Registration successful' 
+		return json({
+			success: true,
+			access,
+			refresh,
+			user_id,
+			message: message || 'Registration successful'
 		});
 	} catch (error) {
-		console.error('OTP registration API error:', error);
 		return json({ error: 'Internal server error' }, { status: 500 });
 	}
 };

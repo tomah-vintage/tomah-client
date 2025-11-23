@@ -39,7 +39,6 @@ export const sendOTP = async (phoneNumber: string, purpose = 'login'): Promise<O
 			return { success: false, error: data.error || 'Failed to send OTP' };
 		}
 	} catch (error) {
-		console.error('Network error sending OTP:', error);
 		return { success: false, error: 'Network error occurred' };
 	}
 };
@@ -82,7 +81,6 @@ export const loginWithOTP = async (
 			return { success: false, error: data.error || 'Login failed' };
 		}
 	} catch (error) {
-		console.error('Network error during OTP login:', error);
 		return { success: false, error: 'Network error occurred' };
 	}
 };
@@ -125,7 +123,6 @@ export const registerWithOTP = async (
 			return { success: false, error: data.error || 'Registration failed' };
 		}
 	} catch (error) {
-		console.error('Network error during OTP registration:', error);
 		return { success: false, error: 'Network error occurred' };
 	}
 };

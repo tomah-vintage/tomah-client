@@ -42,7 +42,6 @@ export const POST: RequestHandler = async ({ request, cookies }) => {
 
 		return json({ success: true, token: access });
 	} catch (error) {
-		console.error('Login API error:', error);
 		return json({ error: 'Internal server error' }, { status: 500 });
 	}
 };

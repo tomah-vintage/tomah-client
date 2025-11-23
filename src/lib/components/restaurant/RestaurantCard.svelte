@@ -33,7 +33,7 @@
 				});
 				restaurantActions.loadRestaurants();
 			} catch (error) {
-				console.error('Failed to favorite restaurant:', error);
+				// Failed to favorite restaurant
 			}
 		} else {
 			showLoginModal = true;

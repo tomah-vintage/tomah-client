@@ -31,7 +31,7 @@
 				id: tableId,
 				restaurantId: restaurantId
 			});
-			
+
 			// Set QR origin for logo navigation (only when coming from QR with table)
 			qrOrigin.set({
 				restaurantId: restaurantId,
@@ -61,7 +61,7 @@
 	$: restaurant = clientRestaurant || data.restaurant;
 	$: menuItems = menuItemsResponse?.results || data.menuItems || [];
 
-	$: featureFoods = menuItems.slice(0, 4);
+	$: featureFoods = menuItems.filter((item) => item.is_emphasized === true);
 
 	let selectedCategoryId = '';
 	let searchTerm = '';

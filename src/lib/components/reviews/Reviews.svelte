@@ -19,7 +19,6 @@
 
 	function handleSubmit(event: CustomEvent<{ rating: number; comment: string }>) {
 		// The ReviewForm now handles the API call directly
-		console.log('Review submitted successfully');
 	}
 </script>
 

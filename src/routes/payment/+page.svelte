@@ -79,7 +79,6 @@
 
 	function handleTimeConfirm(event: CustomEvent<{ date: string; time: string; isAsap: boolean }>) {
 		scheduledTime = event.detail;
-		console.log('Scheduled time:', scheduledTime);
 		// Force reactivity update
 		scheduledTime = { ...scheduledTime };
 	}
@@ -128,7 +127,6 @@
 				showPaymentResultModal = true;
 			}
 		} catch (error) {
-			console.error('Payment polling error:', error);
 			paymentPollingError = 'Төлбөрийн статус шалгахад алдаа гарлаа';
 			paymentSuccess = false;
 			paymentResultMessage = 'Төлбөрийн статус шалгахад алдаа гарлаа';
@@ -156,28 +154,21 @@
 		try {
 			// Build order data according to API format
 			const items = $cart.map((item) => ({
-				menu_item: item.id,
+				menu_item: parseInt(item.id),
 				quantity: item.quantity,
 				unit_price: item.price.toString()
 			}));
 
 			const orderData: CreateOrderRequest = {
 				restaurant: $cart[0].restaurant_id,
-				order_type: orderType,
 				total_price: paymentCalculation.finalAmount.toFixed(2),
+				order_type: orderType,
 				items
 			};
 
-			// Add table ID if dine-in order and table is available
+			// Add table number if dine-in order and table is available (as string)
 			if (orderType === 'DINE_IN' && $currentTable) {
-				orderData.table = parseInt($currentTable.id);
-			}
-
-			// Add scheduled time if not ASAP
-			if (scheduledTime && !scheduledTime.isAsap && scheduledTime.date && scheduledTime.time) {
-				// Combine date and time into ISO 8601 format
-				const scheduledDateTime = `${scheduledTime.date}T${scheduledTime.time}:00`;
-				orderData.scheduled_time = scheduledDateTime;
+				orderData.table = $currentTable.id;
 			}
 
 			const result = await createOrder(orderData);
@@ -211,7 +202,6 @@
 				showError('Захиалга үүсгэхэд алдаа гарлаа', result.error);
 			}
 		} catch (error) {
-			console.error('Order creation failed:', error);
 			orderError = 'Сүлжээний алдаа гарлаа';
 			showError('Сүлжээний алдаа', 'Захиалга үүсгэхэд алдаа гарлаа');
 		} finally {

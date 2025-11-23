@@ -11,7 +11,7 @@ export const GET: RequestHandler = async ({ request, cookies, params }) => {
 
 		// Get authorization header from request
 		const authHeader = request.headers.get('authorization');
-		
+
 		// Get token from cookies as fallback
 		const token = cookies.get('token');
 		const finalAuthHeader = authHeader || (token ? `Bearer ${token}` : '');
@@ -23,7 +23,7 @@ export const GET: RequestHandler = async ({ request, cookies, params }) => {
 		const backendResponse = await fetch(`${PUBLIC_BACKEND_URL}/api/order/${orderId}/`, {
 			method: 'GET',
 			headers: {
-				'Authorization': finalAuthHeader,
+				Authorization: finalAuthHeader,
 				'Content-Type': 'application/json'
 			}
 		});
@@ -39,7 +39,6 @@ export const GET: RequestHandler = async ({ request, cookies, params }) => {
 		const order = await backendResponse.json();
 		return json(order);
 	} catch (error) {
-		console.error('Order status API error:', error);
 		return json({ error: 'Internal server error' }, { status: 500 });
 	}
 };

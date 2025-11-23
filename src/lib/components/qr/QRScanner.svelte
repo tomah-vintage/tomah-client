@@ -42,7 +42,6 @@
 				scanQRCode();
 			}
 		} catch (err) {
-			console.error('Camera access error:', err);
 			error = 'Камер ашиглах эрх олгоно уу';
 			showManualInput = true;
 		}

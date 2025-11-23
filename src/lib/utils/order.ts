@@ -2,17 +2,17 @@ import { apiFetch } from '$lib/utils/api';
 import { env } from '$env/dynamic/public';
 
 export interface OrderItem {
-	menu_item: string;
+	menu_item: number;
 	quantity: number;
 	unit_price: string;
 }
 
 export interface CreateOrderRequest {
 	restaurant: number;
-	table?: number;
-	order_type: 'DINE_IN' | 'TAKE_OUT';
 	total_price: string;
-	scheduled_time?: string; // ISO 8601 format datetime
+	order_type: 'DINE_IN' | 'TAKE_OUT';
+	table?: string;
+	box?: number;
 	items: OrderItem[];
 }
 
@@ -23,16 +23,49 @@ export interface PaymentInfo {
 	status: 'PENDING' | 'PAID' | 'FAILED' | 'EXPIRED';
 }
 
+export interface OrderItemResponse {
+	menu_item: {
+		id: number;
+		name: string;
+		description: string;
+		price: string;
+		img_urls?: string[];
+	};
+	quantity: number;
+	unit_price: string;
+}
+
+export interface VATReceipt {
+	id: number;
+	receipt_id: string | null;
+	bill_id: string | null;
+	receipt_type: string;
+	status: string;
+	receipt_date: string | null;
+	customer_tin: string | null;
+	consumer_no: string | null;
+	error_message: string | null;
+	retry_count: number;
+	created_at: string;
+	updated_at: string;
+}
+
 export interface Order {
 	id: number;
 	user: number;
 	restaurant: number;
 	order_status: 'PENDING' | 'PREPARING' | 'IN_BOX' | 'DONE' | 'CANCELLED';
 	total_price: string;
-	table?: number;
+	table: string | null;
+	box: number | null;
 	order_type: 'DINE_IN' | 'TAKE_OUT';
+	food_code: string;
+	daily_order_code: number;
+	order_date: string;
 	created_at: string;
-	items: OrderItem[];
+	updated_at: string;
+	items: OrderItemResponse[];
+	vat_receipt: VATReceipt | null;
 	payment?: PaymentInfo;
 }
 
@@ -50,14 +83,13 @@ export interface OrderStatusResponse {
 
 export const createOrder = async (orderData: CreateOrderRequest): Promise<OrderResponse> => {
 	try {
-		const data = await apiFetch('/api/order/create/', {
+		const data = await apiFetch(`${env.PUBLIC_BACKEND_URL}/api/order/create/`, {
 			method: 'POST',
 			body: JSON.stringify(orderData)
 		});
 
 		return { success: true, order: data as Order };
 	} catch (error: any) {
-		console.error('Error creating order:', error);
 		return {
 			success: false,
 			error: error.message || error.detail || 'Order creation failed'
@@ -67,13 +99,12 @@ export const createOrder = async (orderData: CreateOrderRequest): Promise<OrderR
 
 export const getOrderStatus = async (orderId: number): Promise<OrderStatusResponse> => {
 	try {
-		const data = await apiFetch(`/api/order/${orderId}/`, {
+		const data = await apiFetch(`${env.PUBLIC_BACKEND_URL}/api/order/${orderId}/`, {
 			method: 'GET'
 		});
 
 		return { success: true, order: data as Order };
 	} catch (error: any) {
-		console.error('Error getting order status:', error);
 		return {
 			success: false,
 			error: error.message || error.detail || 'Failed to get order status'

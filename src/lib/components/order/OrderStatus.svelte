@@ -30,7 +30,6 @@
 				error = result.error || 'Захиалгын мэдээлэл авахад алдаа гарлаа';
 			}
 		} catch (err) {
-			console.error('Error loading order status:', err);
 			error = 'Сүлжээний алдаа гарлаа';
 		} finally {
 			loading = false;

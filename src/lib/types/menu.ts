@@ -13,6 +13,7 @@ export interface MenuItem {
 	meta_data: any;
 	categories: string[];
 	is_available: boolean;
+	is_emphasized?: boolean;
 }
 
 export interface DefaultItemCategory {

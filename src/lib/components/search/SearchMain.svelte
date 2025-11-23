@@ -11,7 +11,6 @@
 	function handleFilterSortChange(event: CustomEvent<Partial<SearchQuery>>) {
 		const newQuery = event.detail;
 		// Dispatch event or call action to update search
-		console.log('Filter/Sort changed:', newQuery);
 		// This would typically trigger a new search via searchActions.performSearch
 	}
 </script>

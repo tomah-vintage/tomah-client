@@ -153,7 +153,6 @@
 			await authStore.revalidate();
 			showProfileUpdateSuccess();
 		} catch (error) {
-			console.error('Profile update failed:', error);
 			message = 'Профайл шинэчлэхэд алдаа гарлаа';
 			messageType = 'error';
 		} finally {
@@ -183,7 +182,6 @@
 			passwordData = { new_password: '', confirm_password: '' };
 			showPasswordChangeSuccess();
 		} catch (error) {
-			console.error('Password change failed:', error);
 			message = 'Нууц үг солихоос алдаа гарлаа';
 			messageType = 'error';
 		} finally {

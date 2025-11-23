@@ -8,10 +8,11 @@ export function createCategoriesQuery() {
 		queryKey: ['default-categories'],
 		queryFn: async () => {
 			try {
-				const response = await apiFetch<DefaultItemCategory[]>(`${PUBLIC_BACKEND_URL}/api/default-categories/`);
+				const response = await apiFetch<DefaultItemCategory[]>(
+					`${PUBLIC_BACKEND_URL}/api/default-categories/`
+				);
 				return response;
 			} catch (error) {
-				console.error('Failed to fetch categories:', error);
 				// Return empty array to fall back to default categories
 				return [];
 			}

@@ -38,13 +38,16 @@ export const GET: RequestHandler = async ({ url }) => {
 			imageUrl: item.logo || (item.restaurant_img_urls && item.restaurant_img_urls[0]),
 			rating: item.average_rating,
 			address: item.address,
-			hours: item.open_hours && item.open_hours.length > 0 ? `${item.open_hours[0].open_time} - ${item.open_hours[0].close_time}` : 'N/A',
-			location: (item.latitude && item.longitude) ? { lat: item.latitude, lng: item.longitude } : undefined,
+			hours:
+				item.open_hours && item.open_hours.length > 0
+					? `${item.open_hours[0].open_time} - ${item.open_hours[0].close_time}`
+					: 'N/A',
+			location:
+				item.latitude && item.longitude ? { lat: item.latitude, lng: item.longitude } : undefined
 		}));
 
 		return json({ results });
 	} catch (error: any) {
-		console.error('Error fetching search results:', error);
 		return json({ error: `Failed to fetch search results: ${error.message}` }, { status: 500 });
 	}
 };

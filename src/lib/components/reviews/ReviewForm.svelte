@@ -39,7 +39,6 @@
 			submitMessage = 'Таны сэтгэгдэл амжилттай нэмэгдлээ!';
 			setTimeout(() => (submitMessage = ''), 3000);
 		} catch (error) {
-			console.error('Error submitting review:', error);
 			submitMessage =
 				error instanceof Error ? error.message : 'Сүлжээний алдаа. Дахин оролдоно уу.';
 		} finally {

@@ -30,7 +30,7 @@ export const getRefreshToken = (): string | null => {
 
 async function refreshToken(): Promise<void> {
 	const refreshToken = getRefreshToken();
-	
+
 	if (!refreshToken) {
 		if (browser) {
 			// Clear any remaining tokens and redirect to home
@@ -55,13 +55,12 @@ async function refreshToken(): Promise<void> {
 			document.cookie = 'refresh_token=; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT;';
 			await goto(`/`);
 		}
-		
+
 		const errorData = await response.json().catch(() => ({}));
 		throw new Error(errorData.message || 'Failed to refresh token');
 	}
 
 	const data = await response.json();
-	console.log('Token refreshed successfully:', data.message);
 }
 
 async function fetchWithRefresh<T>(
@@ -94,9 +93,11 @@ async function fetchWithRefresh<T>(
 			try {
 				const errorData = await response.clone().json();
 				// Check for JWT token validation errors
-				if (errorData.code === 'token_not_valid' || 
+				if (
+					errorData.code === 'token_not_valid' ||
 					errorData.detail?.includes('token not valid') ||
-					errorData.detail?.includes('Token is invalid or expired')) {
+					errorData.detail?.includes('Token is invalid or expired')
+				) {
 					return true;
 				}
 			} catch (e) {
@@ -118,7 +119,6 @@ async function fetchWithRefresh<T>(
 				response = await fetch(url, { ...requestOptions, headers: getHeaders() });
 			} catch (refreshError) {
 				// If refresh fails, don't retry - let the error bubble up
-				console.error('Token refresh failed:', refreshError);
 			} finally {
 				isRefreshing = false;
 				refreshPromise = null;
@@ -132,7 +132,6 @@ async function fetchWithRefresh<T>(
 				response = await fetch(url, requestOptions);
 			} catch (e) {
 				// If waiting for refresh fails, continue with original response
-				console.error('Error waiting for token refresh:', e);
 			}
 		}
 	}

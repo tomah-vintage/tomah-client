@@ -18,7 +18,6 @@
 			const response = await apiFetch(`${env.PUBLIC_BACKEND_URL}/api/order/${orderId}/`);
 			order = response as Order;
 		} catch (err) {
-			console.error('Error loading order:', err);
 			error = 'Захиалга ачаалж чадсангүй';
 		} finally {
 			loading = false;
@@ -45,9 +44,10 @@
 		window.print(); // For now, use print dialog with "Save as PDF" option
 	}
 
-	$: subtotal = order?.items.reduce((sum, item) => {
-		return sum + parseFloat(item.unit_price) * item.quantity;
-	}, 0) || 0;
+	$: subtotal =
+		order?.items.reduce((sum, item) => {
+			return sum + parseFloat(item.unit_price) * item.quantity;
+		}, 0) || 0;
 
 	$: tax = subtotal * 0.1; // 10% tax
 	$: total = parseFloat(order?.total_price || '0');

@@ -25,7 +25,7 @@ function createLocationStore() {
 	return {
 		subscribe,
 		setLocation: (latitude: number, longitude: number, address?: string) => {
-			update(state => ({
+			update((state) => ({
 				...state,
 				latitude,
 				longitude,
@@ -34,32 +34,33 @@ function createLocationStore() {
 			}));
 		},
 		setRadius: (radius: number) => {
-			update(state => ({ ...state, radius }));
+			update((state) => ({ ...state, radius }));
 		},
 		setLoading: (loading: boolean) => {
-			update(state => ({ ...state, loading }));
+			update((state) => ({ ...state, loading }));
 		},
 		setError: (error: string | null) => {
-			update(state => ({ ...state, error }));
+			update((state) => ({ ...state, error }));
 		},
 		clearLocation: () => {
 			set(initialState);
 		},
-		getCurrentLocation: async (): Promise<{ latitude: number; longitude: number; address: string | null } | undefined> => {
+		getCurrentLocation: async (): Promise<
+			{ latitude: number; longitude: number; address: string | null } | undefined
+		> => {
 			// Prevent multiple simultaneous requests
 			if (isRequestInProgress) {
-				console.log('Location request already in progress, skipping...');
 				return;
 			}
 
 			isRequestInProgress = true;
-			update(state => ({ ...state, loading: true, error: null }));
+			update((state) => ({ ...state, loading: true, error: null }));
 
 			// Check if geolocation is supported
 			if (!navigator.geolocation) {
 				const errorMessage = 'Таны хөтөч байршил тодорхойлохыг дэмжихгүй байна';
 				isRequestInProgress = false;
-				update(state => ({
+				update((state) => ({
 					...state,
 					loading: false,
 					error: errorMessage
@@ -72,11 +73,11 @@ function createLocationStore() {
 					isRequestInProgress = false;
 
 					const { latitude, longitude } = position.coords;
-					
+
 					// Generate simple address display from coordinates
 					const address = `${latitude.toFixed(4)}, ${longitude.toFixed(4)}`;
 
-					update(state => ({
+					update((state) => ({
 						...state,
 						latitude,
 						longitude,

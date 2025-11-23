@@ -23,12 +23,11 @@ export const POST: RequestHandler = async ({ request }) => {
 			);
 		}
 
-		return json({ 
-			success: true, 
-			message: data.message || 'OTP sent successfully' 
+		return json({
+			success: true,
+			message: data.message || 'OTP sent successfully'
 		});
 	} catch (error) {
-		console.error('OTP send API error:', error);
 		return json({ error: 'Internal server error' }, { status: 500 });
 	}
 };

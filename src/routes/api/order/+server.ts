@@ -27,14 +27,13 @@ export const POST: RequestHandler = async ({ request, locals }) => {
 			items,
 			totalPrice,
 			status: 'PENDING',
-			createdAt: new Date().toISOString(),
+			createdAt: new Date().toISOString()
 		};
 
 		orders.push(newOrder);
 
 		return json(newOrder, { status: 201 });
 	} catch (error) {
-		console.error('Error creating order:', error);
 		return json({ error: 'Failed to create order' }, { status: 500 });
 	}
 };

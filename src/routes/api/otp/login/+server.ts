@@ -51,15 +51,14 @@ export const POST: RequestHandler = async ({ request, cookies }) => {
 			});
 		}
 
-		return json({ 
-			success: true, 
-			access, 
-			refresh, 
-			user_id, 
-			message: message || 'Login successful' 
+		return json({
+			success: true,
+			access,
+			refresh,
+			user_id,
+			message: message || 'Login successful'
 		});
 	} catch (error) {
-		console.error('OTP login API error:', error);
 		return json({ error: 'Internal server error' }, { status: 500 });
 	}
 };
