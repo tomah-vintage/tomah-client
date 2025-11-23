@@ -73,12 +73,9 @@
 			orders = [];
 			groupedOrders = [];
 
-			// Calculate offset for pagination
-			const offset = (page - 1) * pageSize;
-
 			// Load both orders and restaurants
 			const [ordersResponse, restaurantsResponse] = await Promise.all([
-				apiFetch(`${env.PUBLIC_BACKEND_URL}/api/order/?limit=${pageSize}&offset=${offset}`),
+				apiFetch(`${env.PUBLIC_BACKEND_URL}/api/order/?limit=${pageSize}&page=${page}`),
 				apiFetch(`${env.PUBLIC_BACKEND_URL}/api/restaurants/`)
 			]);
 

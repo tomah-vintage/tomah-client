@@ -14,36 +14,36 @@ export interface QROrigin {
 }
 
 const createTableStore = () => {
-	const initialValue: TableInfo | null = browser 
-		? JSON.parse(localStorage.getItem('currentTable') || 'null') 
+	const initialValue: TableInfo | null = browser
+		? JSON.parse(sessionStorage.getItem('currentTable') || 'null')
 		: null;
-	
+
 	const { subscribe, set, update } = writable<TableInfo | null>(initialValue);
 
-	const syncWithLocalStorage = (table: TableInfo | null) => {
+	const syncWithSessionStorage = (table: TableInfo | null) => {
 		if (browser) {
 			if (table) {
-				localStorage.setItem('currentTable', JSON.stringify(table));
+				sessionStorage.setItem('currentTable', JSON.stringify(table));
 			} else {
-				localStorage.removeItem('currentTable');
+				sessionStorage.removeItem('currentTable');
 			}
 		}
 	};
 
 	const setTable = (table: TableInfo | null) => {
 		set(table);
-		syncWithLocalStorage(table);
+		syncWithSessionStorage(table);
 	};
 
 	const clearTable = () => {
 		set(null);
-		syncWithLocalStorage(null);
+		syncWithSessionStorage(null);
 	};
 
 	const updateTable = (updater: (table: TableInfo | null) => TableInfo | null) => {
 		update((current) => {
 			const newTable = updater(current);
-			syncWithLocalStorage(newTable);
+			syncWithSessionStorage(newTable);
 			return newTable;
 		});
 	};
@@ -63,7 +63,7 @@ export const qrOrigin = {
 			sessionStorage.setItem('qrOrigin', JSON.stringify(origin));
 		}
 	},
-	
+
 	get: (): QROrigin | null => {
 		if (browser) {
 			const stored = sessionStorage.getItem('qrOrigin');
@@ -82,13 +82,13 @@ export const qrOrigin = {
 		}
 		return null;
 	},
-	
+
 	clear: () => {
 		if (browser) {
 			sessionStorage.removeItem('qrOrigin');
 		}
 	},
-	
+
 	getRestaurantUrl: (): string | null => {
 		const origin = qrOrigin.get();
 		if (origin) {
