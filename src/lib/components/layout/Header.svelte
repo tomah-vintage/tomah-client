@@ -41,7 +41,7 @@
 
 	// Trigger animation when cart quantity increases
 	$: {
-		if ($cartQuantity > previousCartQuantity && previousCartQuantity > 0) {
+		if ($cartQuantity > previousCartQuantity) {
 			cartAnimation = true;
 			setTimeout(() => {
 				cartAnimation = false;
@@ -187,13 +187,13 @@
 				<button on:click={openModal} class="relative">
 					<ShoppingCart
 						class="h-6 w-6 text-white transition-transform lg:text-black {cartAnimation
-							? 'animate-bounce'
+							? 'animate-cart-bounce'
 							: ''}"
 					/>
 					{#if $cartQuantity > 0}
 						<span
 							class="absolute -top-1 -right-1 flex h-5 w-5 items-center justify-center rounded-full bg-white text-xs font-bold text-red-600 transition-all lg:bg-red-500 lg:text-white {cartAnimation
-								? 'animate-ping-once scale-125'
+								? 'animate-badge-pop'
 								: ''}"
 						>
 							{$cartQuantity}
@@ -300,22 +300,45 @@
 />
 
 <style lang="postcss">
-	@keyframes ping-once {
-		0% {
-			transform: scale(1);
-			opacity: 1;
+	@keyframes cart-bounce {
+		0%,
+		100% {
+			transform: translateY(0) scale(1);
+		}
+		25% {
+			transform: translateY(-8px) scale(1.1);
 		}
 		50% {
-			transform: scale(1.3);
-			opacity: 0.8;
+			transform: translateY(-4px) scale(1.05);
 		}
-		100% {
-			transform: scale(1);
-			opacity: 1;
+		75% {
+			transform: translateY(-2px) scale(1.02);
 		}
 	}
 
-	.animate-ping-once {
-		animation: ping-once 0.6s cubic-bezier(0.4, 0, 0.6, 1);
+	@keyframes badge-pop {
+		0% {
+			transform: scale(1);
+		}
+		25% {
+			transform: scale(1.3);
+		}
+		50% {
+			transform: scale(0.9);
+		}
+		75% {
+			transform: scale(1.1);
+		}
+		100% {
+			transform: scale(1);
+		}
+	}
+
+	.animate-cart-bounce {
+		animation: cart-bounce 0.6s cubic-bezier(0.34, 1.56, 0.64, 1);
+	}
+
+	.animate-badge-pop {
+		animation: badge-pop 0.6s cubic-bezier(0.34, 1.56, 0.64, 1);
 	}
 </style>
