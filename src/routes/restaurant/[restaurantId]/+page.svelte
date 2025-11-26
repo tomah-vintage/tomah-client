@@ -152,7 +152,7 @@
 {:else if restaurant}
 	<div class="container mx-auto mt-3 w-full max-w-[1200px]">
 		<TableInfo />
-		<Banner {restaurantId} />
+		<Banner {restaurantId} {restaurant} />
 		<FeaturedItems items={featureFoods} {restaurantId} {restaurant} />
 		<MenuTabs {restaurantId} bind:selectedCategoryId bind:searchTerm />
 		<MenuList items={filteredItems} {restaurantId} {restaurant} />

@@ -27,6 +27,8 @@
 	let searchTerm = '';
 	let debounceTimeout: NodeJS.Timeout;
 	let isUserTyping = false;
+	let cartAnimation = false;
+	let previousCartQuantity = 0;
 
 	// Initialize search term from URL search params
 	$: {
@@ -35,6 +37,17 @@
 		if (!isUserTyping && urlQuery !== searchTerm) {
 			searchTerm = urlQuery;
 		}
+	}
+
+	// Trigger animation when cart quantity increases
+	$: {
+		if ($cartQuantity > previousCartQuantity && previousCartQuantity > 0) {
+			cartAnimation = true;
+			setTimeout(() => {
+				cartAnimation = false;
+			}, 600);
+		}
+		previousCartQuantity = $cartQuantity;
 	}
 
 	function handleSearch(value: string) {
@@ -107,7 +120,9 @@
 	}
 </script>
 
-<header class="bg-[#EF3F3D] p-3 shadow-[0_2px_2px_0_rgba(0,0,0,0.15)] lg:bg-white lg:p-4">
+<header
+	class="sticky top-0 z-50 bg-[#EF3F3D] p-2 shadow-[0_2px_2px_0_rgba(0,0,0,0.15)] lg:bg-white lg:p-3"
+>
 	<div class="container mx-auto flex max-w-[1200px] items-center justify-between">
 		<!-- Left Side -->
 		<div class="flex items-center space-x-1 lg:space-x-4">
@@ -169,13 +184,21 @@
 
 			<!-- Cart -->
 			<div class="relative p-2.5 lg:p-2">
-				<button on:click={openModal}>
-					<ShoppingCart class="h-6 w-6 text-white lg:text-black" />
-					<span
-						class="absolute top-0 right-0 flex h-4 w-4 items-center justify-center rounded-full bg-white text-xs text-red-600 lg:bg-red-500 lg:text-white"
-					>
-						{$cartQuantity}
-					</span>
+				<button on:click={openModal} class="relative">
+					<ShoppingCart
+						class="h-6 w-6 text-white transition-transform lg:text-black {cartAnimation
+							? 'animate-bounce'
+							: ''}"
+					/>
+					{#if $cartQuantity > 0}
+						<span
+							class="absolute -top-1 -right-1 flex h-5 w-5 items-center justify-center rounded-full bg-white text-xs font-bold text-red-600 transition-all lg:bg-red-500 lg:text-white {cartAnimation
+								? 'animate-ping-once scale-125'
+								: ''}"
+						>
+							{$cartQuantity}
+						</span>
+					{/if}
 				</button>
 			</div>
 
@@ -208,7 +231,7 @@
 
 <!-- Mobile Search Bar - Visible below header on mobile, hidden on restaurant pages -->
 <div
-	class="bg-white p-3 shadow-sm lg:hidden"
+	class="sticky top-[56px] z-40 bg-white p-2 shadow-sm lg:hidden"
 	class:hidden={$page.route.id === '/restaurant/[restaurantId]'}
 >
 	<div class="container mx-auto max-w-[1200px]">
@@ -277,4 +300,22 @@
 />
 
 <style lang="postcss">
+	@keyframes ping-once {
+		0% {
+			transform: scale(1);
+			opacity: 1;
+		}
+		50% {
+			transform: scale(1.3);
+			opacity: 0.8;
+		}
+		100% {
+			transform: scale(1);
+			opacity: 1;
+		}
+	}
+
+	.animate-ping-once {
+		animation: ping-once 0.6s cubic-bezier(0.4, 0, 0.6, 1);
+	}
 </style>

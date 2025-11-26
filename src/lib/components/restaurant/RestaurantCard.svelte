@@ -73,7 +73,7 @@
 	duration-300 ease-out
 	hover:shadow-lg focus:ring-0 focus:ring-offset-0 focus:outline-none
 	{variant === 'carousel'
-		? 'mb-3 flex h-[248px] w-[300px] flex-col'
+		? 'mb-5 ml-1 flex h-[248px] w-[300px] flex-col'
 		: 'flex min-h-[280px] w-full flex-col sm:min-h-[300px]'} {className}"
 	role="button"
 	tabindex="0"

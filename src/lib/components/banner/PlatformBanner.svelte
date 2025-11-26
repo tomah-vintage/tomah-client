@@ -17,7 +17,7 @@
 
 	function handleScroll() {
 		if (!carouselContainer || !banners.length) return;
-		
+
 		if (isDesktop) {
 			const containerWidth = carouselContainer.offsetWidth;
 			const scrollLeft = carouselContainer.scrollLeft;
@@ -32,12 +32,15 @@
 
 	function goToSlide(index: number) {
 		if (!carouselContainer || !banners.length) return;
-		
+
 		if (isDesktop) {
 			const containerWidth = carouselContainer.offsetWidth;
 			const scrollPosition = index * containerWidth;
 			carouselContainer.scrollTo({
-				left: Math.min(scrollPosition, carouselContainer.scrollWidth - carouselContainer.offsetWidth),
+				left: Math.min(
+					scrollPosition,
+					carouselContainer.scrollWidth - carouselContainer.offsetWidth
+				),
 				behavior: 'smooth'
 			});
 		} else {
@@ -51,10 +54,10 @@
 
 	function nextSlide() {
 		if (!banners.length || !carouselContainer) return;
-		
+
 		if (isDesktop) {
 			const newScrollPosition = carouselContainer.scrollLeft - carouselContainer.offsetWidth;
-			
+
 			if (newScrollPosition <= 0) {
 				const maxScroll = carouselContainer.scrollWidth - carouselContainer.offsetWidth;
 				carouselContainer.scrollTo({ left: maxScroll, behavior: 'smooth' });
@@ -72,11 +75,11 @@
 
 	function prevSlide() {
 		if (!banners.length || !carouselContainer) return;
-		
+
 		if (isDesktop) {
 			const newScrollPosition = carouselContainer.scrollLeft + carouselContainer.offsetWidth;
 			const maxScroll = carouselContainer.scrollWidth - carouselContainer.offsetWidth;
-			
+
 			if (newScrollPosition >= maxScroll) {
 				carouselContainer.scrollTo({ left: 0, behavior: 'smooth' });
 				currentIndex = 0;
@@ -112,11 +115,7 @@
 {#if banners.length > 0}
 	<section class="platform-banners-wrapper">
 		<div class="carousel-container">
-			<div 
-				class="platform-banners-grid"
-				bind:this={carouselContainer}
-				on:scroll={handleScroll}
-			>
+			<div class="platform-banners-grid" bind:this={carouselContainer} on:scroll={handleScroll}>
 				{#each banners as banner (banner.id)}
 					<div
 						class="banner-item"
@@ -129,22 +128,30 @@
 					</div>
 				{/each}
 			</div>
-			
+
 			{#if banners.length > 3 && isDesktop}
-				<button class="carousel-btn carousel-btn-prev" on:click={prevSlide} aria-label="Previous banners">
+				<button
+					class="carousel-btn carousel-btn-prev"
+					on:click={prevSlide}
+					aria-label="Previous banners"
+				>
 					<ArrowLeft size={20} />
 				</button>
-				<button class="carousel-btn carousel-btn-next" on:click={nextSlide} aria-label="Next banners">
+				<button
+					class="carousel-btn carousel-btn-next"
+					on:click={nextSlide}
+					aria-label="Next banners"
+				>
 					<ArrowRight size={20} />
 				</button>
 			{/if}
 		</div>
-		
+
 		{#if banners.length > 1}
 			<div class="carousel-dots mobile-only">
 				{#each Array(maxSlides) as _, index}
-					<button 
-						class="carousel-dot" 
+					<button
+						class="carousel-dot"
 						class:active={index === currentIndex}
 						on:click={() => goToSlide(index)}
 						aria-label={`Go to slide ${index + 1}`}
@@ -162,6 +169,12 @@
 <style>
 	.platform-banners-wrapper {
 		margin: 1rem 0;
+		width: 100vw;
+		position: relative;
+		left: 50%;
+		right: 50%;
+		margin-left: -50vw;
+		margin-right: -50vw;
 	}
 
 	.carousel-container {
@@ -173,7 +186,8 @@
 		display: flex;
 		overflow-x: scroll;
 		scroll-snap-type: x mandatory;
-		gap: 1rem;
+		gap: 0.5rem;
+		padding: 0 1rem;
 		-webkit-overflow-scrolling: touch;
 		scrollbar-width: none;
 		-ms-overflow-style: none;
@@ -185,8 +199,8 @@
 
 	.banner-item {
 		position: relative;
-		flex: 0 0 calc(33.333% - 0.667rem);
-		height: 200px;
+		flex: 0 0 calc(33.333% - 0.334rem);
+		height: 360px;
 		border-radius: 8px;
 		overflow: hidden;
 		cursor: pointer;
@@ -307,26 +321,9 @@
 	}
 
 	@media (max-width: 768px) {
-		.platform-banners-wrapper {
-			width: 100vw;
-			margin: 1rem 0;
-			position: relative;
-			left: 50%;
-			right: 50%;
-			margin-left: -50vw;
-			margin-right: -50vw;
-		}
-
 		.platform-banners-grid {
-			display: flex;
-			overflow-x: scroll;
-			scroll-snap-type: x mandatory;
-			gap: 12px;
-			height: 250px;
-			padding: 0 1rem;
-			-webkit-overflow-scrolling: touch;
-			scrollbar-width: none;
-			-ms-overflow-style: none;
+			gap: 8px;
+			height: 400px;
 		}
 
 		.platform-banners-grid::-webkit-scrollbar {
@@ -335,7 +332,7 @@
 
 		.banner-item {
 			flex: 0 0 calc(100vw - 3rem);
-			height: 250px;
+			height: 400px;
 			border-radius: 12px;
 			scroll-snap-align: start;
 		}
@@ -356,7 +353,7 @@
 		}
 
 		.banner-item {
-			height: 220px;
+			height: 360px;
 		}
 	}
 

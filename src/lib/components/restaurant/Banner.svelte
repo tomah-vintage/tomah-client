@@ -1,6 +1,7 @@
 <script lang="ts">
 	import { createRestaurantBannersQuery } from '$lib/stores/bannerQuery';
 	import type { Banner } from '$lib/types/banner';
+	import type { Restaurant } from '$lib/types/restaurant';
 	import HeroBanner from './HeroBanner.svelte';
 	import CarouselBanner from './CarouselBanner.svelte';
 	import FeaturedBanner from './FeaturedBanner.svelte';
@@ -8,11 +9,12 @@
 	import MagazineBanner from './MagazineBanner.svelte';
 
 	export let restaurantId: number;
+	export let restaurant: Restaurant | null = null;
 
 	$: bannersQuery = createRestaurantBannersQuery(restaurantId);
 	$: ({ data, isLoading: loading, error } = $bannersQuery);
 	$: allBanners = (data as any)?.results || (data as Banner[]) || [];
-	
+
 	// Group banners by layout type and position
 	$: groupedBanners = allBanners.reduce((acc: Record<string, Banner[]>, banner: Banner) => {
 		const key = `${banner.layout_type}_${banner.position}`;
@@ -20,24 +22,25 @@
 		acc[key].push(banner);
 		return acc;
 	}, {});
-	
+
 	// Sort banners within each group by order_index
 	$: Object.values(groupedBanners).forEach((group) => {
 		(group as Banner[]).sort((a: Banner, b: Banner) => a.order_index - b.order_index);
 	});
-
 </script>
 
 {#if loading}
-	<div class="flex h-64 items-center justify-center bg-gray-200 rounded-lg">
+	<div class="flex h-64 items-center justify-center rounded-lg bg-gray-200">
 		<div class="text-gray-500">Loading restaurant banners...</div>
 	</div>
 {:else if error}
-	<div class="flex h-32 items-center justify-center bg-red-50 border border-red-200 rounded-lg">
+	<div class="flex h-32 items-center justify-center rounded-lg border border-red-200 bg-red-50">
 		<div class="text-red-600">Error loading banners: {error.message}</div>
 	</div>
 {:else if (allBanners as Banner[]).length === 0}
-	<div class="flex h-32 items-center justify-center bg-yellow-50 border border-yellow-200 rounded-lg">
+	<div
+		class="flex h-32 items-center justify-center rounded-lg border border-yellow-200 bg-yellow-50"
+	>
 		<div class="text-yellow-600">No banners found for restaurant {restaurantId}</div>
 	</div>
 {:else}
@@ -50,12 +53,12 @@
 				<div class="banner-section">
 					{#if layoutType === 'HERO'}
 						{#if typedBanners.length > 1}
-							<CarouselBanner banners={typedBanners} />
+							<CarouselBanner banners={typedBanners} {restaurant} {restaurantId} />
 						{:else}
-							<HeroBanner banner={typedBanners[0]} />
+							<HeroBanner banner={typedBanners[0]} {restaurant} {restaurantId} />
 						{/if}
 					{:else if layoutType === 'CAROUSEL'}
-						<CarouselBanner banners={typedBanners} />
+						<CarouselBanner banners={typedBanners} {restaurant} {restaurantId} />
 					{:else if layoutType === 'FEATURED'}
 						<FeaturedBanner banners={typedBanners} />
 					{:else if layoutType === 'PROMOTIONAL'}
@@ -66,7 +69,7 @@
 				</div>
 			{/if}
 		{/each}
-		
+
 		<!-- MIDDLE Position Banners -->
 		{#each Object.entries(groupedBanners) as [key, banners]}
 			{@const [layoutType, position] = key.split('_')}
@@ -75,12 +78,12 @@
 				<div class="banner-section">
 					{#if layoutType === 'HERO'}
 						{#if typedBanners.length > 1}
-							<CarouselBanner banners={typedBanners} />
+							<CarouselBanner banners={typedBanners} {restaurant} {restaurantId} />
 						{:else}
-							<HeroBanner banner={typedBanners[0]} />
+							<HeroBanner banner={typedBanners[0]} {restaurant} {restaurantId} />
 						{/if}
 					{:else if layoutType === 'CAROUSEL'}
-						<CarouselBanner banners={typedBanners} />
+						<CarouselBanner banners={typedBanners} {restaurant} {restaurantId} />
 					{:else if layoutType === 'FEATURED'}
 						<FeaturedBanner banners={typedBanners} />
 					{:else if layoutType === 'PROMOTIONAL'}
@@ -91,7 +94,7 @@
 				</div>
 			{/if}
 		{/each}
-		
+
 		<!-- BOTTOM Position Banners -->
 		{#each Object.entries(groupedBanners) as [key, banners]}
 			{@const [layoutType, position] = key.split('_')}
@@ -100,12 +103,12 @@
 				<div class="banner-section">
 					{#if layoutType === 'HERO'}
 						{#if typedBanners.length > 1}
-							<CarouselBanner banners={typedBanners} />
+							<CarouselBanner banners={typedBanners} {restaurant} {restaurantId} />
 						{:else}
-							<HeroBanner banner={typedBanners[0]} />
+							<HeroBanner banner={typedBanners[0]} {restaurant} {restaurantId} />
 						{/if}
 					{:else if layoutType === 'CAROUSEL'}
-						<CarouselBanner banners={typedBanners} />
+						<CarouselBanner banners={typedBanners} {restaurant} {restaurantId} />
 					{:else if layoutType === 'FEATURED'}
 						<FeaturedBanner banners={typedBanners} />
 					{:else if layoutType === 'PROMOTIONAL'}
@@ -116,7 +119,7 @@
 				</div>
 			{/if}
 		{/each}
-		
+
 		<!-- SIDEBAR Position Banners -->
 		{#each Object.entries(groupedBanners) as [key, banners]}
 			{@const [layoutType, position] = key.split('_')}
@@ -125,12 +128,12 @@
 				<div class="banner-section">
 					{#if layoutType === 'HERO'}
 						{#if typedBanners.length > 1}
-							<CarouselBanner banners={typedBanners} />
+							<CarouselBanner banners={typedBanners} {restaurant} {restaurantId} />
 						{:else}
-							<HeroBanner banner={typedBanners[0]} />
+							<HeroBanner banner={typedBanners[0]} {restaurant} {restaurantId} />
 						{/if}
 					{:else if layoutType === 'CAROUSEL'}
-						<CarouselBanner banners={typedBanners} />
+						<CarouselBanner banners={typedBanners} {restaurant} {restaurantId} />
 					{:else if layoutType === 'FEATURED'}
 						<FeaturedBanner banners={typedBanners} />
 					{:else if layoutType === 'PROMOTIONAL'}
@@ -143,4 +146,3 @@
 		{/each}
 	</div>
 {/if}
-

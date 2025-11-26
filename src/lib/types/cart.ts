@@ -4,5 +4,6 @@ export interface CartItem {
 	quantity: number;
 	price: number;
 	img_urls: string;
-	restaurant_id: number
+	restaurant_id: number;
+	order_type?: 'DINE_IN' | 'TAKE_OUT';
 }

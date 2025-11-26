@@ -52,13 +52,15 @@
 </script>
 
 <div
-	class="fixed inset-0 bg-black bg-opacity-50 z-40"
+	class="bg-opacity-50 fixed inset-0 z-40 bg-black"
 	aria-hidden="true"
 	on:click={() => dispatch('close')}
 ></div>
 
-<Card class="fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-full max-w-md z-50 shadow-2xl">
-	<div class="flex justify-between items-center border-b pb-4 mb-4">
+<Card
+	class="fixed top-1/2 left-1/2 z-50 w-full max-w-md -translate-x-1/2 -translate-y-1/2 shadow-2xl"
+>
+	<div class="mb-4 flex items-center justify-between border-b pb-4">
 		<h2 class="text-2xl font-bold">Your Cart</h2>
 		<button on:click={() => dispatch('close')} class="text-gray-500 hover:text-gray-800">
 			<X size={20} />
@@ -67,7 +69,7 @@
 
 	<div class="max-h-[60vh] overflow-y-auto">
 		{#if $cart.length === 0}
-			<p class="text-center text-gray-500 py-8">Your cart is empty.</p>
+			<p class="py-8 text-center text-gray-500">Your cart is empty.</p>
 		{:else}
 			<div class="space-y-4">
 				{#each $cart as item (item.id)}
@@ -75,19 +77,28 @@
 						<div>
 							<p class="font-semibold">{item.name}</p>
 							<p class="text-sm text-gray-500">${item.price.toFixed(2)}</p>
+							{#if item.order_type}
+								<span
+									class="rounded-full px-2 py-0.5 text-xs {item.order_type === 'DINE_IN'
+										? 'bg-blue-100 text-blue-700'
+										: 'bg-green-100 text-green-700'}"
+								>
+									{item.order_type === 'DINE_IN' ? 'Ширээний дээр' : 'Авч явах'}
+								</span>
+							{/if}
 						</div>
 						<div class="flex items-center gap-4">
-							<div class="flex items-center border rounded-md">
+							<div class="flex items-center rounded-md border">
 								<button
 									on:click={() => updateQuantity(item.id, item.quantity - 1)}
-									class="px-2 py-1 hover:bg-gray-100 rounded-l-md"
+									class="rounded-l-md px-2 py-1 hover:bg-gray-100"
 								>
 									-
 								</button>
 								<span class="px-3">{item.quantity}</span>
 								<button
 									on:click={() => updateQuantity(item.id, item.quantity + 1)}
-									class="px-2 py-1 hover:bg-gray-100 rounded-r-md"
+									class="rounded-r-md px-2 py-1 hover:bg-gray-100"
 								>
 									+
 								</button>
@@ -103,19 +114,19 @@
 	</div>
 
 	{#if $cart.length > 0}
-		<div class="border-t mt-4 pt-4 space-y-4">
-			<div class="flex justify-between font-bold text-lg">
+		<div class="mt-4 space-y-4 border-t pt-4">
+			<div class="flex justify-between text-lg font-bold">
 				<span>Total</span>
 				<span>${$cartTotal.toFixed(2)}</span>
 			</div>
 			{#if errorMessage}
-				<p class="text-red-500 text-sm text-center">{errorMessage}</p>
+				<p class="text-center text-sm text-red-500">{errorMessage}</p>
 			{/if}
-			<Button 
-				on:click={handlePlaceOrder} 
-				className="w-full" 
-				label={isLoading ? 'Placing Order...' : 'Place Order'} 
-				disabled={isLoading} 
+			<Button
+				on:click={handlePlaceOrder}
+				className="w-full"
+				label={isLoading ? 'Placing Order...' : 'Place Order'}
+				disabled={isLoading}
 			/>
 		</div>
 	{/if}
