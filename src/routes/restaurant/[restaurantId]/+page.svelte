@@ -66,6 +66,9 @@
 	let selectedCategoryId = '';
 	let searchTerm = '';
 
+	// Check if currently in table mode
+	$: isTableMode = $currentTable !== null;
+
 	$: filteredItems = Array.isArray(menuItems)
 		? menuItems.filter((menu) => {
 				const matchesCategory = !selectedCategoryId || menu.categories.includes(selectedCategoryId);
@@ -152,25 +155,31 @@
 {:else if restaurant}
 	<div class="container mx-auto mt-3 w-full max-w-[1200px]">
 		<TableInfo />
-		<Banner {restaurantId} {restaurant} />
+
+		{#if !isTableMode}
+			<Banner {restaurantId} {restaurant} />
+		{/if}
+
 		<FeaturedItems items={featureFoods} {restaurantId} {restaurant} />
 		<MenuTabs {restaurantId} bind:selectedCategoryId bind:searchTerm />
 		<MenuList items={filteredItems} {restaurantId} {restaurant} />
 
 		<!-- Left-aligned smaller sections -->
 		<div class="mt-8 space-y-6">
-			<div class="max-w-2xl">
-				<InfoPanel {restaurant} />
-			</div>
+			{#if !isTableMode}
+				<div class="max-w-2xl">
+					<InfoPanel {restaurant} />
+				</div>
 
-			<div class="max-w-2xl">
-				<OpeningHours {restaurant} />
-			</div>
+				<div class="max-w-2xl">
+					<OpeningHours {restaurant} />
+				</div>
 
-			<div class="max-w-2xl">
-				<h3 class="mb-4 text-xl font-bold text-gray-900">Байршил</h3>
-				<Map locations={getRestaurantLocation(restaurant)} />
-			</div>
+				<div class="max-w-2xl">
+					<h3 class="mb-4 text-xl font-bold text-gray-900">Байршил</h3>
+					<Map locations={getRestaurantLocation(restaurant)} />
+				</div>
+			{/if}
 
 			<div class="max-w-4xl">
 				<Reviews reviews={restaurant?.reviews || []} {restaurantId} />
