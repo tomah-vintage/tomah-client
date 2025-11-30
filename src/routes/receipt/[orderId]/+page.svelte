@@ -6,13 +6,40 @@
 	import type { Order } from '$lib/utils/order';
 	import { apiFetch } from '$lib/utils/api';
 	import { env } from '$env/dynamic/public';
+	import QRCode from 'qrcode';
 
 	let orderId = $page.params.orderId;
 	let order: Order | null = null;
 	let loading = true;
 	let error = '';
+	let qrCodeDataUrl = '';
+	let lotteryCode = '';
+	let qrData = '';
+	let paymentStatus = '';
 
 	onMount(async () => {
+		// Get URL parameters
+		paymentStatus = $page.url.searchParams.get('status') || '';
+		lotteryCode = $page.url.searchParams.get('lottery') || '';
+		qrData = $page.url.searchParams.get('qrData') || '';
+
+		// Generate QR code if qrData is available
+		if (qrData) {
+			try {
+				qrCodeDataUrl = await QRCode.toDataURL(qrData, {
+					width: 200,
+					margin: 2,
+					color: {
+						dark: '#000000',
+						light: '#FFFFFF'
+					}
+				});
+			} catch (err) {
+				console.error('Failed to generate QR code:', err);
+			}
+		}
+
+		// Try to fetch order data
 		try {
 			loading = true;
 			const response = await apiFetch(`${env.PUBLIC_BACKEND_URL}/api/order/${orderId}/`);
@@ -210,6 +237,29 @@
 								</span>
 							</div>
 						</div>
+					</div>
+				{/if}
+
+				<!-- Lottery and QR Code -->
+				{#if lotteryCode || qrCodeDataUrl}
+					<div class="mt-6 rounded-lg border-2 border-dashed border-gray-300 bg-gray-50 p-6">
+						<h4 class="mb-4 text-center font-semibold text-gray-900">НӨАТ-н баримт</h4>
+
+						{#if lotteryCode}
+							<div class="mb-4 text-center">
+								<p class="mb-1 text-sm text-gray-600">Сугалааны код</p>
+								<p class="text-xl font-bold text-gray-900">{lotteryCode}</p>
+							</div>
+						{/if}
+
+						{#if qrCodeDataUrl}
+							<div class="flex justify-center">
+								<img src={qrCodeDataUrl} alt="QR Code" class="rounded-lg" />
+							</div>
+							<p class="mt-2 text-center text-xs text-gray-500">
+								НӨАТ-н баримтыг шалгахын тулд QR кодыг уншуулна уу
+							</p>
+						{/if}
 					</div>
 				{/if}
 

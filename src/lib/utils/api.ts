@@ -1,5 +1,4 @@
 import { browser } from '$app/environment';
-import { goto } from '$app/navigation';
 
 let isRefreshing = false;
 let refreshPromise: Promise<void> | null = null;
@@ -33,10 +32,9 @@ async function refreshToken(): Promise<void> {
 
 	if (!refreshToken) {
 		if (browser) {
-			// Clear any remaining tokens and redirect to home
+			// Clear any remaining tokens
 			document.cookie = 'token=; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT;';
 			document.cookie = 'refresh_token=; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT;';
-			await goto(`/`);
 		}
 		throw new Error('No refresh token available');
 	}
@@ -49,11 +47,10 @@ async function refreshToken(): Promise<void> {
 	});
 
 	if (!response.ok) {
-		// If refresh fails, clear tokens and redirect
+		// If refresh fails, clear tokens
 		if (browser) {
 			document.cookie = 'token=; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT;';
 			document.cookie = 'refresh_token=; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT;';
-			await goto(`/`);
 		}
 
 		const errorData = await response.json().catch(() => ({}));
