@@ -179,17 +179,8 @@
 	<title>Миний захиалгууд - Tomah</title>
 </svelte:head>
 
-<div class="container mx-auto px-4 py-8">
-	<div class="mb-6">
-		<button
-			on:click={() => goto('/')}
-			class="mb-4 flex items-center text-gray-600 hover:text-gray-800"
-		>
-			<svg class="mr-2 h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-				<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" />
-			</svg>
-			Буцах
-		</button>
+<div class="container mx-auto px-2 py-4 sm:px-4 sm:py-8">
+	<div class="mb-4 sm:mb-6">
 		<h1 class="text-2xl font-bold">Миний захиалгууд</h1>
 	</div>
 
@@ -239,8 +230,8 @@
 	{:else}
 		<div class="space-y-6">
 			{#each groupedOrders as group (group.restaurant.id)}
-				<div class="rounded-lg bg-gray-50 p-4">
-					<div class="mb-4 flex items-center">
+				<div class="mb-4">
+					<div class="mb-3 flex items-center">
 						{#if group.restaurant.logo}
 							<img
 								src={group.restaurant.logo}
