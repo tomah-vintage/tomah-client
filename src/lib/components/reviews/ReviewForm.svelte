@@ -116,12 +116,12 @@
 		</div>
 
 		<!-- Submit Button -->
-		<div class="flex items-center justify-between pt-4">
+		<div class="flex flex-col gap-4 pt-4 sm:flex-row sm:items-center sm:justify-between">
 			<div class="text-sm text-gray-500">* Үнэлгээ болон сэтгэгдэл заавал бөглөнө үү</div>
 			<button
 				type="submit"
 				disabled={!isFormValid || isSubmitting}
-				class="inline-flex items-center rounded-lg px-6 py-3 text-sm font-semibold text-white transition-all duration-200 focus:ring-2 focus:ring-red-500 focus:ring-offset-2 focus:outline-none disabled:cursor-not-allowed disabled:opacity-50 {isFormValid &&
+				class="inline-flex items-center justify-center rounded-lg px-6 py-3 text-sm font-semibold text-white transition-all duration-200 focus:ring-2 focus:ring-red-500 focus:ring-offset-2 focus:outline-none disabled:cursor-not-allowed disabled:opacity-50 {isFormValid &&
 				!isSubmitting
 					? 'bg-red-500 hover:bg-red-600 hover:shadow-lg'
 					: 'bg-gray-400'}"

@@ -7,6 +7,7 @@
 	import { isRestaurantOpen, getNextOpeningTimeMongolian } from '$lib/utils/restaurant';
 	import { cart } from '$lib/stores/cart';
 	import { currentTable } from '$lib/stores/table';
+	import { showSuccess } from '$lib/stores/toast';
 
 	export let item: MenuItem;
 	export let restaurantId: number;
@@ -14,6 +15,26 @@
 
 	let showModal = false;
 	let showClosedWarning = false;
+
+	// Parse image URLs - can be JSON string, comma-separated string, or array
+	$: firstImage = (() => {
+		if (Array.isArray(item.img_urls)) {
+			return item.img_urls[0] || '';
+		}
+		if (typeof item.img_urls === 'string') {
+			// Try to parse as JSON array first
+			try {
+				const parsed = JSON.parse(item.img_urls);
+				if (Array.isArray(parsed)) {
+					return parsed[0] || '';
+				}
+			} catch {
+				// If JSON parse fails, return the string or first item if comma-separated
+				return item.img_urls.split(',')[0]?.trim() || item.img_urls;
+			}
+		}
+		return '';
+	})();
 
 	$: restaurantIsOpen = restaurant ? isRestaurantOpen(restaurant) : true;
 	$: nextOpeningTime = restaurant
@@ -43,6 +64,7 @@
 				...(isAtTable && { order_type: 'DINE_IN' as const })
 			};
 			cart.addItem(cartItem, 1);
+			showSuccess('Сагсанд нэмэгдлээ', undefined, 2000);
 		}
 	};
 
@@ -51,48 +73,51 @@
 </script>
 
 <div
-	class="relative flex w-full flex-col gap-1 rounded-2xl bg-white shadow-md transition-all
-	duration-300 ease-out md:w-[280px]
-	{!restaurantIsOpen || !item.is_available
-		? 'opacity-60'
-		: 'transform hover:-translate-y-1 hover:scale-[1.02] hover:shadow-lg'}"
+	class="group relative flex w-full flex-col overflow-hidden rounded-xl border border-gray-200 bg-white transition-all
+	duration-200 md:w-[280px]
+	{!restaurantIsOpen || !item.is_available ? 'opacity-60' : 'hover:border-gray-300 hover:shadow-sm'}"
 >
-	<button
-		on:click={handleAddToCart}
-		class="absolute top-1/2 right-6 z-20 -translate-y-1/2 rounded-full bg-white p-2.5 shadow-lg transition-all hover:scale-110 hover:bg-red-50"
-		aria-label="Add {item.name} to cart"
-		disabled={!restaurantIsOpen || !item.is_available}
-	>
-		{#if !item.is_available}
-			<X size={24} class="text-red-500" />
-		{:else if restaurantIsOpen}
-			<Plus size={24} class="text-red-500" />
-		{:else}
-			<Clock size={24} class="text-gray-500" />
-		{/if}
-	</button>
-
 	<button
 		on:click={handleCardClick}
 		class="text-left"
 		disabled={!restaurantIsOpen || !item.is_available}
 	>
-		<img
-			src={item.img_urls[0]}
-			alt={item.name}
-			class="h-[150px] w-full rounded-t-2xl object-cover md:h-[220px] md:w-[280px]"
-		/>
-		<div class="px-5 py-3.5">
-			<p class="text-left font-bold">{item.name}</p>
-			<p class="mb-4 text-left text-xs text-gray-500">{item.description}</p>
-			<div class="flex items-center justify-between">
-				<p class="text-left font-semibold text-red-500">{item.price}₮</p>
-				{#if !item.is_available}
-					<span class="rounded bg-red-50 px-2 py-1 text-xs font-medium text-red-500">Дууссан</span>
-				{/if}
-			</div>
+		<div class="relative aspect-[4/3] w-full overflow-hidden bg-gray-100">
+			<img
+				src={firstImage}
+				alt={item.name}
+				class="h-full w-full object-cover transition-transform duration-300 group-hover:scale-105"
+			/>
+		</div>
+		<div class="px-3 py-2.5">
+			<h3 class="mb-1 line-clamp-1 text-sm font-semibold text-gray-900">{item.name}</h3>
+			<p class="mb-2 line-clamp-2 text-xs text-gray-500">{item.description}</p>
 		</div>
 	</button>
+	<div class="flex items-center justify-between px-3 pb-2.5">
+		<div class="flex items-center gap-2">
+			<p class="text-base font-bold text-gray-900">{item.price}₮</p>
+			{#if !item.is_available}
+				<span class="rounded-md bg-red-50 px-2 py-0.5 text-xs font-medium text-red-600"
+					>Дууссан</span
+				>
+			{/if}
+		</div>
+		<button
+			on:click={handleAddToCart}
+			class="flex h-8 w-8 items-center justify-center rounded-lg bg-gray-100 transition-all hover:bg-red-500 hover:text-white"
+			aria-label="Add {item.name} to cart"
+			disabled={!restaurantIsOpen || !item.is_available}
+		>
+			{#if !item.is_available}
+				<X size={18} class="text-red-500" />
+			{:else if restaurantIsOpen}
+				<Plus size={18} class="text-gray-700 group-hover:text-white" />
+			{:else}
+				<Clock size={18} class="text-gray-500" />
+			{/if}
+		</button>
+	</div>
 </div>
 
 <Model open={showModal} onClose={closeModal} width="min(900px, 95vw)">

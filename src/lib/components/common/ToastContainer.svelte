@@ -4,7 +4,7 @@
 </script>
 
 {#if $toastStore.length > 0}
-	<div class="fixed top-4 right-4 z-50 space-y-2 max-w-sm w-full">
+	<div class="fixed right-4 bottom-4 z-50 w-full max-w-sm space-y-2">
 		{#each $toastStore as toast (toast.id)}
 			<Toast {toast} />
 		{/each}

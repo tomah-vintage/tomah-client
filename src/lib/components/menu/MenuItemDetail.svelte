@@ -3,6 +3,7 @@
 	import { cart } from '$lib/stores/cart';
 	import { Tag } from 'lucide-svelte';
 	import { currentTable } from '$lib/stores/table';
+	import { showSuccess } from '$lib/stores/toast';
 
 	export let item: MenuItem;
 	export let onClose = () => {};
@@ -10,21 +11,33 @@
 
 	let quantity = 1;
 	let currentImageIndex = 0;
-	let orderType: 'DINE_IN' | 'TAKE_OUT' = 'DINE_IN';
+	let isTakeOut = false;
 
 	// Check if user is at a table
 	$: isAtTable = $currentTable !== null;
 
-	// Parse image URLs - can be comma-separated string or array
-	$: imageUrls =
-		typeof item.img_urls === 'string'
-			? item.img_urls
+	// Parse image URLs - can be JSON string, comma-separated string, or array
+	$: imageUrls = (() => {
+		if (Array.isArray(item.img_urls)) {
+			return item.img_urls;
+		}
+		if (typeof item.img_urls === 'string') {
+			// Try to parse as JSON array first
+			try {
+				const parsed = JSON.parse(item.img_urls);
+				if (Array.isArray(parsed)) {
+					return parsed;
+				}
+			} catch {
+				// If JSON parse fails, try comma-separated
+				return item.img_urls
 					.split(',')
 					.map((url) => url.trim())
-					.filter(Boolean)
-			: Array.isArray(item.img_urls)
-				? item.img_urls
-				: [];
+					.filter(Boolean);
+			}
+		}
+		return [];
+	})();
 
 	// Parse meta_data if it's a string
 	$: metaData =
@@ -47,9 +60,10 @@
 		const cartItem = {
 			...item,
 			restaurant_id: restaurantId,
-			...(isAtTable && { order_type: orderType })
+			...(isAtTable && { order_type: isTakeOut ? 'TAKE_OUT' : 'DINE_IN' })
 		};
 		cart.addItem(cartItem, quantity);
+		showSuccess('Сагсанд нэмэгдлээ', undefined, 2000);
 		onClose();
 	}
 
@@ -67,9 +81,9 @@
 </script>
 
 <!-- Title -->
-<h2 class="mb-6 text-2xl font-bold text-gray-900">Дэлгэрэнгүй</h2>
+<h2 class="mb-4 text-2xl font-bold text-gray-900">Дэлгэрэнгүй</h2>
 
-<div class="flex flex-col gap-6 md:flex-row">
+<div class="flex flex-col gap-4 md:flex-row">
 	<!-- Product Image with Gallery -->
 	<div class="relative flex-shrink-0">
 		<div
@@ -136,11 +150,11 @@
 
 	<!-- Product Info -->
 	<div class="flex flex-1 flex-col">
-		<div class="flex-1 space-y-5">
+		<div class="flex-1 space-y-3">
 			<div class="flex items-start justify-between gap-3">
 				<div class="flex-1">
-					<h3 class="text-2xl font-bold text-gray-900">{item.name}</h3>
-					<p class="mt-3 text-base leading-relaxed text-gray-600">{item.description}</p>
+					<h3 class="text-xl font-bold text-gray-900">{item.name}</h3>
+					<p class="mt-1.5 text-sm leading-relaxed text-gray-600">{item.description}</p>
 				</div>
 				{#if !item.is_available}
 					<span
@@ -151,23 +165,23 @@
 			</div>
 
 			<!-- Price and Calories -->
-			<div class="flex items-center gap-4">
-				<div class="text-2xl font-bold text-red-600">
+			<div class="flex items-center gap-3">
+				<div class="text-xl font-bold text-red-600">
 					{item.price.toLocaleString()}₮
 				</div>
 				{#if metaData?.calories}
 					<div class="flex items-center gap-1 text-gray-600">
-						<span class="text-sm">{metaData.calories} kcal</span>
+						<span class="text-xs">{metaData.calories} kcal</span>
 					</div>
 				{/if}
 			</div>
 
 			<!-- Categories -->
 			{#if item.categories && item.categories.length > 0}
-				<div class="flex flex-wrap items-center gap-2">
-					<Tag class="h-4 w-4 text-gray-500" />
+				<div class="flex flex-wrap items-center gap-1.5">
+					<Tag class="h-3.5 w-3.5 text-gray-400" />
 					{#each item.categories as category}
-						<span class="rounded bg-gray-100 px-3 py-1 text-sm text-gray-700">
+						<span class="rounded bg-gray-100 px-2 py-0.5 text-xs text-gray-600">
 							{category}
 						</span>
 					{/each}
@@ -176,10 +190,10 @@
 
 			<!-- Ingredients -->
 			{#if metaData?.ingredients}
-				<div class="rounded-lg bg-gray-50 p-4">
-					<div class="flex flex-wrap gap-2">
+				<div class="rounded-lg bg-gray-50 p-2.5">
+					<div class="flex flex-wrap gap-1.5">
 						{#each typeof metaData.ingredients === 'string' ? metaData.ingredients.split(',') : metaData.ingredients as ingredient}
-							<span class="rounded-full bg-white px-3 py-1.5 text-sm text-gray-700 shadow-sm">
+							<span class="rounded-full bg-white px-2.5 py-1 text-xs text-gray-700 shadow-sm">
 								{typeof ingredient === 'string' ? ingredient.trim() : ingredient}
 							</span>
 						{/each}
@@ -189,12 +203,12 @@
 
 			<!-- Meta info badges -->
 			{#if metaData && (metaData.spicy_level || metaData.preparation_time)}
-				<div class="flex flex-wrap items-center gap-3">
+				<div class="flex flex-wrap items-center gap-2">
 					{#if metaData.spicy_level}
-						<span class="text-lg">{'🌶️'.repeat(metaData.spicy_level)}</span>
+						<span class="text-base">{'🌶️'.repeat(metaData.spicy_level)}</span>
 					{/if}
 					{#if metaData.preparation_time}
-						<span class="rounded-full bg-gray-100 px-3 py-1 text-sm text-gray-700">
+						<span class="rounded-full bg-gray-100 px-2.5 py-0.5 text-xs text-gray-700">
 							⏱️ {metaData.preparation_time} минут
 						</span>
 					{/if}
@@ -203,59 +217,41 @@
 
 			<!-- Allergens warning -->
 			{#if metaData?.allergens}
-				<div class="rounded-lg bg-amber-50 p-3">
-					<p class="text-sm text-amber-900">⚠️ {metaData.allergens}</p>
+				<div class="rounded-lg bg-amber-50 p-2.5">
+					<p class="text-xs text-amber-900">⚠️ {metaData.allergens}</p>
 				</div>
 			{/if}
 
 			<!-- Order Type Selector (only shown when at table) -->
 			{#if isAtTable}
-				<div class="space-y-2 rounded-lg border border-gray-200 bg-gray-50 p-4">
-					<label
-						class="flex cursor-pointer items-start gap-3 rounded-lg border-2 bg-white p-3 transition-colors {orderType ===
-						'DINE_IN'
-							? 'border-blue-500 bg-blue-50'
-							: 'border-gray-200 hover:border-gray-300'}"
+				<div
+					class="flex items-center justify-between rounded-lg border border-gray-200 bg-gray-50 p-2.5"
+				>
+					<div class="flex items-center gap-2 text-sm text-gray-700">
+						<span>🛍️</span>
+						<span class="font-medium">Авч явах</span>
+					</div>
+					<button
+						type="button"
+						on:click={() => (isTakeOut = !isTakeOut)}
+						class="relative inline-flex h-6 w-11 items-center rounded-full transition-colors {isTakeOut
+							? 'bg-green-500'
+							: 'bg-gray-300'}"
+						role="switch"
+						aria-checked={isTakeOut}
 					>
-						<input
-							type="radio"
-							bind:group={orderType}
-							value="DINE_IN"
-							class="mt-1 h-4 w-4 text-blue-600"
-						/>
-						<div class="flex-1">
-							<div class="font-medium text-gray-900">🍽️ Ширээний дээр идэх</div>
-							<div class="mt-1 text-xs text-gray-600">
-								Ширээ #{$currentTable?.id}-д захиалга хүлээн авна
-							</div>
-						</div>
-					</label>
-
-					<label
-						class="flex cursor-pointer items-start gap-3 rounded-lg border-2 bg-white p-3 transition-colors {orderType ===
-						'TAKE_OUT'
-							? 'border-green-500 bg-green-50'
-							: 'border-gray-200 hover:border-gray-300'}"
-					>
-						<input
-							type="radio"
-							bind:group={orderType}
-							value="TAKE_OUT"
-							class="mt-1 h-4 w-4 text-green-600"
-						/>
-						<div class="flex-1">
-							<div class="font-medium text-gray-900">🛍️ Авч явах</div>
-							<div class="mt-1 text-xs text-gray-600">
-								Сав баглаа болон хүргэлтийн төлбөр тусгагдана
-							</div>
-						</div>
-					</label>
+						<span
+							class="inline-block h-4 w-4 transform rounded-full bg-white transition-transform {isTakeOut
+								? 'translate-x-6'
+								: 'translate-x-1'}"
+						></span>
+					</button>
 				</div>
 			{/if}
 		</div>
 
 		<!-- Quantity + Price -->
-		<div class="mt-6 space-y-4 border-t border-gray-200 pt-6">
+		<div class="mt-4 space-y-3 border-t border-gray-200 pt-4">
 			<div class="flex items-center justify-between">
 				{#if item.is_available}
 					<div class="flex items-center gap-2 rounded-lg border border-gray-300 bg-white p-1">
@@ -291,7 +287,7 @@
 					</div>
 				{/if}
 
-				<div class="text-3xl font-bold text-red-600">
+				<div class="text-2xl font-bold text-red-600">
 					{(item.price * quantity).toLocaleString()}₮
 				</div>
 			</div>

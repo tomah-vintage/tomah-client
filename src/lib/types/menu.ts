@@ -9,7 +9,7 @@ export interface MenuItem {
 	name: string;
 	description: string;
 	price: number;
-	img_urls: string;
+	img_urls: string | string[];
 	meta_data: any;
 	categories: string[];
 	is_available: boolean;

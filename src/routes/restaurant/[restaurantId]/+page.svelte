@@ -161,7 +161,7 @@
 		{/if}
 
 		<FeaturedItems items={featureFoods} {restaurantId} {restaurant} />
-		<MenuTabs {restaurantId} bind:selectedCategoryId bind:searchTerm />
+		<MenuTabs {restaurantId} bind:selectedCategoryId bind:searchTerm {isTableMode} />
 		<MenuList items={filteredItems} {restaurantId} {restaurant} />
 
 		<!-- Left-aligned smaller sections -->
