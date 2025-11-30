@@ -102,13 +102,9 @@
 				(updatedOrder) => {
 					currentOrder = updatedOrder;
 
-					// Show status updates
-					if (updatedOrder.payment?.status === 'PAID') {
-						paymentSuccess = true;
-						paymentResultMessage = 'Таны захиалга амжилттай баталгаажлаа';
-					} else if (updatedOrder.order_status === 'PREPARING') {
-						paymentSuccess = true;
-						paymentResultMessage = 'Хоол бэлтгэж эхэллээ';
+					// Navigate directly to order detail page when PREPARING
+					if (updatedOrder.order_status === 'PREPARING') {
+						goto(`/order/${updatedOrder.id}`);
 					}
 				},
 				3000, // Poll every 3 seconds
@@ -116,6 +112,11 @@
 			);
 
 			if (finalOrder) {
+				// If order reached PREPARING status, navigation already happened
+				if (finalOrder.order_status === 'PREPARING') {
+					// Navigation already done in callback
+					return;
+				}
 				// Payment completed, show success modal
 				paymentSuccess = true;
 				paymentResultMessage = 'Таны захиалга амжилттай баталгаажлаа';
@@ -216,7 +217,7 @@
 
 <div class="min-h-screen bg-gray-50 lg:bg-white lg:py-8">
 	<div class="mx-auto max-w-2xl lg:px-4">
-		<div class="bg-white p-4 lg:m-5 lg:rounded-2xl lg:p-6 lg:shadow-lg">
+		<div class="bg-white pt-4 lg:m-5 lg:rounded-2xl lg:p-6 lg:shadow-lg">
 			<h2 class="mb-3 text-lg font-bold lg:mb-4">Төлбөрийн нөхцлүүд</h2>
 
 			<!-- Order Items Component -->
@@ -231,37 +232,39 @@
 				finalAmount={paymentCalculation.finalAmount}
 			/>
 
-			<!-- Order Type Selection Component (only show when table is available) -->
-			{#if hasTable}
+			<!-- Order Type Selection Component (only show when table is NOT available) -->
+			{#if !hasTable}
 				<OrderTypeSelector bind:orderType />
 			{/if}
 
-			<!-- Time Selection -->
-			<div class="mb-4 rounded-lg border border-gray-200 bg-white p-4">
-				<div class="mb-3 flex items-center justify-between">
-					<div class="flex items-center gap-2">
-						<Clock class="h-5 w-5 text-gray-600" />
-						<h3 class="font-semibold text-gray-900">Хүргэлтийн цаг</h3>
+			<!-- Time Selection (only show when table is NOT available) -->
+			{#if !hasTable}
+				<div class="mb-4 rounded-lg border border-gray-200 bg-white p-4">
+					<div class="mb-3 flex items-center justify-between">
+						<div class="flex items-center gap-2">
+							<Clock class="h-5 w-5 text-gray-600" />
+							<h3 class="font-semibold text-gray-900">Хүргэлтийн цаг</h3>
+						</div>
+						<button
+							on:click={() => (showTimeModal = true)}
+							class="text-sm font-medium text-red-600 hover:text-red-700"
+						>
+							Өөрчлөх
+						</button>
 					</div>
-					<button
-						on:click={() => (showTimeModal = true)}
-						class="text-sm font-medium text-red-600 hover:text-red-700"
-					>
-						Өөрчлөх
-					</button>
-				</div>
-				<div class="rounded-lg bg-gray-50 p-3">
-					<p class="text-sm font-medium text-gray-700">
-						{getTimeDisplayText()}
-					</p>
-					{#if scheduledTime && !scheduledTime.isAsap}
-						<p class="mt-1 text-xs text-gray-500">
-							Захиалга {scheduledTime.date}
-							{scheduledTime.time} цагт бэлэн болно
+					<div class="rounded-lg bg-gray-50 p-3">
+						<p class="text-sm font-medium text-gray-700">
+							{getTimeDisplayText()}
 						</p>
-					{/if}
+						{#if scheduledTime && !scheduledTime.isAsap}
+							<p class="mt-1 text-xs text-gray-500">
+								Захиалга {scheduledTime.date}
+								{scheduledTime.time} цагт бэлэн болно
+							</p>
+						{/if}
+					</div>
 				</div>
-			</div>
+			{/if}
 
 			<!-- Payer Type Component -->
 			<PayerTypeSelector
