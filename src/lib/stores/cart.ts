@@ -18,10 +18,12 @@ const createCart = () => {
 			let newItems;
 			const qty = Math.max(1, quantity);
 			if (existingItem) {
+				// Update existing item: preserve or update is_takeout, and increment quantity
 				newItems = items.map((i) =>
-					i.id === itemToAdd.id ? { ...i, quantity: i.quantity + qty } : i
+					i.id === itemToAdd.id ? { ...i, ...itemToAdd, quantity: i.quantity + qty } : i
 				);
 			} else {
+				// Add new item with all properties including is_takeout
 				newItems = [...items, { ...itemToAdd, quantity: qty }];
 			}
 			syncWithLocalStorage(newItems);
@@ -55,19 +57,28 @@ const createCart = () => {
 		syncWithLocalStorage([]);
 	};
 
+	const toggleItemTakeout = (itemId: string, isTakeout: boolean) => {
+		update((items) => {
+			const newItems = items.map((i) => (i.id === itemId ? { ...i, is_takeout: isTakeout } : i));
+			syncWithLocalStorage(newItems);
+			return newItems;
+		});
+	};
+
 	return {
 		subscribe,
 		addItem,
 		removeItem,
 		updateQuantity,
 		clearCart,
+		toggleItemTakeout,
 		initialValue
 	};
 };
 
 export const cart = createCart();
 
-export const { addItem, removeItem, updateQuantity, clearCart } = cart;
+export const { addItem, removeItem, updateQuantity, clearCart, toggleItemTakeout } = cart;
 
 export const cartTotal = writable(0);
 cart.subscribe((items) => {

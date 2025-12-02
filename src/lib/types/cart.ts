@@ -6,4 +6,5 @@ export interface CartItem {
 	img_urls: string;
 	restaurant_id: number;
 	order_type?: 'DINE_IN' | 'TAKE_OUT';
+	is_takeout?: boolean; // Per-item takeout flag for container fees
 }

@@ -10,6 +10,7 @@
 	} from '$lib/utils/order';
 	import { currentTable } from '$lib/stores/table';
 	import { calculatePaymentTotal, shouldShowPackagingFee } from '$lib/utils/payment';
+	import { createRestaurantQuery } from '$lib/stores/restaurantQuery';
 	import { goto } from '$app/navigation';
 	import { onMount } from 'svelte';
 	import { showSuccess, showError, showInfo } from '$lib/stores/toast';
@@ -30,7 +31,12 @@
 	let isProcessingOrder = false;
 	let orderError = '';
 	let discount = 0;
-	let packagingFee = 2000;
+
+	// Fetch restaurant data to get container price
+	$: restaurantId = $cart[0]?.restaurant_id;
+	$: restaurantQuery = restaurantId ? createRestaurantQuery(restaurantId) : null;
+	$: restaurant = $restaurantQuery?.data;
+	$: containerPrice = restaurant?.takeout_container_price || 2000;
 
 	// Payment polling state
 	let currentOrder: Order | null = null;
@@ -52,8 +58,7 @@
 	let restaurantHours = { open: '09:00', close: '22:00' }; // Default hours, should come from restaurant data
 
 	// Payment calculations
-	$: paymentCalculation = calculatePaymentTotal($cart, orderType, discount, packagingFee);
-	$: showPackagingFee = shouldShowPackagingFee(orderType);
+	$: paymentCalculation = calculatePaymentTotal($cart, orderType, discount, containerPrice);
 
 	onMount(() => {
 		// Redirect back if cart is empty
@@ -157,7 +162,8 @@
 			const items = $cart.map((item) => ({
 				menu_item: parseInt(item.id),
 				quantity: item.quantity,
-				unit_price: item.price.toString()
+				unit_price: item.price.toString(),
+				is_takeout: item.is_takeout || false
 			}));
 
 			const orderData: CreateOrderRequest = {
@@ -227,8 +233,7 @@
 			<PaymentSummary
 				cartTotal={paymentCalculation.cartTotal}
 				{discount}
-				{packagingFee}
-				{showPackagingFee}
+				packagingFee={paymentCalculation.appliedPackagingFee}
 				finalAmount={paymentCalculation.finalAmount}
 			/>
 

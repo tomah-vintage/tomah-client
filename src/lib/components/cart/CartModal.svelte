@@ -1,13 +1,40 @@
 <script lang="ts">
-	import { cart, cartTotal, clearCart, updateQuantity, removeItem } from '$lib/stores/cart';
+	import {
+		cart,
+		cartTotal,
+		clearCart,
+		updateQuantity,
+		removeItem,
+		toggleItemTakeout
+	} from '$lib/stores/cart';
 	import { authStore } from '$lib/stores/auth';
+	import { currentTable } from '$lib/stores/table';
 	import { goto } from '$app/navigation';
 	import { createEventDispatcher } from 'svelte';
+	import { createRestaurantQuery } from '$lib/stores/restaurantQuery';
 	import Button from '../common/Button.svelte';
 	import Card from '../common/Card.svelte';
-	import { X, Trash2 } from 'lucide-svelte';
+	import ItemTakeoutToggle from './ItemTakeoutToggle.svelte';
+	import { X, Trash2, Package } from 'lucide-svelte';
 
 	const dispatch = createEventDispatcher();
+
+	// Check if user is at a table
+	$: isAtTable = $currentTable !== null;
+
+	// Fetch restaurant data to get container price
+	$: restaurantId = $cart[0]?.restaurant_id;
+	$: restaurantQuery = restaurantId ? createRestaurantQuery(restaurantId) : null;
+	$: restaurant = $restaurantQuery?.data;
+	$: containerPrice = restaurant?.takeout_container_price || 2000;
+
+	// Calculate total container fees
+	$: containerFees = $cart.reduce((sum, item) => {
+		return sum + (item.is_takeout ? item.quantity * containerPrice : 0);
+	}, 0);
+
+	// Calculate total including container fees
+	$: totalWithFees = $cartTotal + containerFees;
 
 	let isLoading = false;
 	let errorMessage: string | null = null;
@@ -73,40 +100,92 @@
 		{:else}
 			<div class="space-y-4">
 				{#each $cart as item (item.id)}
-					<div class="flex items-center justify-between">
-						<div>
-							<p class="font-semibold">{item.name}</p>
-							<p class="text-sm text-gray-500">${item.price.toFixed(2)}</p>
-							{#if item.order_type}
-								<span
-									class="rounded-full px-2 py-0.5 text-xs {item.order_type === 'DINE_IN'
-										? 'bg-blue-100 text-blue-700'
-										: 'bg-green-100 text-green-700'}"
-								>
-									{item.order_type === 'DINE_IN' ? 'Ширээний дээр' : 'Авч явах'}
-								</span>
-							{/if}
-						</div>
-						<div class="flex items-center gap-4">
-							<div class="flex items-center rounded-md border">
+					<div class="space-y-2 rounded-lg border border-gray-200 p-3">
+						<div class="flex items-center justify-between">
+							<div class="flex-1">
+								<div class="flex items-center gap-2">
+									<p class="font-semibold">{item.name}</p>
+									{#if item.is_takeout}
+										<span
+											class="flex items-center gap-1 rounded-full bg-red-100 px-2 py-0.5 text-xs text-red-700"
+										>
+											<Package class="h-3 w-3" />
+											Савтай
+										</span>
+									{/if}
+								</div>
+								<div class="mt-1 flex items-center gap-2">
+									<p class="text-sm text-gray-500">{item.price.toLocaleString()}₮</p>
+									{#if item.is_takeout}
+										<span class="text-xs text-red-600"
+											>+ сав {(item.quantity * containerPrice).toLocaleString()}₮</span
+										>
+									{/if}
+								</div>
+								{#if item.order_type}
+									<span
+										class="mt-1 inline-block rounded-full px-2 py-0.5 text-xs {item.order_type ===
+										'DINE_IN'
+											? 'bg-blue-100 text-blue-700'
+											: 'bg-green-100 text-green-700'}"
+									>
+										{item.order_type === 'DINE_IN' ? 'Ширээний дээр' : 'Авч явах'}
+									</span>
+								{/if}
+							</div>
+							<div class="flex items-center gap-4">
+								<div class="flex items-center rounded-md border">
+									<button
+										on:click={() => updateQuantity(item.id, item.quantity - 1)}
+										class="rounded-l-md px-2 py-1 hover:bg-gray-100"
+									>
+										-
+									</button>
+									<span class="px-3">{item.quantity}</span>
+									<button
+										on:click={() => updateQuantity(item.id, item.quantity + 1)}
+										class="rounded-r-md px-2 py-1 hover:bg-gray-100"
+									>
+										+
+									</button>
+								</div>
 								<button
-									on:click={() => updateQuantity(item.id, item.quantity - 1)}
-									class="rounded-l-md px-2 py-1 hover:bg-gray-100"
+									on:click={() => removeItem(item.id)}
+									class="text-red-500 hover:text-red-700"
 								>
-									-
-								</button>
-								<span class="px-3">{item.quantity}</span>
-								<button
-									on:click={() => updateQuantity(item.id, item.quantity + 1)}
-									class="rounded-r-md px-2 py-1 hover:bg-gray-100"
-								>
-									+
+									<Trash2 size={16} />
 								</button>
 							</div>
-							<button on:click={() => removeItem(item.id)} class="text-red-500 hover:text-red-700">
-								<Trash2 size={16} />
-							</button>
 						</div>
+
+						<!-- Takeout toggle for each item (only show for table orders) -->
+						{#if isAtTable}
+							<ItemTakeoutToggle
+								isChecked={item.is_takeout || false}
+								{containerPrice}
+								quantity={item.quantity}
+								onToggle={(checked) => toggleItemTakeout(item.id, checked)}
+							/>
+						{:else}
+							<!-- For online orders, show takeout status (non-editable) -->
+							<div class="flex items-center justify-between rounded-lg bg-red-50 p-2">
+								<div class="flex items-center gap-2">
+									<input
+										type="checkbox"
+										checked={item.is_takeout || false}
+										disabled
+										class="h-4 w-4 rounded border-gray-300 text-red-500 opacity-50"
+									/>
+									<Package class="h-4 w-4 text-red-600" />
+									<span class="text-sm font-medium text-red-700">Авч явах (онлайн)</span>
+								</div>
+								{#if item.is_takeout}
+									<span class="text-sm font-medium text-red-600"
+										>+{(item.quantity * containerPrice).toLocaleString()}₮</span
+									>
+								{/if}
+							</div>
+						{/if}
 					</div>
 				{/each}
 			</div>
@@ -115,9 +194,21 @@
 
 	{#if $cart.length > 0}
 		<div class="mt-4 space-y-4 border-t pt-4">
-			<div class="flex justify-between text-lg font-bold">
-				<span>Total</span>
-				<span>${$cartTotal.toFixed(2)}</span>
+			<div class="space-y-2">
+				<div class="flex justify-between text-sm">
+					<span>Хоолны дүн:</span>
+					<span>{$cartTotal.toLocaleString()}₮</span>
+				</div>
+				{#if containerFees > 0}
+					<div class="flex justify-between text-sm text-red-600">
+						<span>Савны төлбөр:</span>
+						<span>+{containerFees.toLocaleString()}₮</span>
+					</div>
+				{/if}
+				<div class="flex justify-between text-lg font-bold">
+					<span>Төлөх дүн:</span>
+					<span>{totalWithFees.toLocaleString()}₮</span>
+				</div>
 			</div>
 			{#if errorMessage}
 				<p class="text-center text-sm text-red-500">{errorMessage}</p>

@@ -26,5 +26,6 @@ export interface Restaurant {
 	discount?: number;
 	rating?: number;
 	average_rating?: number;
-	is_liked : boolean
+	is_liked: boolean;
+	takeout_container_price?: number; // Container price for takeout items
 }

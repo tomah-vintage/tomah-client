@@ -5,6 +5,7 @@ export interface OrderItem {
 	menu_item: number;
 	quantity: number;
 	unit_price: string;
+	is_takeout?: boolean; // Per-item takeout flag for container fees
 }
 
 export interface CreateOrderRequest {

@@ -60,6 +60,7 @@
 		const cartItem = {
 			...item,
 			restaurant_id: restaurantId,
+			is_takeout: isAtTable ? isTakeOut : true, // Default: true for online, based on toggle for table
 			...(isAtTable && { order_type: isTakeOut ? 'TAKE_OUT' : 'DINE_IN' })
 		};
 		cart.addItem(cartItem, quantity);

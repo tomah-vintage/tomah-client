@@ -1,7 +1,7 @@
 <script lang="ts">
 	import type { MenuItem } from '$lib/types/menu';
 	import type { Restaurant, OpenHours } from '$lib/types/restaurant';
-	import { Plus, Clock, X } from 'lucide-svelte';
+	import { Plus, Minus, Clock, X } from 'lucide-svelte';
 	import Model from '../order/OrderModel.svelte';
 	import MenuItemDetail from './MenuItemDetail.svelte';
 	import { isRestaurantOpen, getNextOpeningTimeMongolian } from '$lib/utils/restaurant';
@@ -41,6 +41,8 @@
 		? getNextOpeningTimeMongolian(restaurant)
 		: 'Цагийн мэдээлэл байхгүй';
 	$: isAtTable = $currentTable !== null;
+	$: itemInCart = $cart.find((cartItem) => cartItem.id === item.id);
+	$: quantityInCart = itemInCart?.quantity || 0;
 
 	const handleCardClick = () => {
 		if (!restaurantIsOpen) {
@@ -61,10 +63,35 @@
 			const cartItem = {
 				...item,
 				restaurant_id: restaurantId,
+				is_takeout: !isAtTable, // Default: true for online orders, false for table orders
 				...(isAtTable && { order_type: 'DINE_IN' as const })
 			};
 			cart.addItem(cartItem, 1);
 			showSuccess('Сагсанд нэмэгдлээ', undefined, 2000);
+		}
+	};
+
+	const handleIncrement = (e: MouseEvent) => {
+		e.stopPropagation();
+		if (!restaurantIsOpen) {
+			showClosedWarning = true;
+		} else if (item.is_available) {
+			const cartItem = {
+				...item,
+				restaurant_id: restaurantId,
+				is_takeout: !isAtTable,
+				...(isAtTable && { order_type: 'DINE_IN' as const })
+			};
+			cart.addItem(cartItem, 1);
+		}
+	};
+
+	const handleDecrement = (e: MouseEvent) => {
+		e.stopPropagation();
+		if (quantityInCart > 1) {
+			cart.updateQuantity(item.id, quantityInCart - 1);
+		} else {
+			cart.removeItem(item.id);
 		}
 	};
 
@@ -103,20 +130,43 @@
 				>
 			{/if}
 		</div>
-		<button
-			on:click={handleAddToCart}
-			class="flex h-8 w-8 items-center justify-center rounded-lg bg-gray-100 transition-all hover:bg-red-500 hover:text-white"
-			aria-label="Add {item.name} to cart"
-			disabled={!restaurantIsOpen || !item.is_available}
-		>
-			{#if !item.is_available}
-				<X size={18} class="text-red-500" />
-			{:else if restaurantIsOpen}
-				<Plus size={18} class="text-gray-700 group-hover:text-white" />
-			{:else}
-				<Clock size={18} class="text-gray-500" />
-			{/if}
-		</button>
+		{#if quantityInCart > 0}
+			<div class="flex items-center gap-2">
+				<button
+					on:click={handleDecrement}
+					class="group/btn flex h-8 w-8 items-center justify-center rounded-lg bg-gray-100 transition-all hover:bg-red-500"
+					aria-label="Decrease quantity"
+				>
+					<Minus size={18} class="text-gray-700 group-hover/btn:text-white" />
+				</button>
+				<span class="min-w-[20px] text-center text-sm font-semibold text-gray-900"
+					>{quantityInCart}</span
+				>
+				<button
+					on:click={handleIncrement}
+					class="group/btn flex h-8 w-8 items-center justify-center rounded-lg bg-gray-100 transition-all hover:bg-red-500"
+					aria-label="Increase quantity"
+					disabled={!restaurantIsOpen || !item.is_available}
+				>
+					<Plus size={18} class="text-gray-700 group-hover/btn:text-white" />
+				</button>
+			</div>
+		{:else}
+			<button
+				on:click={handleAddToCart}
+				class="group/btn flex h-8 w-8 items-center justify-center rounded-lg bg-gray-100 transition-all hover:bg-red-500 hover:text-white"
+				aria-label="Add {item.name} to cart"
+				disabled={!restaurantIsOpen || !item.is_available}
+			>
+				{#if !item.is_available}
+					<X size={18} class="text-red-500" />
+				{:else if restaurantIsOpen}
+					<Plus size={18} class="text-gray-700 group-hover/btn:text-white" />
+				{:else}
+					<Clock size={18} class="text-gray-500" />
+				{/if}
+			</button>
+		{/if}
 	</div>
 </div>
 
