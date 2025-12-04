@@ -237,10 +237,8 @@
 				finalAmount={paymentCalculation.finalAmount}
 			/>
 
-			<!-- Order Type Selection Component (only show when table is NOT available) -->
-			{#if !hasTable}
-				<OrderTypeSelector bind:orderType />
-			{/if}
+			<!-- Order Type Selection Component -->
+			<OrderTypeSelector bind:orderType {hasTable} />
 
 			<!-- Time Selection (only show when table is NOT available) -->
 			{#if !hasTable}
