@@ -3,7 +3,13 @@ import type { CartItem } from '$lib/types/cart';
 import { browser } from '$app/environment';
 
 const createCart = () => {
-	const initialValue: CartItem[] = browser ? JSON.parse(localStorage.getItem('cart') || '[]') : [];
+	// Load cart from localStorage and ensure all items have container_price
+	const loadedCart: CartItem[] = browser ? JSON.parse(localStorage.getItem('cart') || '[]') : [];
+	const migratedCart = loadedCart.map((item) => ({
+		...item,
+		container_price: item.container_price ?? 0 // Ensure old items have container_price
+	}));
+	const initialValue: CartItem[] = migratedCart;
 	const { subscribe, set, update } = writable<CartItem[]>(initialValue);
 
 	const syncWithLocalStorage = (items: CartItem[]) => {
@@ -14,17 +20,27 @@ const createCart = () => {
 
 	const addItem = (itemToAdd: Omit<CartItem, 'quantity'>, quantity: number = 1) => {
 		update((items) => {
-			const existingItem = items.find((i) => i.id === itemToAdd.id);
+			// Ensure price and container_price are numbers (convert from string if needed)
+			const normalizedItem = {
+				...itemToAdd,
+				price: typeof itemToAdd.price === 'string' ? parseFloat(itemToAdd.price) : itemToAdd.price,
+				container_price:
+					typeof itemToAdd.container_price === 'string'
+						? parseFloat(itemToAdd.container_price)
+						: itemToAdd.container_price || 0
+			};
+
+			const existingItem = items.find((i) => i.id === normalizedItem.id);
 			let newItems;
 			const qty = Math.max(1, quantity);
 			if (existingItem) {
 				// Update existing item: preserve or update is_takeout, and increment quantity
 				newItems = items.map((i) =>
-					i.id === itemToAdd.id ? { ...i, ...itemToAdd, quantity: i.quantity + qty } : i
+					i.id === normalizedItem.id ? { ...i, ...normalizedItem, quantity: i.quantity + qty } : i
 				);
 			} else {
 				// Add new item with all properties including is_takeout
-				newItems = [...items, { ...itemToAdd, quantity: qty }];
+				newItems = [...items, { ...normalizedItem, quantity: qty }];
 			}
 			syncWithLocalStorage(newItems);
 			return newItems;

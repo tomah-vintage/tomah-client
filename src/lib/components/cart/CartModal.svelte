@@ -22,15 +22,9 @@
 	// Check if user is at a table
 	$: isAtTable = $currentTable !== null;
 
-	// Fetch restaurant data to get container price
-	$: restaurantId = $cart[0]?.restaurant_id;
-	$: restaurantQuery = restaurantId ? createRestaurantQuery(restaurantId) : null;
-	$: restaurant = $restaurantQuery?.data;
-	$: containerPrice = restaurant?.takeout_container_price || 2000;
-
-	// Calculate total container fees
+	// Calculate total container fees from individual items
 	$: containerFees = $cart.reduce((sum, item) => {
-		return sum + (item.is_takeout ? item.quantity * containerPrice : 0);
+		return sum + (item.is_takeout ? item.quantity * (item.container_price || 0) : 0);
 	}, 0);
 
 	// Calculate total including container fees
@@ -116,9 +110,9 @@
 								</div>
 								<div class="mt-1 flex items-center gap-2">
 									<p class="text-sm text-gray-500">{item.price.toLocaleString()}₮</p>
-									{#if item.is_takeout}
+									{#if item.is_takeout && item.container_price > 0}
 										<span class="text-xs text-red-600"
-											>+ сав {(item.quantity * containerPrice).toLocaleString()}₮</span
+											>+ сав {(item.quantity * item.container_price).toLocaleString()}₮</span
 										>
 									{/if}
 								</div>
@@ -162,7 +156,7 @@
 						{#if isAtTable}
 							<ItemTakeoutToggle
 								isChecked={item.is_takeout || false}
-								{containerPrice}
+								containerPrice={item.container_price || 0}
 								quantity={item.quantity}
 								onToggle={(checked) => toggleItemTakeout(item.id, checked)}
 							/>
@@ -181,7 +175,7 @@
 								</div>
 								{#if item.is_takeout}
 									<span class="text-sm font-medium text-red-600"
-										>+{(item.quantity * containerPrice).toLocaleString()}₮</span
+										>+{(item.quantity * item.container_price).toLocaleString()}₮</span
 									>
 								{/if}
 							</div>

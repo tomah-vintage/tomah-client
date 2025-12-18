@@ -58,7 +58,7 @@
 	let restaurantHours = { open: '09:00', close: '22:00' }; // Default hours, should come from restaurant data
 
 	// Payment calculations
-	$: paymentCalculation = calculatePaymentTotal($cart, orderType, discount, containerPrice);
+	$: paymentCalculation = calculatePaymentTotal($cart, orderType, discount);
 
 	onMount(() => {
 		// Redirect back if cart is empty

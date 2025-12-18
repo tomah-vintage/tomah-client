@@ -9,6 +9,7 @@ export interface MenuItem {
 	name: string;
 	description: string;
 	price: number;
+	container_price: number;
 	img_urls: string | string[];
 	meta_data: any;
 	categories: string[];

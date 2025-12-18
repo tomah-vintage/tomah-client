@@ -3,6 +3,7 @@ export interface CartItem {
 	name: string;
 	quantity: number;
 	price: number;
+	container_price: number;
 	img_urls: string;
 	restaurant_id: number;
 	order_type?: 'DINE_IN' | 'TAKE_OUT';

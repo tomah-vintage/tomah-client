@@ -1,0 +1,21 @@
+@@ -228,10 +228,17 @@
+ 			<div
+ 				class="flex items-center justify-between rounded-lg border border-gray-200 bg-gray-50 p-2.5"
+ 			>
+-				<div class="flex items-center gap-2 text-sm text-gray-700">
+-					<span>🛍️</span>
+-					<span class="font-medium">Авч явах</span>
++				<div class="flex flex-col gap-0.5">
++					<div class="flex items-center gap-2 text-sm text-gray-700">
++						<span>🛍️</span>
++						<span class="font-medium">Авч явах</span>
++					</div>
++					{#if isTakeOut && item.container_price > 0}
++						<span class="text-xs text-gray-500">
++							Савны төлбөр: {item.container_price.toLocaleString()}₮
++						</span>
++					{/if}
+ 				</div>
+ 				<button
+ 					type="button"
+ 					on:click={() => (isTakeOut = !isTakeOut)}
