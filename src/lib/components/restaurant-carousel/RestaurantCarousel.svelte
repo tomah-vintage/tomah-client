@@ -1,9 +1,8 @@
 <script lang="ts">
 	import type { Restaurant } from '$lib/types/restaurant';
 	import RestaurantCarouselCard from './RestaurantCarouselCard.svelte';
-	import { ArrowLeft, ArrowRight } from 'lucide-svelte';
 	import { createEventDispatcher } from 'svelte';
-	import Carousel from 'svelte-light-carousel';
+	import InfiniteCarousel from '$lib/components/common/InfiniteCarousel.svelte';
 
 	const dispatch = createEventDispatcher<{ viewRestaurant: string }>();
 
@@ -20,49 +19,28 @@
 		const numCards = (width + cardGap) / (cardWidth + cardGap);
 		return Math.max(1, Math.floor(numCards));
 	}
+
+	function handleRestaurantView(restaurant: Restaurant) {
+		dispatch('viewRestaurant', restaurant.id.toString());
+	}
 </script>
 
-<div class="relative w-full mb-8" bind:clientWidth={containerWidth}>
-	{#if restaurants.length > 0 && containerWidth}
-		<Carousel
-			class="relative"
-			slides={restaurants}
-			layout={{ default: cardsToShow }}
-			gaps={{ default: CARD_GAP }}
+<div class="relative mb-8 w-full" bind:clientWidth={containerWidth}>
+	{#if restaurants.length > 0 && containerWidth && cardsToShow}
+		<InfiniteCarousel
+			items={restaurants}
+			aspectRatio="386 / 249"
+			showArrows={true}
+			showDots={false}
+			gap={CARD_GAP}
+			itemsPerView={cardsToShow}
+			autoPlay={false}
+			let:item={restaurant}
 		>
-			<button
-				slot="prev"
-				let:prev
-				let:canScrollPrev
-				on:click={prev}
-				disabled={!canScrollPrev}
-				class="absolute top-[109px] left-[2px] w-fit rounded-full border border-[#494b5733] bg-white/60 p-1.5 text-[#222222] hover:bg-[#71717A] hover:text-white focus:ring-0 focus:outline-none disabled:cursor-not-allowed disabled:opacity-50"
-			>
-				<ArrowLeft size={24} />
-			</button>
-			<button
-				slot="next"
-				let:next
-				let:canScrollNext
-				on:click={next}
-				disabled={!canScrollNext}
-				class="absolute top-[109px] right-[2px] w-fit rounded-full border border-[#494b5733] bg-white/60 p-1.5 text-[#222222] hover:bg-[#71717A] hover:text-white focus:ring-0 focus:outline-none disabled:cursor-not-allowed disabled:opacity-50"
-			>
-				<ArrowRight size={24} />
-			</button>
-
-			<div slot="slide" let:slide>
-				<RestaurantCarouselCard
-					restaurant={slide}
-					on:view={(event) => dispatch('viewRestaurant', event.detail)}
-				/>
-			</div>
-		</Carousel>
+			<RestaurantCarouselCard
+				{restaurant}
+				on:view={(event) => dispatch('viewRestaurant', event.detail)}
+			/>
+		</InfiniteCarousel>
 	{/if}
 </div>
-
-<style lang="postcss">
-	:global(.carousel) {
-		overflow: visible !important;
-	}
-</style>
