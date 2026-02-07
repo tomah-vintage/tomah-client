@@ -11,14 +11,19 @@
 	}>();
 
 	let videoElement: HTMLVideoElement;
-	let canvasElement: HTMLCanvasElement;
 	let stream: MediaStream | null = null;
 	let scanning = false;
 	let error = '';
 	let manualInput = '';
 	let showManualInput = false;
+	let barcodeDetector: any = null;
 
 	onMount(() => {
+		// Initialize BarcodeDetector if available (supported on mobile Chrome/Safari)
+		if ('BarcodeDetector' in window) {
+			barcodeDetector = new (window as any).BarcodeDetector({ formats: ['qr_code'] });
+		}
+
 		if (showModal) {
 			startCamera();
 		}
@@ -31,6 +36,13 @@
 	async function startCamera() {
 		try {
 			error = '';
+
+			if (!barcodeDetector) {
+				error = 'QR код уншигч дэмжигдэхгүй байна. Гараар оруулна уу.';
+				showManualInput = true;
+				return;
+			}
+
 			stream = await navigator.mediaDevices.getUserMedia({
 				video: { facingMode: 'environment' }
 			});
@@ -56,26 +68,27 @@
 	}
 
 	async function scanQRCode() {
-		if (!scanning || !videoElement || !canvasElement) return;
+		if (!scanning || !videoElement || !barcodeDetector) return;
 
-		const canvas = canvasElement;
-		const video = videoElement;
-		const context = canvas.getContext('2d');
-
-		if (!context || video.readyState !== video.HAVE_ENOUGH_DATA) {
+		if (videoElement.readyState !== videoElement.HAVE_ENOUGH_DATA) {
 			requestAnimationFrame(scanQRCode);
 			return;
 		}
 
-		canvas.width = video.videoWidth;
-		canvas.height = video.videoHeight;
-		context.drawImage(video, 0, 0, canvas.width, canvas.height);
-
 		try {
-			// Use jsQR or similar library if needed
-			// For now, we'll rely on manual input
-			requestAnimationFrame(scanQRCode);
+			const barcodes = await barcodeDetector.detect(videoElement);
+			if (barcodes.length > 0) {
+				const rawValue = barcodes[0].rawValue;
+				if (rawValue) {
+					processQRData(rawValue);
+					return;
+				}
+			}
 		} catch (err) {
+			// Detection failed for this frame, continue scanning
+		}
+
+		if (scanning) {
 			requestAnimationFrame(scanQRCode);
 		}
 	}
@@ -91,8 +104,13 @@
 
 	function processQRData(data: string) {
 		try {
-			// Parse URL format: /restaurant/{id}?table={tableId}
-			const url = new URL(data, window.location.origin);
+			// Ensure the data has a protocol for URL parsing
+			let urlString = data;
+			if (!urlString.startsWith('http://') && !urlString.startsWith('https://')) {
+				urlString = 'https://' + urlString;
+			}
+
+			const url = new URL(urlString);
 			const pathParts = url.pathname.split('/');
 			const restaurantId = pathParts[pathParts.indexOf('restaurant') + 1];
 			const tableId = url.searchParams.get('table');
@@ -147,7 +165,6 @@
 			<div class="relative mb-4 w-full overflow-hidden rounded-lg bg-black">
 				<video bind:this={videoElement} class="h-64 w-full object-cover" playsinline autoplay muted
 				></video>
-				<canvas bind:this={canvasElement} class="hidden"></canvas>
 
 				<!-- Scanning overlay -->
 				<div class="absolute inset-0 flex items-center justify-center">

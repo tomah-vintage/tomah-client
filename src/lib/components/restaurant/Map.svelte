@@ -214,8 +214,8 @@
 
 			map = L.map(mapElement).setView(initialCenter, initialZoom);
 
-			// Use CartoDB Positron - clean, minimal but more lively than grayscale
-			L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png', {
+			// Use CartoDB Voyager - colorful and clean
+			L.tileLayer('https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png', {
 				attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors &copy; <a href="https://carto.com/attributions">CARTO</a>',
 				subdomains: 'abcd',
 				maxZoom: 19
@@ -233,7 +233,7 @@
 
 	/* Apply subtle filter to map tiles to make pins stand out */
 	:global(.map-container .leaflet-tile-pane) {
-		filter: contrast(0.9) brightness(1.02) saturate(0.85);
+		filter: contrast(0.95) brightness(1.02);
 	}
 
 	/* Ensure map controls remain unfiltered */

@@ -3,18 +3,19 @@
 	import { cart } from '$lib/stores/cart';
 	import { Tag } from 'lucide-svelte';
 	import { currentTable } from '$lib/stores/table';
-	import { showSuccess } from '$lib/stores/toast';
-
 	export let item: MenuItem;
 	export let onClose = () => {};
 	export let restaurantId: number;
 
-	let quantity = 1;
 	let currentImageIndex = 0;
 	let isTakeOut = false;
 
 	// Check if user is at a table
 	$: isAtTable = $currentTable !== null;
+
+	// Get quantity directly from cart
+	$: itemInCart = $cart.find((cartItem) => cartItem.id === item.id);
+	$: quantity = itemInCart?.quantity || 0;
 
 	// Parse image URLs - can be JSON string, comma-separated string, or array
 	$: imageUrls = (() => {
@@ -51,22 +52,26 @@
 				})()
 			: item.meta_data;
 
-	const increase = () => quantity++;
-	const decrease = () => {
-		if (quantity > 1) quantity--;
-	};
-
-	function addToCart() {
-		const cartItem = {
+	function buildCartItem() {
+		return {
 			...item,
 			restaurant_id: restaurantId,
-			is_takeout: isAtTable ? isTakeOut : true, // Default: true for online, based on toggle for table
+			is_takeout: isAtTable ? isTakeOut : true,
 			...(isAtTable && { order_type: isTakeOut ? 'TAKE_OUT' : 'DINE_IN' })
 		};
-		cart.addItem(cartItem, quantity);
-		showSuccess('Сагсанд нэмэгдлээ', undefined, 2000);
-		onClose();
 	}
+
+	const increase = () => {
+		cart.addItem(buildCartItem(), 1);
+	};
+
+	const decrease = () => {
+		if (quantity > 1) {
+			cart.updateQuantity(item.id, quantity - 1);
+		} else if (quantity === 1) {
+			cart.removeItem(item.id);
+		}
+	};
 
 	function nextImage() {
 		if (imageUrls.length > 1) {
@@ -259,83 +264,65 @@
 		</div>
 
 		<!-- Quantity + Price -->
-		<div class="mt-4 space-y-3 border-t border-gray-200 pt-4">
+		<div class="mt-4 border-t border-gray-200 pt-4">
 			<div class="flex items-center justify-between">
 				{#if item.is_available}
-					<div class="flex items-center gap-2 rounded-lg border border-gray-300 bg-white p-1">
+					{#if quantity > 0}
+						<div class="flex items-center gap-2 rounded-lg border border-gray-300 bg-white p-1">
+							<button
+								class="rounded bg-gray-100 px-4 py-2 font-bold text-gray-700 transition-colors hover:bg-red-500 hover:text-white"
+								on:click={decrease}
+							>
+								−
+							</button>
+							<span class="w-12 text-center text-xl font-bold text-gray-900">{quantity}</span>
+							<button
+								class="rounded bg-red-500 px-4 py-2 font-bold text-white transition-colors hover:bg-red-600"
+								on:click={increase}
+							>
+								+
+							</button>
+						</div>
+						<div class="text-2xl font-bold text-red-600">
+							{(item.price * quantity).toLocaleString()}₮
+						</div>
+					{:else}
 						<button
-							class="rounded bg-gray-100 px-4 py-2 font-bold text-gray-700 transition-colors hover:bg-gray-200"
-							on:click={decrease}
-						>
-							−
-						</button>
-						<span class="w-12 text-center text-xl font-bold text-gray-900">{quantity}</span>
-						<button
-							class="rounded bg-red-500 px-4 py-2 font-bold text-white transition-colors hover:bg-red-600"
 							on:click={increase}
+							class="w-full rounded-lg bg-red-500 py-4 font-bold text-white transition-colors hover:bg-red-600"
 						>
-							+
+							<span class="flex items-center justify-center gap-2">
+								<svg class="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+									<path
+										stroke-linecap="round"
+										stroke-linejoin="round"
+										stroke-width="2"
+										d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z"
+									/>
+								</svg>
+								Сагсанд хийх
+							</span>
 						</button>
-					</div>
+					{/if}
 				{:else}
-					<div
-						class="flex items-center gap-2 rounded-lg border border-gray-200 bg-gray-50 p-1 opacity-50"
+					<button
+						disabled
+						class="w-full cursor-not-allowed rounded-lg bg-gray-300 py-4 font-bold text-gray-500"
 					>
-						<button
-							disabled
-							class="cursor-not-allowed rounded bg-gray-100 px-4 py-2 font-bold text-gray-400"
-							>−</button
-						>
-						<span class="w-12 text-center text-xl font-bold text-gray-400">1</span>
-						<button
-							disabled
-							class="cursor-not-allowed rounded bg-gray-200 px-4 py-2 font-bold text-gray-400"
-							>+</button
-						>
-					</div>
+						<span class="flex items-center justify-center gap-2">
+							<svg class="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+								<path
+									stroke-linecap="round"
+									stroke-linejoin="round"
+									stroke-width="2"
+									d="M6 18L18 6M6 6l12 12"
+								/>
+							</svg>
+							Дууссан байна
+						</span>
+					</button>
 				{/if}
-
-				<div class="text-2xl font-bold text-red-600">
-					{(item.price * quantity).toLocaleString()}₮
-				</div>
 			</div>
-
-			<!-- Add to Cart Button -->
-			{#if item.is_available}
-				<button
-					on:click={addToCart}
-					class="w-full rounded-lg bg-red-500 py-4 font-bold text-white transition-colors hover:bg-red-600"
-				>
-					<span class="flex items-center justify-center gap-2">
-						<svg class="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-							<path
-								stroke-linecap="round"
-								stroke-linejoin="round"
-								stroke-width="2"
-								d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z"
-							/>
-						</svg>
-						Сагсанд хийх
-					</span>
-				</button>
-			{:else}
-				<button
-					disabled
-					class="w-full cursor-not-allowed rounded-lg bg-gray-300 py-4 font-bold text-gray-500"
-				>
-					<span class="flex items-center justify-center gap-2">
-						<svg class="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-							<path
-								stroke-linecap="round"
-								stroke-linejoin="round"
-								stroke-width="2"
-								d="M6 18L18 6M6 6l12 12"
-							/>
-						</svg>
-						Дууссан байна
-					</span>
-				</button>
-			{/if}
 		</div>
 	</div>
 </div>
