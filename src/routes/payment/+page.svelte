@@ -29,6 +29,7 @@
 	// State variables
 	let payerType: 'person' | 'company' = 'person';
 	let regNumber = '';
+	let companyTin = '';
 	let isProcessingOrder = false;
 	let orderError = '';
 	let discount = 0;
@@ -102,10 +103,15 @@
 	// Event handlers
 	function handlePayerTypeChange(event: CustomEvent<'person' | 'company'>) {
 		payerType = event.detail;
+		companyTin = '';
 	}
 
 	function handleRegNumberChange(event: CustomEvent<string>) {
 		regNumber = event.detail;
+	}
+
+	function handleCompanyValidated(event: CustomEvent<{ tin: string; name: string } | null>) {
+		companyTin = event.detail?.tin ?? '';
 	}
 
 	function handleTimeConfirm(event: CustomEvent<{ date: string; time: string; isAsap: boolean }>) {
@@ -205,6 +211,11 @@
 				order_type: orderType,
 				items
 			};
+
+			// Add company TIN for B2B receipt when payer is a company
+			if (payerType === 'company' && companyTin) {
+				orderData.customer_tin = companyTin;
+			}
 
 			// Add table number if dine-in order and table is available (as string)
 			if (orderType === 'DINE_IN' && $currentTable) {
@@ -308,6 +319,7 @@
 				bind:regNumber
 				on:payerTypeChange={handlePayerTypeChange}
 				on:regNumberChange={handleRegNumberChange}
+				on:companyValidated={handleCompanyValidated}
 			/>
 
 			<!-- Payment Methods Component -->

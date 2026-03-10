@@ -14,6 +14,7 @@ export interface CreateOrderRequest {
 	order_type: 'DINE_IN' | 'TAKE_OUT';
 	table?: string;
 	box?: number;
+	customer_tin?: string;
 	items: OrderItem[];
 }
 
