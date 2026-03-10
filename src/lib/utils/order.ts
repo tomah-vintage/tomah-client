@@ -43,6 +43,7 @@ export interface VATReceipt {
 	receipt_type: string;
 	status: string;
 	receipt_date: string | null;
+	lottery_number: string | null;
 	customer_tin: string | null;
 	consumer_no: string | null;
 	error_message: string | null;
@@ -110,6 +111,25 @@ export const getOrderStatus = async (orderId: number): Promise<OrderStatusRespon
 			success: false,
 			error: error.message || error.detail || 'Failed to get order status'
 		};
+	}
+};
+
+export interface VerifyPaymentResponse {
+	verified?: boolean;
+	pending?: boolean;
+	already_processed?: boolean;
+	order?: Order;
+	error?: string;
+}
+
+export const verifyPayment = async (orderId: number): Promise<VerifyPaymentResponse> => {
+	try {
+		const data = await apiFetch(`${env.PUBLIC_BACKEND_URL}/api/order/${orderId}/verify_payment/`, {
+			method: 'POST'
+		});
+		return data as VerifyPaymentResponse;
+	} catch (error: any) {
+		return { error: error.message || 'Payment verification failed' };
 	}
 };
 

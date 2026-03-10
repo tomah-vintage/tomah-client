@@ -5,6 +5,7 @@
 		createOrder,
 		redirectToPayment,
 		pollOrderPaymentStatus,
+		verifyPayment,
 		type CreateOrderRequest,
 		type Order
 	} from '$lib/utils/order';
@@ -42,6 +43,7 @@
 	let currentOrder: Order | null = null;
 	let isPollingPayment = false;
 	let paymentPollingError = '';
+	let isVerifyingPayment = false;
 
 	// Payment result modal state
 	let showPaymentResultModal = false;
@@ -71,7 +73,31 @@
 		if ($currentTable && orderType === 'TAKE_OUT') {
 			orderType = 'DINE_IN';
 		}
+
+		// Plan B: when user returns to this tab (e.g. after closing Bonum window),
+		// immediately verify payment directly with Bonum
+		function handleWindowFocus() {
+			if (currentOrder && isPollingPayment && !isVerifyingPayment) {
+				triggerPlanB(currentOrder.id);
+			}
+		}
+		window.addEventListener('focus', handleWindowFocus);
+		return () => window.removeEventListener('focus', handleWindowFocus);
 	});
+
+	async function triggerPlanB(orderId: number) {
+		isVerifyingPayment = true;
+		try {
+			const result = await verifyPayment(orderId);
+			if (result.order?.order_status === 'PREPARING' || result.verified || result.already_processed) {
+				goto(`/receipt/${orderId}?status=success`);
+			}
+		} catch {
+			// Silent — polling will continue as the primary mechanism
+		} finally {
+			isVerifyingPayment = false;
+		}
+	}
 
 	// Event handlers
 	function handlePayerTypeChange(event: CustomEvent<'person' | 'company'>) {
@@ -107,9 +133,9 @@
 				(updatedOrder) => {
 					currentOrder = updatedOrder;
 
-					// Navigate directly to order detail page when PREPARING
+					// Navigate to receipt page when PREPARING (payment confirmed)
 					if (updatedOrder.order_status === 'PREPARING') {
-						goto(`/order/${updatedOrder.id}`);
+						goto(`/receipt/${updatedOrder.id}?status=success`);
 					}
 				},
 				3000, // Poll every 3 seconds
@@ -127,9 +153,16 @@
 				paymentResultMessage = 'Таны захиалга амжилттай баталгаажлаа';
 				showPaymentResultModal = true;
 			} else {
-				// Polling timeout
+				// Plan B: polling timed out, verify directly with Bonum
+				if (currentOrder) {
+					const result = await verifyPayment(currentOrder.id);
+					if (result.order?.order_status === 'PREPARING' || result.verified || result.already_processed) {
+						goto(`/receipt/${currentOrder.id}?status=success`);
+						return;
+					}
+				}
 				paymentSuccess = false;
-				paymentResultMessage = 'Төлбөрийн статус шалгах хугацаа дууссан';
+				paymentResultMessage = 'Төлбөрийн статус шалгах хугацаа дууссан. Захиалгын хуудаснаас шалгана уу.';
 				showPaymentResultModal = true;
 			}
 		} catch (error) {
@@ -201,8 +234,8 @@
 					// Start polling for payment status
 					startPaymentPolling(result.order.id);
 				} else {
-					// Fallback: go to order success page
-					goto(`/payment/success?orderId=${result.order.id}`);
+					// Fallback: go to receipt page
+					goto(`/receipt/${result.order.id}?status=success`);
 				}
 			} else {
 				orderError = result.error || 'Захиалга үүсгэхэд алдаа гарлаа';
