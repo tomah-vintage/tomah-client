@@ -1,17 +1,15 @@
 <script lang="ts">
 	import { createEventDispatcher } from 'svelte';
-	import { PUBLIC_EBARIMT_SERVICE_URL } from '$env/static/public';
 
 	export let payerType: 'person' | 'company';
 	export let regNumber: string;
+	export let isCheckingCompany = false;
 
 	const dispatch = createEventDispatcher<{
 		payerTypeChange: 'person' | 'company';
 		regNumberChange: string;
 		companyValidated: { tin: string; name: string } | null;
 	}>();
-
-	let isCheckingCompany = false;
 	let companyName: string | null = null;
 	let companyError: string | null = null;
 	let checkTimeout: ReturnType<typeof setTimeout> | null = null;
@@ -50,16 +48,14 @@
 		companyError = null;
 
 		try {
-			const res = await fetch(
-				`${PUBLIC_EBARIMT_SERVICE_URL}/api/v1/company/check?regNo=${encodeURIComponent(regNo)}`
-			);
+			const res = await fetch(`/api/company/check?regNo=${encodeURIComponent(regNo)}`);
 			const json = await res.json();
 
-			if (json.success && json.data?.found) {
-				companyName = json.data.name ?? 'Байгууллага олдлоо';
-				dispatch('companyValidated', { tin: json.data.tin, name: companyName });
+			if (json.found && json.tin) {
+				companyName = json.name ?? 'Байгууллага олдлоо';
+				dispatch('companyValidated', { tin: json.tin, name: companyName });
 			} else {
-				companyError = json.data?.error ?? 'Байгууллага олдсонгүй';
+				companyError = json.error ?? 'Байгууллага олдсонгүй';
 				dispatch('companyValidated', null);
 			}
 		} catch {

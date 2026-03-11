@@ -30,6 +30,7 @@
 	let payerType: 'person' | 'company' = 'person';
 	let regNumber = '';
 	let companyTin = '';
+	let isCheckingCompany = false;
 	let isProcessingOrder = false;
 	let orderError = '';
 	let discount = 0;
@@ -193,6 +194,11 @@
 			return;
 		}
 
+		if (payerType === 'company' && !companyTin) {
+			orderError = 'Байгууллагын регистрийн дугаарыг оруулж баталгаажуулна уу.';
+			return;
+		}
+
 		isProcessingOrder = true;
 		orderError = '';
 
@@ -317,6 +323,7 @@
 			<PayerTypeSelector
 				bind:payerType
 				bind:regNumber
+				bind:isCheckingCompany
 				on:payerTypeChange={handlePayerTypeChange}
 				on:regNumberChange={handleRegNumberChange}
 				on:companyValidated={handleCompanyValidated}
@@ -359,7 +366,7 @@
 			<!-- Create Order and Payment Button -->
 			<button
 				on:click={handleCreateOrder}
-				disabled={isProcessingOrder || isPollingPayment || $cart.length === 0}
+				disabled={isProcessingOrder || isPollingPayment || $cart.length === 0 || isCheckingCompany || (payerType === 'company' && !companyTin)}
 				class="flex w-full items-center justify-center rounded-lg bg-red-500 py-3 text-sm font-medium text-white hover:bg-red-600 disabled:bg-red-400 lg:py-3 lg:text-base"
 			>
 				{#if isProcessingOrder}
