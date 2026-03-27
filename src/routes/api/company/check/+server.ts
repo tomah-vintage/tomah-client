@@ -1,7 +1,7 @@
 import { json } from '@sveltejs/kit';
 import type { RequestHandler } from './$types';
-
-const EBARIMT_BASE = 'https://st-api.ebarimt.mn';
+import { env } from '$env/dynamic/private';
+import { env as publicEnv } from '$env/dynamic/public';
 
 export const GET: RequestHandler = async ({ url }) => {
 	const regNo = url.searchParams.get('regNo');
@@ -10,38 +10,21 @@ export const GET: RequestHandler = async ({ url }) => {
 		return json({ found: false, error: 'regNo is required' }, { status: 400 });
 	}
 
+	const posServiceUrl = publicEnv.PUBLIC_EBARIMT_SERVICE_URL || 'http://localhost:3000';
+	const apiKey = env.EBARIMT_API_KEY || 'pos-service-api-key-2024';
+
 	try {
-		// Step 1: resolve regNo → TIN
-		const tinRes = await fetch(
-			`${EBARIMT_BASE}/api/info/check/getTinInfo?regNo=${encodeURIComponent(regNo)}`,
-			{ headers: { Accept: 'application/json' } }
+		const res = await fetch(
+			`${posServiceUrl}/api/v1/company/check?regNo=${encodeURIComponent(regNo)}`,
+			{ headers: { 'x-api-key': apiKey } }
 		);
-		const tinJson = await tinRes.json();
+		const body = await res.json();
 
-		if (!tinJson || tinJson.status !== 200 || !tinJson.data) {
-			return json({ found: false, error: 'Байгууллага олдсонгүй' });
+		if (!res.ok || !body.success) {
+			return json({ found: false, error: body.data?.error ?? 'Байгууллага олдсонгүй' });
 		}
 
-		const tin = tinJson.data as string;
-
-		// Step 2: fetch company info by TIN
-		const infoRes = await fetch(
-			`${EBARIMT_BASE}/api/info/check/getInfo?tin=${encodeURIComponent(tin)}`,
-			{ headers: { Accept: 'application/json' } }
-		);
-		const infoJson = await infoRes.json();
-
-		if (!infoJson || infoJson.status !== 200 || !infoJson.data?.found) {
-			return json({ found: false, tin, error: 'Байгууллагын мэдээлэл олдсонгүй' });
-		}
-
-		return json({
-			found: true,
-			tin,
-			name: infoJson.data.name ?? null,
-			vatPayer: infoJson.data.vatPayer ?? false,
-			cityPayer: infoJson.data.cityPayer ?? false
-		});
+		return json(body.data);
 	} catch (err) {
 		return json({ found: false, error: 'Байгууллага шалгахад алдаа гарлаа' }, { status: 500 });
 	}
