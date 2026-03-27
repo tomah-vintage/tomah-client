@@ -1,7 +1,8 @@
 import { json } from '@sveltejs/kit';
 import type { RequestHandler } from './$types';
+import { env } from '$env/dynamic/private';
 
-const EBARIMT_BASE = 'https://st-api.ebarimt.mn';
+const EBARIMT_BASE = env.EBARIMT_INFO_URL ?? 'https://api.ebarimt.mn';
 
 export const GET: RequestHandler = async ({ url }) => {
 	const regNo = url.searchParams.get('regNo');
