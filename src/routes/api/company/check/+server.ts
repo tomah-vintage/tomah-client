@@ -10,6 +10,18 @@ export const GET: RequestHandler = async ({ url }) => {
 		return json({ found: false, error: 'regNo is required' }, { status: 400 });
 	}
 
+	// Temporary hardcoded test data
+	if (regNo === '99119911') {
+		return json({
+			found: true,
+			tin: '37900846788',
+			name: 'ТЕСТИЙН ХЭРЭГЛЭГЧ 1',
+			vatPayer: true,
+			cityPayer: true,
+			vatpayerRegisteredDate: '2022-05-04'
+		});
+	}
+
 	const posServiceUrl = publicEnv.PUBLIC_EBARIMT_SERVICE_URL || 'http://localhost:3000';
 	const apiKey = env.EBARIMT_API_KEY || 'pos-service-api-key-2024';
 
