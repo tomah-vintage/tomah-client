@@ -24,13 +24,17 @@ export const load: PageLoad = async ({ params, fetch, url }) => {
 
 		const restaurant: Restaurant = await restaurantResponse.json();
 
-		// Fetch menu items as well for initial load
-		const menuResponse = await fetch(`${PUBLIC_BACKEND_URL}/api/restaurants/${restaurantId}/menu-items/`);
-		let menuItems = [];
-		
-		if (menuResponse.ok) {
+		// Fetch all menu items for initial load
+		let menuItems: unknown[] = [];
+		let menuUrl: string | null =
+			`${PUBLIC_BACKEND_URL}/api/restaurants/${restaurantId}/menu-items/?page_size=1000`;
+
+		while (menuUrl) {
+			const menuResponse = await fetch(menuUrl);
+			if (!menuResponse.ok) break;
 			const menuData = await menuResponse.json();
-			menuItems = menuData.results || [];
+			menuItems = menuItems.concat(menuData.results || []);
+			menuUrl = menuData.next ?? null;
 		}
 
 		return {

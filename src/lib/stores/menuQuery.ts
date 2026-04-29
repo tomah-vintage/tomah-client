@@ -23,25 +23,34 @@ interface CategoriesResponse {
 	previous?: string | null;
 }
 
+function convertPrices(item: RawMenuItem): RawMenuItem {
+	return {
+		...item,
+		price: typeof item.price === 'string' ? parseFloat(item.price) : item.price,
+		container_price:
+			typeof item.container_price === 'string'
+				? parseFloat(item.container_price)
+				: item.container_price
+	};
+}
+
 export function createMenuItemsQuery(restaurantId: number) {
 	return createQuery<MenuItemsResponse>({
 		queryKey: ['menuItems', restaurantId],
 		queryFn: async () => {
-			const response = await apiFetch<MenuItemsResponse>(
-				`${env.PUBLIC_BACKEND_URL}/api/menu-item/?restaurant=${restaurantId}`
-			);
-			// Convert string prices to numbers
-			if (response.results) {
-				response.results = response.results.map((item) => ({
-					...item,
-					price: typeof item.price === 'string' ? parseFloat(item.price) : item.price,
-					container_price:
-						typeof item.container_price === 'string'
-							? parseFloat(item.container_price)
-							: item.container_price
-				}));
+			let allItems: RawMenuItem[] = [];
+			let nextUrl: string | null =
+				`${env.PUBLIC_BACKEND_URL}/api/menu-item/?restaurant=${restaurantId}&page_size=1000`;
+
+			while (nextUrl) {
+				const response = await apiFetch<MenuItemsResponse>(nextUrl);
+				if (response.results) {
+					allItems = allItems.concat(response.results.map(convertPrices));
+				}
+				nextUrl = response.next ?? null;
 			}
-			return response;
+
+			return { results: allItems, count: allItems.length, next: null, previous: null };
 		}
 	});
 }
