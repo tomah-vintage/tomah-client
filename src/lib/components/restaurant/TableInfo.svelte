@@ -10,7 +10,7 @@
 		<div class="flex items-center gap-2 text-blue-700">
 			<Hash size={16} />
 			<span class="text-sm font-medium">
-				Ширээ #{table.id}
+				Ширээ #{table.number ?? table.id}
 			</span>
 		</div>
 		<p class="text-xs text-blue-600 mt-1">

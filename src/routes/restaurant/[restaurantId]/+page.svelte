@@ -29,6 +29,7 @@
 			// Set current table info
 			currentTable.set({
 				id: tableId,
+				number: data.tableNumber ?? undefined,
 				restaurantId: restaurantId
 			});
 
