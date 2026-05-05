@@ -60,6 +60,23 @@ async function refreshToken(): Promise<void> {
 	const data = await response.json();
 }
 
+function extractDRFError(error: Record<string, unknown>): string {
+	if (typeof error.detail === 'string') return error.detail;
+	if (typeof error.message === 'string') return error.message;
+	if (typeof error.error === 'string') return error.error;
+	// DRF non-field errors
+	if (error.non_field_errors) {
+		const v = error.non_field_errors;
+		return Array.isArray(v) ? (v as string[]).join(' ') : String(v);
+	}
+	// DRF field-level errors — return the first meaningful message
+	for (const val of Object.values(error)) {
+		if (typeof val === 'string') return val;
+		if (Array.isArray(val) && val.length > 0 && typeof val[0] === 'string') return val[0];
+	}
+	return 'An error occurred';
+}
+
 async function fetchWithRefresh<T>(
 	url: string,
 	options: RequestInit = {},
@@ -138,7 +155,7 @@ async function fetchWithRefresh<T>(
 		try {
 			const error = await response.json();
 			// Provide more detailed error information
-			const errorMessage = error.detail || error.message || error.error || 'An error occurred';
+			const errorMessage = extractDRFError(error);
 			const apiError = new Error(errorMessage);
 			// Attach additional error details if available
 			(apiError as any).status = response.status;
@@ -146,6 +163,7 @@ async function fetchWithRefresh<T>(
 			(apiError as any).messages = error.messages;
 			throw apiError;
 		} catch (parseError) {
+			if ((parseError as any).status !== undefined) throw parseError;
 			// If we can't parse the error response, create a generic error
 			const genericError = new Error(`HTTP ${response.status}: ${response.statusText}`);
 			(genericError as any).status = response.status;

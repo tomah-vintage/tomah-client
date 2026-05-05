@@ -40,7 +40,7 @@ export const load: PageLoad = async ({ params, fetch, url }) => {
 		let tableNumber: string | null = null;
 		if (tableId) {
 			try {
-				const tableResponse = await fetch(`${PUBLIC_BACKEND_URL}/api/table/${tableId}/`);
+				const tableResponse = await fetch(`${PUBLIC_BACKEND_URL}/api/public/table/${tableId}/`);
 				if (tableResponse.ok) {
 					const tableData = await tableResponse.json();
 					tableNumber = tableData.table_number ?? null;
