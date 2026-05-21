@@ -92,6 +92,8 @@
 				return 'text-yellow-600 bg-yellow-100';
 			case 'PREPARING':
 				return 'text-blue-600 bg-blue-100';
+			case 'READY':
+				return 'text-orange-600 bg-orange-100';
 			case 'IN_BOX':
 				return 'text-green-600 bg-green-100';
 			case 'DONE':

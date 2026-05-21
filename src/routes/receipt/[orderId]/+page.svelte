@@ -75,6 +75,7 @@
 		paymentStatus === 'success' ||
 		order?.payment?.status === 'PAID' ||
 		order?.order_status === 'PREPARING' ||
+		order?.order_status === 'READY' ||
 		order?.order_status === 'IN_BOX' ||
 		order?.order_status === 'DONE';
 
@@ -184,6 +185,7 @@
 							<p class="font-semibold text-gray-900">
 								{#if order.order_status === 'PENDING'}Хүлээгдэж байна
 								{:else if order.order_status === 'PREPARING'}Бэлтгэж байна
+								{:else if order.order_status === 'READY'}Хайрцагт хийгдэж байна
 								{:else if order.order_status === 'IN_BOX'}Савлагдсан
 								{:else if order.order_status === 'DONE'}Дууссан
 								{:else}{order.order_status}{/if}

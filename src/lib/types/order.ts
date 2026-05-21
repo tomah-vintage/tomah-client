@@ -50,7 +50,7 @@ export interface Order {
 	id: number;
 	user: number;
 	restaurant: number;
-	order_status: 'PENDING' | 'PREPARING' | 'CANCELLED' | 'IN_BOX' | 'DONE';
+	order_status: 'PENDING' | 'PREPARING' | 'READY' | 'CANCELLED' | 'IN_BOX' | 'DONE';
 	total_price: string;
 	table: Table | null;
 	box: Box | null;

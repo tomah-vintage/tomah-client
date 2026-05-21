@@ -194,6 +194,7 @@ export const pollOrderPaymentStatus = async (
 export const ORDER_STATUS_LABELS: Record<string, string> = {
 	PENDING: 'Төлбөр хүлээгдэж байна',
 	PREPARING: 'Хоол бэлтгэж байна',
+	READY: 'Хоол бэлэн, хайрцагт хийгдэж байна',
 	IN_BOX: 'Авахад бэлэн',
 	DONE: 'Дууссан',
 	CANCELLED: 'Цуцлагдсан'
